@@ -1,4 +1,4 @@
-package com.bitdubai.fermat_art_api.layer.sub_app_module.community;
+package com.bitdubai.fermat_art_api.layer.sub_app_module.community.fan.interfaces;
 
 import com.bitdubai.fermat_api.layer.actor_connection.common.exceptions.ActorConnectionNotFoundException;
 import com.bitdubai.fermat_api.layer.actor_connection.common.exceptions.CantAcceptActorConnectionRequestException;
@@ -20,7 +20,7 @@ import java.util.UUID;
 /**
  * Created by Alexander Jimenez (alex_jimenez76@hotmail.com) on 3/23/16.
  */
-public interface FanCommunityModuleManager extends ModuleManager {
+public interface ArtFanCommunityManager {
     /**
      * Through the method <code>getSearch</code> we can get a new instance of Actor Connection Search.
      * This Actor Connection search provides all the necessary functionality to make an Actor Connection Search.

@@ -10,24 +10,36 @@ import com.bitdubai.fermat_api.layer.all_definition.enums.Layers;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Platforms;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
 import com.bitdubai.fermat_api.layer.all_definition.enums.ServiceStatus;
+import com.bitdubai.fermat_api.layer.all_definition.settings.structure.SettingsManager;
 import com.bitdubai.fermat_api.layer.all_definition.util.Version;
+import com.bitdubai.fermat_api.layer.modules.common_classes.ActiveActorIdentityInformation;
+import com.bitdubai.fermat_api.layer.modules.exceptions.ActorIdentityNotSelectedException;
+import com.bitdubai.fermat_api.layer.modules.exceptions.CantGetSelectedActorIdentityException;
 import com.bitdubai.fermat_api.layer.modules.interfaces.ModuleManager;
+import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
 import com.bitdubai.fermat_art_api.layer.identity.fan.interfaces.FanIdentityManager;
+import com.bitdubai.fermat_art_api.layer.sub_app_module.identity.fan.FanIdentityPreferenceSettings;
+import com.bitdubai.fermat_art_api.layer.sub_app_module.identity.fan.interfaces.ArtFanIdentityManager;
+import com.bitdubai.fermat_art_api.layer.sub_app_module.identity.fan.interfaces.ArtFanIdentityManagerModule;
 import com.bitdubai.fermat_art_plugin.layer.sub_app_module.fan_identity.developer.bitdubai.version_1.structure.ModuleFanIdentityManager;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
 
-
 /**
  * Created by Manuel Perez (darkpriestrelative@gmail.com) on 08/03/16.
  */
-public class FanIdentityPluginRoot extends AbstractPlugin {
+public class FanIdentityPluginRoot extends AbstractPlugin implements ArtFanIdentityManagerModule{
     @NeededAddonReference(platform = Platforms.PLUG_INS_PLATFORM, layer = Layers.PLATFORM_SERVICE, addon = Addons.ERROR_MANAGER)
     private ErrorManager errorManager;
 
     @NeededPluginReference(platform = Platforms.ART_PLATFORM, layer = Layers.IDENTITY,plugin = Plugins.ARTIST_IDENTITY)
     private FanIdentityManager fanIdentityManager;
 
+    @NeededAddonReference(platform = Platforms.OPERATIVE_SYSTEM_API, layer = Layers.SYSTEM, addon = Addons.PLUGIN_FILE_SYSTEM)
+    PluginFileSystem pluginFileSystem;
+
+    private SettingsManager<FanIdentityPreferenceSettings> settingsManager;
+    private ArtFanIdentityManager artFanIdentityManager;
     private ModuleFanIdentityManager moduleFanIdentityManager;
     /**
      * Default constructor
@@ -40,14 +52,12 @@ public class FanIdentityPluginRoot extends AbstractPlugin {
                 errorManager,
                 fanIdentityManager);
     }
-    public ModuleManager getManager(){
-        return this.moduleFanIdentityManager;
-    }
 
     @Override
     public void start() throws CantStartPluginException {
         try{
             initPluginManager();
+            System.out.println("########### FanIdentityPluginRoot");
         } catch (Exception e) {
             this.errorManager.reportUnexpectedPluginException(
                     Plugins.ART_FAN_SUB_APP_MODULE,
@@ -67,5 +77,49 @@ public class FanIdentityPluginRoot extends AbstractPlugin {
         this.serviceStatus = ServiceStatus.STOPPED;
     }
 
+    /**
+     * This method is used by the fermat-core to get the plugin manager in execution time.
+     * @return
+     */
+    @Override
+    public ArtFanIdentityManager getFanIdentityManager() {
+        if(artFanIdentityManager==null){
+            artFanIdentityManager=new ModuleFanIdentityManager(
+                    errorManager,
+                    fanIdentityManager
+                    );
+        }
+        return artFanIdentityManager;    }
 
+    @Override
+    public SettingsManager<FanIdentityPreferenceSettings> getSettingsManager() {
+        if (this.settingsManager != null)
+            return this.settingsManager;
+
+        this.settingsManager = new SettingsManager<>(
+                pluginFileSystem,
+                pluginId
+        );
+
+        return this.settingsManager;    }
+
+    @Override
+    public ActiveActorIdentityInformation getSelectedActorIdentity() throws CantGetSelectedActorIdentityException, ActorIdentityNotSelectedException {
+        return null;
+    }
+
+    @Override
+    public void createIdentity(String name, String phrase, byte[] profile_img) throws Exception {
+
+    }
+
+    @Override
+    public void setAppPublicKey(String publicKey) {
+
+    }
+
+    @Override
+    public int[] getMenuNotifications() {
+        return new int[0];
+    }
 }

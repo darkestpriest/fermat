@@ -1,4 +1,4 @@
-package com.bitdubai.fermat_art_api.layer.sub_app_module.identity;
+package com.bitdubai.fermat_art_api.layer.sub_app_module.identity.fan.interfaces;
 
 import com.bitdubai.fermat_api.layer.modules.interfaces.ModuleManager;
 import com.bitdubai.fermat_art_api.all_definition.exceptions.CantPublishIdentityException;
@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by Alexander Jimenez (alex_jimenez76@hotmail.com) on 3/23/16.
  */
-public interface FanIdentityManagerModule extends ModuleManager {
+public interface ArtFanIdentityManager {
     /**
      * Through the method <code>listIdentitiesFromCurrentDeviceUser</code> we can get all the artist
      * identities linked to the current logged device user.

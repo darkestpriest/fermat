@@ -17,7 +17,7 @@ import com.bitdubai.fermat_api.layer.modules.exceptions.CantGetSelectedActorIden
 import com.bitdubai.fermat_art_api.layer.actor_connection.fan.interfaces.FanActorConnectionManager;
 import com.bitdubai.fermat_art_api.layer.actor_connection.fan.interfaces.FanActorConnectionSearch;
 import com.bitdubai.fermat_art_api.layer.actor_connection.fan.utils.FanLinkedActorIdentity;
-import com.bitdubai.fermat_art_api.layer.sub_app_module.community.FanCommunityModuleManager;
+import com.bitdubai.fermat_art_api.layer.sub_app_module.community.fan.interfaces.ArtFanCommunityManager;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
 
 import java.util.UUID;
@@ -25,7 +25,7 @@ import java.util.UUID;
 /**
  * Created by Alexander Jimenez (alex_jimenez76@hotmail.com) on 3/23/16.
  */
-public class FanCommunityManager implements FanCommunityModuleManager {
+public class FanCommunityManager implements ArtFanCommunityManager {
     private final ErrorManager errorManager;
     private final FanActorConnectionManager fanActorConnectionManager;
 
@@ -63,30 +63,5 @@ public class FanCommunityManager implements FanCommunityModuleManager {
     @Override
     public void acceptConnection(UUID connectionId) throws CantAcceptActorConnectionRequestException, ActorConnectionNotFoundException, UnexpectedConnectionStateException {
         fanActorConnectionManager.acceptConnection(connectionId);
-    }
-
-    @Override
-    public SettingsManager getSettingsManager() {
-        return null;
-    }
-
-    @Override
-    public ActiveActorIdentityInformation getSelectedActorIdentity() throws CantGetSelectedActorIdentityException, ActorIdentityNotSelectedException {
-        return null;
-    }
-
-    @Override
-    public void createIdentity(String name, String phrase, byte[] profile_img) throws Exception {
-
-    }
-
-    @Override
-    public void setAppPublicKey(String publicKey) {
-
-    }
-
-    @Override
-    public int[] getMenuNotifications() {
-        return new int[0];
     }
 }
