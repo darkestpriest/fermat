@@ -12,8 +12,7 @@ import com.bitdubai.fermat_art_api.layer.identity.fan.exceptions.CantListFanIden
 import com.bitdubai.fermat_art_api.layer.identity.fan.exceptions.CantUpdateFanIdentityException;
 import com.bitdubai.fermat_art_api.layer.identity.fan.exceptions.FanIdentityAlreadyExistsException;
 import com.bitdubai.fermat_art_api.layer.identity.fan.interfaces.Fan;
-import com.bitdubai.fermat_art_api.layer.identity.fan.interfaces.FanIdentityManager;
-import com.bitdubai.fermat_art_api.layer.sub_app_module.identity.FanIdentityManagerModule;
+import com.bitdubai.fermat_art_api.layer.sub_app_module.identity.fan.interfaces.ArtFanIdentityManager;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
 
 import java.util.List;
@@ -21,11 +20,11 @@ import java.util.List;
 /**
  * Created by alexander on 3/15/16.
  */
-public class ModuleFanIdentityManager implements FanIdentityManagerModule {
+public class ModuleFanIdentityManager implements ArtFanIdentityManager {
     private final ErrorManager errorManager;
-    private final FanIdentityManager fanIdentityManager;
+    private final com.bitdubai.fermat_art_api.layer.identity.fan.interfaces.FanIdentityManager fanIdentityManager;
 
-    public ModuleFanIdentityManager(ErrorManager errorManager, FanIdentityManager fanIdentityManager) {
+    public ModuleFanIdentityManager(ErrorManager errorManager, com.bitdubai.fermat_art_api.layer.identity.fan.interfaces.FanIdentityManager fanIdentityManager) {
         this.errorManager = errorManager;
         this.fanIdentityManager = fanIdentityManager;
     }
@@ -53,30 +52,5 @@ public class ModuleFanIdentityManager implements FanIdentityManagerModule {
     @Override
     public void publishIdentity(String publicKey) throws CantPublishIdentityException, IdentityNotFoundException {
         fanIdentityManager.publishIdentity(publicKey);
-    }
-
-    @Override
-    public SettingsManager getSettingsManager() {
-        return null;
-    }
-
-    @Override
-    public ActiveActorIdentityInformation getSelectedActorIdentity() throws CantGetSelectedActorIdentityException, ActorIdentityNotSelectedException {
-        return null;
-    }
-
-    @Override
-    public void createIdentity(String name, String phrase, byte[] profile_img) throws Exception {
-
-    }
-
-    @Override
-    public void setAppPublicKey(String publicKey) {
-
-    }
-
-    @Override
-    public int[] getMenuNotifications() {
-        return new int[0];
     }
 }
