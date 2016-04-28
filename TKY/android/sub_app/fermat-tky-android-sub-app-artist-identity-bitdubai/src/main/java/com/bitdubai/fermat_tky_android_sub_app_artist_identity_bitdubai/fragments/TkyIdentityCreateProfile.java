@@ -247,6 +247,7 @@ public class TkyIdentityCreateProfile extends AbstractFermatFragment {
                             case CREATE_IDENTITY_SUCCESS:
                                 if (!isUpdate) {
                                     Toast.makeText(getActivity(), "Identity created", Toast.LENGTH_SHORT).show();
+                                    getActivity().onBackPressed();
                                 } else {
                                     Toast.makeText(getActivity(), "Changes saved", Toast.LENGTH_SHORT).show();
                                 }
