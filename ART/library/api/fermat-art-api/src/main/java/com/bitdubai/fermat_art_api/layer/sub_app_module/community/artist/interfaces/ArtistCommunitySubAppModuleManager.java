@@ -2,6 +2,7 @@ package com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.interf
 
 import com.bitdubai.fermat_api.layer.actor_connection.common.enums.ConnectionState;
 import com.bitdubai.fermat_api.layer.modules.interfaces.ModuleManager;
+import com.bitdubai.fermat_art_api.all_definition.enums.ArtExternalPlatform;
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.exceptions.ActorConnectionAlreadyRequestedException;
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.exceptions.ActorTypeNotSupportedException;
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.exceptions.ArtistCancellingFailedException;
@@ -180,8 +181,6 @@ public interface ArtistCommunitySubAppModuleManager extends ModuleManager<Artist
      * @throws CantValidateConnectionStateException if something goes wrong.
      */
     ConnectionState getActorConnectionState(String publicKey) throws CantValidateConnectionStateException;
-
-    void createArtistIdentity(String name, String phrase, byte[] profile_img,UUID externalIdentityID) throws Exception;
 
 
 }

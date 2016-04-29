@@ -26,6 +26,7 @@ public class FanaticIdentityImp implements DealsWithPluginFileSystem, DealsWithP
     private byte[] imageProfile;
     private UUID externalIdentityID;
     private ArtExternalPlatform externalPlatform;
+    private String externalUsername;
     /**
      * DealsWithPluginFileSystem Interface member variables.
      */
@@ -44,12 +45,21 @@ public class FanaticIdentityImp implements DealsWithPluginFileSystem, DealsWithP
      * @param pluginFileSystem
      * @param pluginId
      */
-    public FanaticIdentityImp(String alias, String publicKey, UUID externalIdentityID, PluginFileSystem pluginFileSystem, UUID pluginId) {
+    public FanaticIdentityImp(
+            String alias,
+            String publicKey,
+            UUID externalIdentityID,
+            PluginFileSystem pluginFileSystem,
+            UUID pluginId,
+            ArtExternalPlatform artExternalPlatform,
+            String externalUsername) {
         this.alias = alias;
         this.publicKey = publicKey;
         this.externalIdentityID = externalIdentityID;
         this.pluginFileSystem = pluginFileSystem;
         this.pluginId = pluginId;
+        this.externalPlatform = artExternalPlatform;
+        this.externalUsername = externalUsername;
     }
 
     /**
@@ -59,11 +69,19 @@ public class FanaticIdentityImp implements DealsWithPluginFileSystem, DealsWithP
      * @param imageProfile
      * @param externalIdentityID
      */
-    public FanaticIdentityImp(String alias, String publicKey, byte[] imageProfile, UUID externalIdentityID) {
+    public FanaticIdentityImp(
+            String alias,
+            String publicKey,
+            byte[] imageProfile,
+            UUID externalIdentityID,
+            ArtExternalPlatform artExternalPlatform,
+            String externalUsername) {
         this.alias = alias;
         this.publicKey = publicKey;
         this.imageProfile = imageProfile;
         this.externalIdentityID = externalIdentityID;
+        this.externalPlatform = artExternalPlatform;
+        this.externalUsername = externalUsername;
     }
 
     /**
@@ -75,21 +93,46 @@ public class FanaticIdentityImp implements DealsWithPluginFileSystem, DealsWithP
      * @param pluginFileSystem
      * @param pluginId
      */
-    public FanaticIdentityImp(String alias, String publicKey, byte[] imageProfile, UUID externalIdentityID, PluginFileSystem pluginFileSystem, UUID pluginId) {
+    public FanaticIdentityImp(
+            String alias,
+            String publicKey,
+            byte[] imageProfile,
+            UUID externalIdentityID,
+            PluginFileSystem pluginFileSystem,
+            UUID pluginId,
+            ArtExternalPlatform artExternalPlatform,
+            String externalUsername) {
         this.alias = alias;
         this.publicKey = publicKey;
         this.imageProfile = imageProfile;
         this.externalIdentityID = externalIdentityID;
         this.pluginFileSystem = pluginFileSystem;
         this.pluginId = pluginId;
+        this.externalPlatform = artExternalPlatform;
+        this.externalUsername = externalUsername;
     }
 
-    public FanaticIdentityImp(String publicKey, byte[] imageProfile, String alias, UUID externalIdentityID, ArtExternalPlatform externalPlatform) {
+    /**
+     * Default constructor with parameters
+     * @param publicKey
+     * @param imageProfile
+     * @param alias
+     * @param externalIdentityID
+     * @param externalPlatform
+     */
+    public FanaticIdentityImp(
+            String publicKey,
+            byte[] imageProfile,
+            String alias,
+            UUID externalIdentityID,
+            ArtExternalPlatform externalPlatform,
+            String externalUsername) {
         this.publicKey = publicKey;
         this.imageProfile = imageProfile;
         this.alias = alias;
         this.externalIdentityID = externalIdentityID;
         this.externalPlatform = externalPlatform;
+        this.externalUsername = externalUsername;
     }
 
     /**
@@ -169,5 +212,13 @@ public class FanaticIdentityImp implements DealsWithPluginFileSystem, DealsWithP
     @Override
     public void setPluginId(UUID pluginId) {
         this.pluginId = pluginId;
+    }
+
+    /**
+     * This method returns external username.
+     * @return
+     */
+    public String getExternalUsername(){
+        return this.externalUsername;
     }
 }

@@ -82,8 +82,16 @@ public class ActorConnectionEventsActions {
      */
     public void handleNewsEvent() throws CantHandleNewsEventException {
         try {
-            final List<ArtistConnectionRequest> list = actorArtistNetworkServiceManager.
+            //Here we got all the Artist request
+            List<ArtistConnectionRequest> list = actorArtistNetworkServiceManager.
                     listPendingConnectionNews(PlatformComponentType.ART_ARTIST);
+
+            for (final ArtistConnectionRequest request : list)
+                this.handleRequestConnection(request);
+
+            //Now the fans request
+            list = actorArtistNetworkServiceManager.
+                    listPendingConnectionNews(PlatformComponentType.ART_FAN);
 
             for (final ArtistConnectionRequest request : list)
                 this.handleRequestConnection(request);
@@ -189,10 +197,9 @@ public class ActorConnectionEventsActions {
                     throw new UnsupportedActorTypeException(
                             "request: "+request, "Unsupported actor type exception.");
             }
-            //TODO: I'll use ART_ARTIST_IDENTITY until the Art community is ready
             broadcaster.publish(
                     BroadcasterType.NOTIFICATION_SERVICE,
-                    SubAppsPublicKeys.ART_ARTIST_IDENTITY.getCode(),
+                    SubAppsPublicKeys.ART_ARTIST_COMMUNITY.getCode(),
                     ArtistActorConnectionNotificationType.CONNECTION_REQUEST_RECEIVED.getCode());
 
 

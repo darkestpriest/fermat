@@ -52,13 +52,36 @@ public class ModuleFanIdentityManager implements FanIdentityManagerModule,Serial
     }
 
     @Override
-    public Fanatic createFanaticIdentity(String alias, byte[] imageBytes, UUID externalIdentityID) throws CantCreateFanIdentityException, FanIdentityAlreadyExistsException {
-        return fanaticIdentityManager.createFanaticIdentity(alias,imageBytes,externalIdentityID);
+    public Fanatic createFanaticIdentity(
+            String alias,
+            byte[] imageBytes,
+            UUID externalIdentityID,
+            ArtExternalPlatform artExternalPlatform,
+            String externalUsername) throws
+            CantCreateFanIdentityException, FanIdentityAlreadyExistsException {
+        return fanaticIdentityManager.createFanaticIdentity(
+                alias,
+                imageBytes,
+                externalIdentityID,
+                artExternalPlatform,
+                externalUsername);
     }
 
     @Override
-    public void updateFanIdentity(String alias, String publicKey, byte[] imageProfile, UUID externalIdentityID) throws CantUpdateFanIdentityException {
-        fanaticIdentityManager.updateFanIdentity(alias,publicKey,imageProfile,externalIdentityID);
+    public void updateFanIdentity(
+            String alias,
+            String publicKey,
+            byte[] imageProfile,
+            UUID externalIdentityID,
+            ArtExternalPlatform artExternalPlatform,
+            String externalUsername) throws CantUpdateFanIdentityException {
+        fanaticIdentityManager.updateFanIdentity(
+                alias,
+                publicKey,
+                imageProfile,
+                externalIdentityID,
+                artExternalPlatform,
+                externalUsername);
     }
 
     @Override

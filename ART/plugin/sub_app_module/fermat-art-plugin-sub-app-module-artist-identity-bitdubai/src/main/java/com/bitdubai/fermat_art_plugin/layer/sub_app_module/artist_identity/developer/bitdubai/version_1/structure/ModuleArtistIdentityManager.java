@@ -20,6 +20,8 @@ import com.bitdubai.fermat_art_api.layer.identity.artist.interfaces.ArtistIdenti
 import com.bitdubai.fermat_art_api.layer.sub_app_module.identity.Artist.ArtistIdentityManagerModule;
 import com.bitdubai.fermat_art_api.layer.sub_app_module.identity.Artist.ArtistIdentitySettings;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
+import com.bitdubai.fermat_tky_api.all_definitions.enums.ArtistAcceptConnectionsType;
+import com.bitdubai.fermat_tky_api.all_definitions.enums.ExposureLevel;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -64,13 +66,37 @@ public class ModuleArtistIdentityManager implements ArtistIdentityManagerModule,
     }
 
     @Override
-    public Artist createArtistIdentity(String alias, byte[] imageBytes, UUID externalIdentityID) throws CantCreateArtistIdentityException, ArtistIdentityAlreadyExistsException {
-        return artistIdentityManager.createArtistIdentity(alias,imageBytes,externalIdentityID);
+    public Artist createArtistIdentity(
+            final String alias,
+            final byte[] imageBytes,
+            final String externalUsername,
+            ExposureLevel exposureLevel, ArtistAcceptConnectionsType acceptConnectionsType, final UUID externalIdentityID,
+            final ArtExternalPlatform artExternalPlatform) throws CantCreateArtistIdentityException, ArtistIdentityAlreadyExistsException {
+        return artistIdentityManager.createArtistIdentity(
+                alias,
+                imageBytes,
+                externalUsername,
+                exposureLevel,
+                acceptConnectionsType,
+                externalIdentityID,
+                artExternalPlatform);
     }
 
     @Override
-    public void updateArtistIdentity(String alias, String publicKey, byte[] profileImage,UUID externalIdentityID) throws CantUpdateArtistIdentityException {
-        artistIdentityManager.updateArtistIdentity(alias, publicKey, profileImage,externalIdentityID);
+    public void updateArtistIdentity(
+            String alias, String publicKey, byte[] profileImage,
+            ExposureLevel exposureLevel, ArtistAcceptConnectionsType acceptConnectionsType, UUID externalIdentityID,
+            ArtExternalPlatform artExternalPlatform,String externalUserName) throws CantUpdateArtistIdentityException {
+        artistIdentityManager.updateArtistIdentity(
+                alias,
+                publicKey,
+                profileImage,
+                exposureLevel,
+                acceptConnectionsType,
+                externalIdentityID,
+                artExternalPlatform,
+                externalUserName);
+
     }
 
     @Override

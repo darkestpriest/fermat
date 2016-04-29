@@ -23,6 +23,7 @@ import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseS
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
 import com.bitdubai.fermat_art_api.all_definition.events.enums.EventType;
 import com.bitdubai.fermat_art_api.layer.actor_network_service.interfaces.artist.ArtistManager;
+import com.bitdubai.fermat_art_api.layer.actor_network_service.interfaces.fan.FanManager;
 import com.bitdubai.fermat_art_plugin.layer.actor_connection.fan.developer.bitdubai.version1.database.FanActorConnectionDao;
 import com.bitdubai.fermat_art_plugin.layer.actor_connection.fan.developer.bitdubai.version1.database.FanActorConnectionDeveloperDatabaseFactory;
 import com.bitdubai.fermat_art_plugin.layer.actor_connection.fan.developer.bitdubai.version1.event_handler.ArtistConnectionRequestNewsEventHandler;
@@ -59,6 +60,9 @@ public class FanActorConnectionPluginRoot extends AbstractPlugin implements Data
     @NeededPluginReference(platform = Platforms.PLATFORM_ART, layer = Layers.ACTOR_NETWORK_SERVICE, plugin =  Plugins.ARTIST)
     private ArtistManager artistActorNetworkServiceManager;
 
+    @NeededPluginReference(platform = Platforms.PLATFORM_ART, layer = Layers.ACTOR_NETWORK_SERVICE, plugin =  Plugins.FAN)
+    private FanManager fanActorNetworkServiceManager;
+
     /**
      * Represents the plugin manager.
      */
@@ -90,6 +94,7 @@ public class FanActorConnectionPluginRoot extends AbstractPlugin implements Data
             dao.initializeDatabase();
             final ActorConnectionEventActions eventActions = new ActorConnectionEventActions(
                     artistActorNetworkServiceManager,
+                    fanActorNetworkServiceManager,
                     dao,
                     errorManager,
                     broadcaster,
@@ -117,7 +122,8 @@ public class FanActorConnectionPluginRoot extends AbstractPlugin implements Data
                     artistActorNetworkServiceManager,
                     dao,
                     errorManager,
-                    this.getPluginVersionReference()
+                    this.getPluginVersionReference(),
+                    fanActorNetworkServiceManager
             );
             super.start();
         } catch (final CantInitializeActorConnectionDatabaseException

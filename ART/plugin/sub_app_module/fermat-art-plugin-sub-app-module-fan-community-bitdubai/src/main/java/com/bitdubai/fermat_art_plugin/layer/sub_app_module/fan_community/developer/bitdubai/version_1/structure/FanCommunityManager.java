@@ -18,6 +18,7 @@ import com.bitdubai.fermat_api.layer.all_definition.settings.structure.SettingsM
 import com.bitdubai.fermat_api.layer.modules.exceptions.ActorIdentityNotSelectedException;
 import com.bitdubai.fermat_api.layer.modules.exceptions.CantGetSelectedActorIdentityException;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
+import com.bitdubai.fermat_art_api.all_definition.enums.ArtExternalPlatform;
 import com.bitdubai.fermat_art_api.layer.actor_connection.fan.interfaces.FanActorConnectionManager;
 import com.bitdubai.fermat_art_api.layer.actor_connection.fan.interfaces.FanActorConnectionSearch;
 import com.bitdubai.fermat_art_api.layer.actor_connection.fan.utils.FanActorConnection;
@@ -310,8 +311,12 @@ public class FanCommunityManager implements FanCommunityModuleManager,Serializab
     }
 
     @Override
-    public void requestConnectionToFan(FanCommunitySelectableIdentity selectedIdentity,
-                                       FanCommunityInformation artistToContact) throws CantRequestConnectionException,ActorConnectionAlreadyRequestedException,ActorTypeNotSupportedException{
+    public void requestConnectionToFan(
+            FanCommunitySelectableIdentity selectedIdentity,
+            FanCommunityInformation artistToContact) throws
+            CantRequestConnectionException,
+            ActorConnectionAlreadyRequestedException,
+            ActorTypeNotSupportedException{
         try {
 
             final ActorIdentityInformation actorSending = new ActorIdentityInformation(
@@ -478,49 +483,6 @@ public class FanCommunityManager implements FanCommunityModuleManager,Serializab
 
     }
 
-    @Override
-    public void createFanaticIdentity(String name, String phrase, byte[] profile_img, UUID externalIdentityID) throws Exception {
-        String createdPublicKey = null;
-
-        try{
-            final Artist createdIdentity = artistIdentityManager.createArtistIdentity(name, profile_img, externalIdentityID);
-            createdPublicKey = createdIdentity.getPublicKey();
-
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        artistIdentityManager.publishIdentity(createdIdentity.getPublicKey());
-                    } catch(Exception e) {
-                        errorManager.reportUnexpectedPluginException(pluginVersionReference, UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN, e);
-                    }
-                }
-            }.start();
-        }catch(Exception e) {
-            this.errorManager.reportUnexpectedPluginException(pluginVersionReference, UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN, e);
-            return;
-        }
-
-
-        //Try to get appSettings
-        FanCommunitySettings appSettings = null;
-        try {
-            appSettings = this.settingsManager.loadAndGetSettings(this.subAppPublicKey);
-        }catch (Exception e){ appSettings = null; }
-
-
-        //If appSettings exist
-        if(appSettings != null){
-            appSettings.setLastSelectedIdentityPublicKey(createdPublicKey);
-            try {
-                this.settingsManager.persistSettings(this.subAppPublicKey, appSettings);
-            }catch (CantPersistSettingsException e){
-                this.errorManager.reportUnexpectedPluginException(pluginVersionReference, UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
-            }
-        }
-    }
-
-    @Override
     public void setAppPublicKey(String publicKey) {
         this.subAppPublicKey = publicKey;
     }

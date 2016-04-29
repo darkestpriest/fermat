@@ -46,7 +46,7 @@ public interface FanaticIdentityManager extends FermatManager {
     ArtIdentity getLinkedIdentity(String publicKey);
 
     /**
-     * Through the method <code>createFanaticIdentity</code> you can create a new artist identity.
+     * Through the method <code>createFanaticIdentity</code> you can create a new Fan identity.
      * @param alias
      * @param imageBytes
      * @param externalIdentityID
@@ -55,9 +55,13 @@ public interface FanaticIdentityManager extends FermatManager {
      */
     Fanatic createFanaticIdentity(
             final String alias,
-            final byte[] imageBytes, UUID externalIdentityID) throws
+            final byte[] imageBytes,
+            UUID externalIdentityID,
+            ArtExternalPlatform artExternalPlatform,
+            String externalUsername) throws
             CantCreateFanIdentityException,
             FanIdentityAlreadyExistsException;
+
     /**
      * This method updates the fan identity
      * @param alias
@@ -69,7 +73,9 @@ public interface FanaticIdentityManager extends FermatManager {
             String alias,
             String publicKey,
             byte[] imageProfile,
-            UUID externalIdentityID) throws
+            UUID externalIdentityID,
+            ArtExternalPlatform artExternalPlatform,
+            String externalUsername) throws
             CantUpdateFanIdentityException;
 
     /**
