@@ -34,7 +34,6 @@ import com.bitdubai.fermat_api.FermatException;
 import com.bitdubai.fermat_api.layer.all_definition.enums.UISource;
 import com.bitdubai.fermat_api.layer.all_definition.exceptions.InvalidParameterException;
 import com.bitdubai.fermat_api.layer.all_definition.settings.structure.SettingsManager;
-import com.bitdubai.fermat_api.layer.all_definition.util.Validate;
 import com.bitdubai.fermat_api.layer.dmp_engine.sub_app_runtime.enums.SubApps;
 
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedSubAppExceptionSeverity;
@@ -65,9 +64,9 @@ import static android.widget.Toast.LENGTH_LONG;
 import static android.widget.Toast.makeText;
 
 /**
- * Created by Gabriel Araujo.
+ * Created by Juan Sulbaran sulbaranja@gmail.com on 21/03/16.
  */
-public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
+public class TkyIdentityCreateProfile extends AbstractFermatFragment {
 
     private static final String TAG = "CreateTokenlyArtistIdentity";
     private static final int CREATE_IDENTITY_FAIL_MODULE_IS_NULL = 0;
@@ -106,8 +105,8 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
 
 
 
-    public static TokenlyArtistIdentityCreateProfile newInstance() {
-        return new TokenlyArtistIdentityCreateProfile();
+    public static TkyIdentityCreateProfile newInstance() {
+        return new TkyIdentityCreateProfile();
     }
 
 
@@ -246,6 +245,11 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
                         resultKey = createNewIdentity();
                         switch (resultKey) {
                             case CREATE_IDENTITY_SUCCESS:
+                                if (!isUpdate) {
+                                    Toast.makeText(getActivity(), "Identity created", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(getActivity(), "Changes saved", Toast.LENGTH_SHORT).show();
+                                }
                                 break;
                             case CREATE_IDENTITY_FAIL_MODULE_EXCEPTION:
                                 Toast.makeText(getActivity(), "Error al crear la identidad", Toast.LENGTH_LONG).show();
@@ -378,30 +382,6 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
                 break;
             }
         }
-
-        arraySpinner = ExposureLevel.getArrayItems();
-        adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, arraySpinner);
-        MexposureLevel.setAdapter(adapter);
-        ExposureLevel[] exposureLevels = ExposureLevel.values();
-        for (int i=0; i<exposureLevels.length; i++){
-            if(exposureLevels[i] == identitySelected.getExposureLevel()){
-                MexposureLevel.setSelection(i);
-                break;
-            }
-        }
-
-        arraySpinner = ArtistAcceptConnectionsType.getArrayItems();
-        adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, arraySpinner);
-        MartistAcceptConnectionsType.setAdapter(adapter);
-        ArtistAcceptConnectionsType[] artistAcceptConnectionsTypes = ArtistAcceptConnectionsType.values();
-        for (int i=0; i<artistAcceptConnectionsTypes.length; i++){
-            if(artistAcceptConnectionsTypes[i] == identitySelected.getArtistAcceptConnectionsType()){
-                MartistAcceptConnectionsType.setSelection(i);
-                break;
-            }
-        }
-
-
     }
 
     /**
@@ -425,11 +405,15 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
             externalPlatform = ExternalPlatform.getExternalPlatformByLabel(mArtistExternalPlatform.getSelectedItem().toString());
         }
 
-        ExposureLevel  exposureLevel;
-        exposureLevel = ExposureLevel.getExposureLevelByLabel(MexposureLevel.getSelectedItem().toString());
+        ExposureLevel  exposureLevel = ExposureLevel.DEFAULT_EXPOSURE_LEVEL;
+        if(MexposureLevel.isSelected()){
+            exposureLevel = ExposureLevel.getByCode(MexposureLevel.getSelectedItem().toString());
+        }
 
-        ArtistAcceptConnectionsType artistAcceptConnectionsType;
-        artistAcceptConnectionsType = ArtistAcceptConnectionsType.getArtistAcceptConnectionsTypeByLabel(MartistAcceptConnectionsType.getSelectedItem().toString());
+        ArtistAcceptConnectionsType artistAcceptConnectionsType = ArtistAcceptConnectionsType.AUTOMATIC;
+        if(MartistAcceptConnectionsType.isSelected()){
+            artistAcceptConnectionsType = ArtistAcceptConnectionsType.getByCode(MartistAcceptConnectionsType.getSelectedItem().toString());
+        }
 
         boolean dataIsValid = validateIdentityData(ArtistExternalName, ArtistPassword, ArtistImageByteArray, externalPlatform);
 
@@ -486,7 +470,6 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
         ExposureLevel exposureLevel;
         ArtistAcceptConnectionsType artistAcceptConnectionsType;
 
-        private Artist artist;
         int identityAction;
         public static final int CREATE_IDENTITY = 0;
         public static final int UPDATE_IDENTITY = 1;
@@ -521,16 +504,12 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
                         "Authentication credentials are invalid.",
                         Toast.LENGTH_SHORT).show();
             }
-            if(Validate.isObjectNull(artist)){
-                Toast.makeText(getActivity(), "The tokenly authentication failed.", Toast.LENGTH_SHORT).show();
+            if(isUpdate){
+                Toast.makeText(getActivity(), "Identity updated", Toast.LENGTH_SHORT).show();
+                getActivity().onBackPressed();
             }else{
-                if(isUpdate){
-                    Toast.makeText(getActivity(), "Identity updated", Toast.LENGTH_SHORT).show();
-                    getActivity().onBackPressed();
-                }else{
-                    Toast.makeText(getActivity(), "Identity created", Toast.LENGTH_SHORT).show();
-                    getActivity().onBackPressed();
-                }
+                Toast.makeText(getActivity(), "Identity created", Toast.LENGTH_SHORT).show();
+                getActivity().onBackPressed();
             }
 
         }
@@ -540,7 +519,7 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
             try{
                 switch (identityAction){
                     case CREATE_IDENTITY:
-                       artist = createIdentity(
+                       createIdentity(
                                fanExternalName,
                                fanPassword,
                                externalPlatform,
@@ -548,7 +527,7 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
                                artistAcceptConnectionsType);
                         break;
                     case UPDATE_IDENTITY:
-                        artist = updateIdentity(
+                        updateIdentity(
                                 fanExternalName,
                                 fanPassword,
                                 externalPlatform,
@@ -556,7 +535,7 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
                                 artistAcceptConnectionsType);
                         break;
                     case UPDATE_IMAGE_IDENTITY:
-                        artist = updateIdentityImage(
+                        updateIdentityImage(
                                 fanExternalName,
                                 fanPassword,
                                 externalPlatform,
@@ -590,7 +569,7 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
         }
     }
 
-    private Artist createIdentity(
+    private void createIdentity(
             String fanExternalName,
             String fanPassword,
             ExternalPlatform externalPlatform,
@@ -599,7 +578,7 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
             CantCreateArtistIdentityException,
             ArtistIdentityAlreadyExistsException,
             WrongTokenlyUserCredentialsException {
-       return moduleManager.createArtistIdentity(
+        moduleManager.createArtistIdentity(
                 fanExternalName,
                 (ArtistImageByteArray == null) ? convertImage(R.drawable.ic_profile_male) : ArtistImageByteArray,
                 fanPassword,
@@ -608,7 +587,7 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
                 artistAcceptConnectionsType) ;
     }
 
-    private Artist updateIdentity(
+    private void updateIdentity(
             String fanExternalName,
             String fanPassword,
             ExternalPlatform externalPlatform,
@@ -616,7 +595,7 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
             ArtistAcceptConnectionsType artistAcceptConnectionsType) throws
             CantUpdateArtistIdentityException,
             WrongTokenlyUserCredentialsException {
-       return moduleManager.updateArtistIdentity(
+        moduleManager.updateArtistIdentity(
                 fanExternalName,
                 fanPassword, identitySelected.getId(),
                 identitySelected.getPublicKey(),
@@ -626,7 +605,7 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
                 artistAcceptConnectionsType);
     }
 
-    private Artist updateIdentityImage(
+    private void updateIdentityImage(
             String fanExternalName,
             String fanPassword,
             ExternalPlatform externalPlatform,
@@ -634,7 +613,7 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment {
             ArtistAcceptConnectionsType artistAcceptConnectionsType) throws
             CantUpdateArtistIdentityException,
             WrongTokenlyUserCredentialsException {
-       return  moduleManager.updateArtistIdentity(
+        moduleManager.updateArtistIdentity(
                 fanExternalName,
                 fanPassword,
                 identitySelected.getId(),
