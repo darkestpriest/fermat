@@ -1,10 +1,16 @@
 package com.bitdubai.fermat_tky_plugin.layer.identity.fan_identity.developer.bitdubai.version_1.database;
 
 import com.bitdubai.fermat_api.DealsWithPluginIdentity;
+import com.bitdubai.fermat_api.FermatException;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededAddonReference;
 import com.bitdubai.fermat_api.layer.all_definition.developer.DeveloperDatabase;
 import com.bitdubai.fermat_api.layer.all_definition.developer.DeveloperDatabaseTable;
 import com.bitdubai.fermat_api.layer.all_definition.developer.DeveloperDatabaseTableRecord;
 import com.bitdubai.fermat_api.layer.all_definition.developer.DeveloperObjectFactory;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Addons;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Layers;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Platforms;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.Database;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseRecord;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTable;
@@ -15,6 +21,8 @@ import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.Cant
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantLoadTableToMemoryException;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantOpenDatabaseException;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.DatabaseNotFoundException;
+import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedPluginExceptionSeverity;
+import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
 import com.bitdubai.fermat_tky_plugin.layer.identity.fan_identity.developer.bitdubai.version_1.exceptions.CantInitializeTokenlyFanIdentityDatabaseException;
 
 import java.util.ArrayList;
@@ -25,7 +33,8 @@ import java.util.UUID;
  * Created by GAbriel Araujo 10/03/16.
  */
 public class TokenlyFanIdentityDeveloperDatabaseFactory implements DealsWithPluginDatabaseSystem, DealsWithPluginIdentity {
-
+    @NeededAddonReference(platform = Platforms.PLUG_INS_PLATFORM, layer = Layers.PLATFORM_SERVICE, addon = Addons.ERROR_MANAGER)
+    private ErrorManager errorManager;
     /**
      * DealsWithPluginDatabaseSystem Interface member variables.
      */
@@ -101,10 +110,22 @@ public class TokenlyFanIdentityDeveloperDatabaseFactory implements DealsWithPlug
                    */
                 throw new CantInitializeTokenlyFanIdentityDatabaseException(cantCreateDatabaseException.getMessage());
             }
-        } catch (Exception e) {
-
-            throw new CantInitializeTokenlyFanIdentityDatabaseException(e.getMessage());
-
+        } catch (NullPointerException ex){
+            throw new CantInitializeTokenlyFanIdentityDatabaseException(
+                    CantInitializeTokenlyFanIdentityDatabaseException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Database error",
+                    "Unknown Failure.");
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            throw new CantInitializeTokenlyFanIdentityDatabaseException(
+                    CantInitializeTokenlyFanIdentityDatabaseException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Database error",
+                    "unknown failure.");
         }
     }
 
@@ -148,7 +169,7 @@ public class TokenlyFanIdentityDeveloperDatabaseFactory implements DealsWithPlug
         return tables;
     }
 
-    public List<DeveloperDatabaseTableRecord> getDatabaseTableContent(DeveloperObjectFactory developerObjectFactory, DeveloperDatabaseTable developerDatabaseTable) {
+    public List<DeveloperDatabaseTableRecord> getDatabaseTableContent(DeveloperObjectFactory developerObjectFactory, DeveloperDatabaseTable developerDatabaseTable) throws CantLoadTableToMemoryException{
         /**
          * Will get the records for the given table
          */
@@ -179,17 +200,31 @@ public class TokenlyFanIdentityDeveloperDatabaseFactory implements DealsWithPlug
             /**
              * return the list of DeveloperRecords for the passed table.
              */
-        } catch (CantLoadTableToMemoryException cantLoadTableToMemory) {
-            /**
-             * if there was an error, I will returned an empty list.
-             */
-            database.closeDatabase();
-            return returnedRecords;
-        } catch (Exception e){
-            database.closeDatabase();
-            return returnedRecords;
+        }catch (NullPointerException ex){
+            throw new CantLoadTableToMemoryException(
+                    CantLoadTableToMemoryException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Database error",
+                    "Unknown Failure.");
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            throw new CantLoadTableToMemoryException(
+                    CantLoadTableToMemoryException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Database error",
+                    "unknown failure.");
+        } finally {
+            if(database != null){
+                database.closeDatabase();
+            }
         }
-        database.closeDatabase();
+
+
         return returnedRecords;
     }
+
+
 }

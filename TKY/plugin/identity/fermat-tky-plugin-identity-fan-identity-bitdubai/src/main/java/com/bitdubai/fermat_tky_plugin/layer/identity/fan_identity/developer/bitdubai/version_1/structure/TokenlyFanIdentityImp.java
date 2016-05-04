@@ -1,8 +1,15 @@
 package com.bitdubai.fermat_tky_plugin.layer.identity.fan_identity.developer.bitdubai.version_1.structure;
 
 import com.bitdubai.fermat_api.DealsWithPluginIdentity;
+import com.bitdubai.fermat_api.FermatException;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededAddonReference;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Addons;
 import com.bitdubai.fermat_api.layer.all_definition.enums.DeviceDirectory;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Layers;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Platforms;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
 import com.bitdubai.fermat_api.layer.all_definition.util.XMLParser;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantLoadTableToMemoryException;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.DealsWithPluginFileSystem;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.FileLifeSpan;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.FilePrivacy;
@@ -10,6 +17,9 @@ import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginBinaryFile;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.CantCreateFileException;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.CantPersistFileException;
+import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.FileNotFoundException;
+import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedPluginExceptionSeverity;
+import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
 import com.bitdubai.fermat_tky_api.all_definitions.enums.ExternalPlatform;
 import com.bitdubai.fermat_tky_api.all_definitions.exceptions.ObjectNotSetException;
 import com.bitdubai.fermat_tky_api.all_definitions.interfaces.User;
@@ -26,6 +36,9 @@ import java.util.UUID;
  * Created by Gabriel Araujo (gabe_512@hotmail.com) on 10/03/16.
  */
 public class TokenlyFanIdentityImp implements DealsWithPluginFileSystem, DealsWithPluginIdentity, Fan {
+
+    @NeededAddonReference(platform = Platforms.PLUG_INS_PLATFORM, layer = Layers.PLATFORM_SERVICE, addon = Addons.ERROR_MANAGER)
+    private ErrorManager errorManager;
 
     private UUID id;
     private String tokenlyID;
@@ -143,27 +156,37 @@ public class TokenlyFanIdentityImp implements DealsWithPluginFileSystem, DealsWi
     }
 
     @Override
-    public void setNewProfileImage(byte[] imageBytes) {
+    public void setNewProfileImage(byte[] imageBytes) throws CantCreateFileException {
         try {
             PluginBinaryFile file = this.pluginFileSystem.createBinaryFile(pluginId,
                     DeviceDirectory.LOCAL_USERS.getName(),
                     TokenlyFanIdentityPluginRoot.TOKENLY_FAN_IDENTITY_PROFILE_IMAGE + "_" + publicKey,
                     FilePrivacy.PRIVATE,
-                    FileLifeSpan.PERMANENT
-            );
+                    FileLifeSpan.PERMANENT);
 
             file.setContent(imageBytes);
-
-
             file.persistToMedia();
-        } catch (CantPersistFileException e) {
-            e.printStackTrace();
-        } catch (CantCreateFileException e) {
-            e.printStackTrace();
-        }catch (Exception e){
-            e.printStackTrace();
+
+        } catch (NullPointerException | CantPersistFileException | CantCreateFileException  e) {
+            throw new CantCreateFileException(
+                    CantCreateFileException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(e),
+                    "NewProfileImage error",
+                    "Unknown Failure.");
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            throw new CantCreateFileException(
+                    CantCreateFileException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "NewProfileImage error",
+                    "unknown failure.");
+        } finally {
+            this.imageProfile = imageBytes;
         }
-        this.imageProfile = imageBytes;
+
     }
 
     @Override
@@ -288,12 +311,32 @@ public class TokenlyFanIdentityImp implements DealsWithPluginFileSystem, DealsWi
      * This method persist the username in the fan identity.
      * @param userName
      */
-    public void addNewArtistConnected(String userName) throws ObjectNotSetException {
-        ObjectChecker.checkArgument(userName, "The user name is null");
-        if(this.artistsConnectedList==null){
-            this.artistsConnectedList = new ArrayList<>();
+    public void addNewArtistConnected(String userName) throws ObjectNotSetException{
+        try {
+            ObjectChecker.checkArgument(userName, "The user name is null");
+        }catch (NullPointerException ex){
+            throw new ObjectNotSetException(
+                    ObjectNotSetException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "New Artist Argument error",
+                    "Unknown Failure.");
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            throw new ObjectNotSetException(
+                    ObjectNotSetException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Database error",
+                    "unknown failure.");
+        } finally {
+            if(this.artistsConnectedList==null){
+                this.artistsConnectedList = new ArrayList<>();
+            }
+            this.artistsConnectedList.add(userName);
         }
-        this.artistsConnectedList.add(userName);
+
     }
 
     /**

@@ -1,8 +1,14 @@
 package com.bitdubai.fermat_tky_plugin.layer.identity.fan_identity.developer.bitdubai.version_1.database;
 
+import com.bitdubai.fermat_api.CantStartPluginException;
 import com.bitdubai.fermat_api.FermatException;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededAddonReference;
 import com.bitdubai.fermat_api.layer.all_definition.crypto.util.CryptoHasher;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Addons;
 import com.bitdubai.fermat_api.layer.all_definition.enums.DeviceDirectory;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Layers;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Platforms;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.Database;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseFilterType;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTable;
@@ -24,8 +30,11 @@ import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.CantCrea
 import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.CantLoadFileException;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.CantPersistFileException;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.FileNotFoundException;
+import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedPluginExceptionSeverity;
+import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
 import com.bitdubai.fermat_pip_api.layer.user.device_user.interfaces.DeviceUser;
 import com.bitdubai.fermat_tky_api.all_definitions.enums.ExternalPlatform;
+import com.bitdubai.fermat_tky_api.all_definitions.exceptions.TKYException;
 import com.bitdubai.fermat_tky_api.all_definitions.interfaces.User;
 import com.bitdubai.fermat_tky_api.layer.identity.fan.exceptions.CantGetFanIdentityException;
 import com.bitdubai.fermat_tky_api.layer.identity.fan.exceptions.CantListFanIdentitiesException;
@@ -41,76 +50,97 @@ import com.bitdubai.fermat_tky_plugin.layer.identity.fan_identity.developer.bitd
 import com.bitdubai.fermat_tky_plugin.layer.identity.fan_identity.developer.bitdubai.version_1.exceptions.CantPersistProfileImageException;
 import com.bitdubai.fermat_tky_plugin.layer.identity.fan_identity.developer.bitdubai.version_1.structure.TokenlyFanIdentityImp;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * Created by Gabriel Araujo 10/03/16.
+ *@author root  Created by Gabriel Araujo 10/03/16.
+ *@author  Revised and Modified by MACUARE 30/04/16
+ *@version 1.1
  */
 public class TokenlyFanIdentityDao implements DealsWithPluginDatabaseSystem {
-    /**
-     * Represent the Plugin Database.
-     */
+    @NeededAddonReference(platform = Platforms.PLUG_INS_PLATFORM, layer = Layers.PLATFORM_SERVICE, addon = Addons.ERROR_MANAGER)
+    private ErrorManager errorManager;
+
+    /**Represent the Plugin Database.*/
     private PluginDatabaseSystem pluginDatabaseSystem;
-
     private PluginFileSystem pluginFileSystem;
-
     private UUID pluginId;
 
+    /**Represent de Database where i will be working with*/
+    private Database database;
+
     /**
-     * Constructor with parameters
+     * Automatically provides a default constructor that initializes all member variables
      *
-     * @param pluginDatabaseSystem DealsWithPluginDatabaseSystem
+     * @param pluginDatabaseSystem
+     * @param pluginFileSystem
+     * @param pluginId
+     * @return TokenlyFanIdentityDao
+     * @throws CantInitializeTokenlyFanIdentityDatabaseException
+     * @see CantInitializeTokenlyFanIdentityDatabaseException
+     * @see FermatException
      */
-
-    public TokenlyFanIdentityDao(PluginDatabaseSystem pluginDatabaseSystem, PluginFileSystem pluginFileSystem, UUID pluginId) throws CantInitializeTokenlyFanIdentityDatabaseException {
-        this.pluginDatabaseSystem = pluginDatabaseSystem;
-        this.pluginFileSystem = pluginFileSystem;
-        this.pluginId = pluginId;
-
+    public TokenlyFanIdentityDao(PluginDatabaseSystem pluginDatabaseSystem, PluginFileSystem pluginFileSystem, UUID pluginId) throws CantInitializeTokenlyFanIdentityDatabaseException, CantStartPluginException {
         try {
+            this.pluginDatabaseSystem = pluginDatabaseSystem;
+            this.pluginFileSystem = pluginFileSystem;
+            this.pluginId = pluginId;
+
             initializeDatabase();
-        } catch (CantInitializeTokenlyFanIdentityDatabaseException e) {
-            throw new CantInitializeTokenlyFanIdentityDatabaseException(e.getMessage());
+
+        }catch (CantInitializeTokenlyFanIdentityDatabaseException | NullPointerException e){
+            throw new CantInitializeTokenlyFanIdentityDatabaseException(FermatException.wrapException(e));
+        }catch (Exception e){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    e);
+            throw new CantInitializeTokenlyFanIdentityDatabaseException(
+                    CantStartPluginException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(e),
+                    "Cant Initialize Database.",
+                    "");
+            //
         }
     }
 
-    /**
-     * Represent de Database where i will be working with
-     */
-    Database database;
-
     @Override
     public void setPluginDatabaseSystem(PluginDatabaseSystem pluginDatabaseSystem) {
-        this.pluginDatabaseSystem = pluginDatabaseSystem;
+        try {
+            this.pluginDatabaseSystem = pluginDatabaseSystem;
+        }catch (NullPointerException e){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    e);
+        }
     }
 
     /**
      * This method open or creates the database i'll be working with
      *
      * @throws CantInitializeTokenlyFanIdentityDatabaseException
+     * @see CantInitializeTokenlyFanIdentityDatabaseException
      */
     private void initializeDatabase() throws CantInitializeTokenlyFanIdentityDatabaseException {
+
         try {
-
-             /*
-              * Open new database connection
-              */
-
+            //Open new database connection
             database = this.pluginDatabaseSystem.openDatabase(this.pluginId, TokenlyFanIdentityDatabaseConstants.TOKENLY_FAN_IDENTITY_DB_NAME);
 
         } catch (CantOpenDatabaseException cantOpenDatabaseException) {
-
-             /*
-              * The database exists but cannot be open. I can not handle this situation.
-              */
-            throw new CantInitializeTokenlyFanIdentityDatabaseException(cantOpenDatabaseException.getMessage());
+            //The database exists but cannot be open. I can not handle this situation.
+            throw new CantInitializeTokenlyFanIdentityDatabaseException(
+                    CantStartPluginException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(cantOpenDatabaseException),
+                    "Cant Open Database.",
+                    "Connection");
 
         } catch (DatabaseNotFoundException e) {
-
-             /*
-              * The database no exist may be the first time the plugin is running on this device,
+             /*The database no exist may be the first time the plugin is running on this device,
               * We need to create the new database
               */
             TokenlyFanIdentityDatabaseFactory tokenlyFanIdentityDatabaseFactory = new TokenlyFanIdentityDatabaseFactory(pluginDatabaseSystem);
@@ -125,12 +155,18 @@ public class TokenlyFanIdentityDao implements DealsWithPluginDatabaseSystem {
                   /*
                    * The database cannot be created. I can not handle this situation.
                    */
-                throw new CantInitializeTokenlyFanIdentityDatabaseException(cantCreateDatabaseException.getMessage());
+                throw new CantInitializeTokenlyFanIdentityDatabaseException(
+                        CantCreateDatabaseException.DEFAULT_MESSAGE,
+                        FermatException.wrapException(cantCreateDatabaseException),
+                        "Cant Open Database.",
+                        "Connection");
             }
         } catch (Exception e) {
-
-            throw new CantInitializeTokenlyFanIdentityDatabaseException(e.getMessage());
-
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw new CantInitializeTokenlyFanIdentityDatabaseException(FermatException.wrapException(e).getMessage());
         }
     }
     /**
@@ -144,8 +180,10 @@ public class TokenlyFanIdentityDao implements DealsWithPluginDatabaseSystem {
      * @param deviceUser
      * @param profileImage
      * @throws CantCreateNewDeveloperException
+     * @see CantCreateNewDeveloperException
      */
-    public void createNewUser(User user, UUID id,String publicKey, String privateKey, DeviceUser deviceUser, byte[] profileImage, String password, ExternalPlatform externalPlatform) throws CantCreateNewDeveloperException {
+    public void createNewUser(User user, UUID id,String publicKey, String privateKey, DeviceUser deviceUser, byte[] profileImage, String password, ExternalPlatform externalPlatform)
+            throws CantCreateNewDeveloperException {
 
         try {
             if (aliasExists(user.getUsername())) {
@@ -176,16 +214,29 @@ public class TokenlyFanIdentityDao implements DealsWithPluginDatabaseSystem {
 
         } catch (CantInsertRecordException e) {
             // Cant insert record.
-            throw new CantCreateNewDeveloperException(e.getMessage(), e, "Redeem Point Identity", "Cant create new Redeem Point, insert database problems.");
-
+            throw new CantCreateNewDeveloperException(
+                    CantCreateNewDeveloperException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(e),
+                    "Redeem Point Identity",
+                    "Cant create new Redeem Point, insert database problems.");
         } catch (CantPersistPrivateKeyException e) {
             // Cant insert record.
-            throw new CantCreateNewDeveloperException(e.getMessage(), e, "ARedeem Point Identity", "Cant create new Redeem Point, persist private key error.");
-
+            throw new CantCreateNewDeveloperException(
+                    CantCreateNewDeveloperException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(e),
+                    "ARedeem Point Identity",
+                    "Cant create new Redeem Point, persist private key error.");
         } catch (Exception e) {
             // Failure unknown.
-
-            throw new CantCreateNewDeveloperException(e.getMessage(), FermatException.wrapException(e), "Redeem Point Identity", "Cant create new Redeem Point, unknown failure.");
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw new CantCreateNewDeveloperException(
+                    CantCreateNewDeveloperException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(e),
+                    "Redeem Point Identity",
+                    "Cant create new Redeem Point, unknown failure.");
         }
     }
 
@@ -195,22 +246,42 @@ public class TokenlyFanIdentityDao implements DealsWithPluginDatabaseSystem {
      * @throws CantUpdateFanIdentityException
      */
     public void updateIdentityFanUser(Fan fan) throws CantUpdateFanIdentityException {
-        User user = fan.getMusicUser();
-        String password = fan.getUserPassword();
-        UUID id = fan.getId();
-        String publicKey = fan.getPublicKey();
-        byte[] profileImage = fan.getProfileImage();
-        ExternalPlatform externalPlatform = fan.getExternalPlatform();
-        String xmlStringList = fan.getArtistsConnectedStringList();
-        //Update the Fan identity
-        updateIdentityFanUser(
-                user,
-                password,
-                id,
-                publicKey,
-                profileImage,
-                externalPlatform,
-                xmlStringList);
+        try{
+            User user = fan.getMusicUser();
+            String password = fan.getUserPassword();
+            UUID id = fan.getId();
+            String publicKey = fan.getPublicKey();
+            byte[] profileImage = fan.getProfileImage();
+            ExternalPlatform externalPlatform = fan.getExternalPlatform();
+            String xmlStringList = fan.getArtistsConnectedStringList();
+
+            //Update the Fan identity
+            updateIdentityFanUser(
+                    user,
+                    password,
+                    id,
+                    publicKey,
+                    profileImage,
+                    externalPlatform,
+                    xmlStringList);
+        }catch (NullPointerException ex){
+            throw new CantUpdateFanIdentityException(
+                    CantUpdateFanIdentityException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Fan Identity Cant be Updated",
+                    "Unknown Failure.");
+        }catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            throw new CantUpdateFanIdentityException(
+                    CantUpdateFanIdentityException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Fan Identity Cant be Updated",
+                    "Unknown Failure.");
+        }
+
 
     }
 
@@ -266,8 +337,7 @@ public class TokenlyFanIdentityDao implements DealsWithPluginDatabaseSystem {
             /**
              * 1) Get the table.
              */
-            DatabaseTable table = this.database.getTable(
-                    TokenlyFanIdentityDatabaseConstants.TOKENLY_FAN_IDENTITY_TABLE_NAME);
+            DatabaseTable table = this.database.getTable(TokenlyFanIdentityDatabaseConstants.TOKENLY_FAN_IDENTITY_TABLE_NAME);
 
             if (table == null) {
                 /**
@@ -335,13 +405,23 @@ public class TokenlyFanIdentityDao implements DealsWithPluginDatabaseSystem {
                     e,
                     "Fan Identity",
                     "Cant update Fan Identity, persist image error.");
-        } catch (Exception e) {
+        }catch (NullPointerException e){
             throw new CantUpdateFanIdentityException(
-                    e.getMessage(),
+                    CantUpdateFanIdentityException.DEFAULT_MESSAGE,
                     FermatException.wrapException(e),
-                    "Fan Identity",
-                    "Cant update Fan Identity, unknown failure.");
-        }
+                    "Fan Identity Cant be Updated",
+                    "Unknown Failure.");
+        }catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                ex);
+            throw new CantUpdateFanIdentityException(
+                CantUpdateFanIdentityException.DEFAULT_MESSAGE,
+                FermatException.wrapException(ex),
+                "Fan Identity Cant be Updated",
+                "Unknown Failure.");
+    }
     }
 
     public List<Fan> getIdentityFansFromCurrentDeviceUser(DeviceUser deviceUser) throws CantListFanIdentitiesException {
@@ -395,9 +475,27 @@ public class TokenlyFanIdentityDao implements DealsWithPluginDatabaseSystem {
                         pluginId));
             }
         } catch (CantLoadTableToMemoryException e) {
-            throw new CantListFanIdentitiesException(e.getMessage(), e, "Asset Redeem Point Identity", "Cant load " + TokenlyFanIdentityDatabaseConstants.TOKENLY_FAN_IDENTITY_TABLE_NAME + " table in memory.");
-        } catch (Exception e) {
-            throw new CantListFanIdentitiesException(e.getMessage(), FermatException.wrapException(e), "Asset Redeem Point Identity", "Cant get Asset Issuer identity list, unknown failure.");
+            throw new CantListFanIdentitiesException(
+                    e.getMessage(),
+                    e,
+                    "Asset Redeem Point Identity",
+                    "Cant load " + TokenlyFanIdentityDatabaseConstants.TOKENLY_FAN_IDENTITY_TABLE_NAME + " table in memory.");
+        }catch (NullPointerException ex){
+            throw new CantListFanIdentitiesException(
+                    CantListFanIdentitiesException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Asset Redeem Point Identity",
+                    "Unknown Failure.");
+        }catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            throw new CantListFanIdentitiesException(
+                    CantListFanIdentitiesException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Asset Redeem Point Identity",
+                    "Cant get Asset Issuer identity list, unknown failure.");
         }
 
         // Return the list values.
@@ -459,9 +557,26 @@ public class TokenlyFanIdentityDao implements DealsWithPluginDatabaseSystem {
 
             }
         } catch (CantLoadTableToMemoryException e) {
-            throw new CantGetFanIdentityException(e.getMessage(), e, "Asset Redeem Point Identity", "Cant load " + TokenlyFanIdentityDatabaseConstants.TOKENLY_FAN_IDENTITY_TABLE_NAME + " table in memory.");
-        } catch (Exception e) {
-            throw new CantGetFanIdentityException(e.getMessage(), FermatException.wrapException(e), "Asset Redeem Point Identity", "Cant get Asset Redeem Point identity list, unknown failure.");
+            throw new CantGetFanIdentityException(e.getMessage(),
+                    e,
+                    "Asset Redeem Point Identity",
+                    "Cant load " + TokenlyFanIdentityDatabaseConstants.TOKENLY_FAN_IDENTITY_TABLE_NAME + " table in memory.");
+        }catch (NullPointerException ex){
+            throw new CantGetFanIdentityException(
+                    CantGetFanIdentityException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Asset Redeem Point Identity",
+                    "Unknown Failure.");
+        }catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            throw new CantGetFanIdentityException(
+                    CantGetFanIdentityException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Asset Redeem Point Identity",
+                    "Cant get Asset Redeem Point identity list, unknown failure.");
         }
 
         // Return the list values.
@@ -521,9 +636,27 @@ public class TokenlyFanIdentityDao implements DealsWithPluginDatabaseSystem {
                                         TOKENLY_FAN_IDENTITY_ARTIST_CONNECTED_LIST_COLUMN_NAME));
             }
         } catch (CantLoadTableToMemoryException e) {
-            throw new CantGetFanIdentityException(e.getMessage(), e, "Asset Redeem Point Identity", "Cant load " + TokenlyFanIdentityDatabaseConstants.TOKENLY_FAN_IDENTITY_TABLE_NAME + " table in memory.");
-        } catch (Exception e) {
-            throw new CantGetFanIdentityException(e.getMessage(), FermatException.wrapException(e), "Asset Redeem Point Identity", "Cant get Asset Redeem Point identity list, unknown failure.");
+            throw new CantGetFanIdentityException(
+                    e.getMessage(),
+                    e,
+                    "Asset Redeem Point Identity",
+                    "Cant load " + TokenlyFanIdentityDatabaseConstants.TOKENLY_FAN_IDENTITY_TABLE_NAME + " table in memory.");
+        } catch (NullPointerException ex){
+            throw new CantGetFanIdentityException(
+                    CantGetFanIdentityException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Asset Redeem Point Identity",
+                    "Unknown Failure.");
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            throw new CantGetFanIdentityException(
+                    CantGetFanIdentityException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Asset Redeem Point Identity",
+                    "Cant get Asset Redeem Point identity list, unknown failure.");
         }
 
         // Return the list values.
@@ -548,10 +681,25 @@ public class TokenlyFanIdentityDao implements DealsWithPluginDatabaseSystem {
             throw new CantGetTokenlyFanIdentityProfileImageException("CAN'T GET IMAGE PROFILE ", e, "Error loaded file.", null);
         } catch (FileNotFoundException | CantCreateFileException e) {
             profileImage = new byte[0];
-            // throw new CantGetIntraWalletUserIdentityProfileImageException("CAN'T GET IMAGE PROFILE ", e, "Error getting developer identity private keys file.", null);
-        } catch (Exception e) {
-            throw new CantGetTokenlyFanIdentityProfileImageException("CAN'T GET IMAGE PROFILE ", FermatException.wrapException(e), "", "");
+            throw new CantGetTokenlyFanIdentityProfileImageException("CAN'T GET IMAGE PROFILE ", e, "Error loaded file.", null);
+        }catch (NullPointerException ex){
+            throw new CantGetTokenlyFanIdentityProfileImageException(
+                    CantGetTokenlyFanIdentityProfileImageException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Asset Redeem Point Identity",
+                    "Unknown Failure.");
+        }catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            throw new CantGetTokenlyFanIdentityProfileImageException(
+                    CantGetTokenlyFanIdentityProfileImageException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "CAN'T GET IMAGE PROFILE",
+                    "unknown failure.");
         }
+
 
         return profileImage;
     }
@@ -576,8 +724,22 @@ public class TokenlyFanIdentityDao implements DealsWithPluginDatabaseSystem {
             throw new CantPersistPrivateKeyException("CAN'T PERSIST PRIVATE KEY ", e, "Error persist file.", null);
         } catch (CantCreateFileException e) {
             throw new CantPersistPrivateKeyException("CAN'T PERSIST PRIVATE KEY ", e, "Error creating file.", null);
-        } catch (Exception e) {
-            throw new CantPersistPrivateKeyException("CAN'T PERSIST PRIVATE KEY ", FermatException.wrapException(e), "", "");
+        } catch (NullPointerException ex){
+            throw new CantPersistPrivateKeyException(
+                    CantPersistPrivateKeyException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "CAN'T PERSIST PRIVATE KEY",
+                    "Unknown Failure.");
+        }catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            throw new CantPersistPrivateKeyException(
+                    CantPersistPrivateKeyException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "CAN'T PERSIST PRIVATE KEY",
+                    "unknown failure.");
         }
     }
 
@@ -597,8 +759,22 @@ public class TokenlyFanIdentityDao implements DealsWithPluginDatabaseSystem {
             throw new CantPersistProfileImageException("CAN'T PERSIST PROFILE IMAGE ", e, "Error persist file.", null);
         } catch (CantCreateFileException e) {
             throw new CantPersistProfileImageException("CAN'T PERSIST PROFILE IMAGE ", e, "Error creating file.", null);
-        } catch (Exception e) {
-            throw new CantPersistProfileImageException("CAN'T PERSIST PROFILE IMAGE ", FermatException.wrapException(e), "", "");
+        } catch (NullPointerException ex){
+            throw new CantPersistProfileImageException(
+                    CantPersistProfileImageException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "CAN'T PERSIST PROFILE IMAGE",
+                    "Unknown Failure.");
+        }catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            throw new CantPersistProfileImageException(
+                    CantPersistProfileImageException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "CAN'T PERSIST PROFILE IMAGE",
+                    "unknown failure.");
         }
     }
 
@@ -634,8 +810,22 @@ public class TokenlyFanIdentityDao implements DealsWithPluginDatabaseSystem {
         } catch (CantLoadTableToMemoryException em) {
             throw new CantCreateNewDeveloperException(em.getMessage(), em, "Asset Issuer  Identity", "Cant load " + TokenlyFanIdentityDatabaseConstants.TOKENLY_FAN_IDENTITY_TABLE_NAME + " table in memory.");
 
-        } catch (Exception e) {
-            throw new CantCreateNewDeveloperException(e.getMessage(), FermatException.wrapException(e), "Asset Issuer  Identity", "unknown failure.");
+        } catch (NullPointerException ex){
+            throw new CantCreateNewDeveloperException(
+                    CantCreateNewDeveloperException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Asset Issuer  Identity",
+                    "Unknown Failure.");
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            throw new CantCreateNewDeveloperException(
+                    CantCreateNewDeveloperException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Asset Issuer  Identity",
+                    "unknown failure.");
         }
     }
 
@@ -657,8 +847,22 @@ public class TokenlyFanIdentityDao implements DealsWithPluginDatabaseSystem {
             throw new CantGetTokenlyFanIdentityPrivateKeyException("CAN'T GET PRIVATE KEY ", e, "Error loaded file.", null);
         } catch (FileNotFoundException | CantCreateFileException e) {
             throw new CantGetTokenlyFanIdentityPrivateKeyException("CAN'T GET PRIVATE KEY ", e, "Error getting developer identity private keys file.", null);
-        } catch (Exception e) {
-            throw new CantGetTokenlyFanIdentityPrivateKeyException("CAN'T GET PRIVATE KEY ", FermatException.wrapException(e), "", "");
+        } catch (NullPointerException ex){
+            throw new CantGetTokenlyFanIdentityPrivateKeyException(
+                    CantGetTokenlyFanIdentityPrivateKeyException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "CAN'T GET PRIVATE KEY",
+                    "Unknown Failure.");
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            throw new CantGetTokenlyFanIdentityPrivateKeyException(
+                    CantGetTokenlyFanIdentityPrivateKeyException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "CAN'T GET PRIVATE KEY",
+                    "unknown failure.");
         }
 
         return privateKey;

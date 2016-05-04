@@ -1,5 +1,6 @@
 package com.bitdubai.fermat_tky_api.all_definitions.interfaces;
 
+import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.CantCreateFileException;
 import com.bitdubai.fermat_tky_api.all_definitions.enums.ExternalPlatform;
 import com.bitdubai.fermat_tky_api.layer.external_api.interfaces.music.MusicUser;
 
@@ -32,7 +33,7 @@ public interface Identity extends User{
      * This method saves a profile image
      * @param imageBytes
      */
-    void setNewProfileImage(final byte[] imageBytes);
+    void setNewProfileImage(final byte[] imageBytes) throws CantCreateFileException;
 
     /**
      * This method returns the external platform that the identity uses to redeem tokens.

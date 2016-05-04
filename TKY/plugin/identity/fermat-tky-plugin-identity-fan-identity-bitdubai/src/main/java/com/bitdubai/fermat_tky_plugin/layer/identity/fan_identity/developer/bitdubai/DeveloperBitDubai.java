@@ -1,5 +1,6 @@
 package com.bitdubai.fermat_tky_plugin.layer.identity.fan_identity.developer.bitdubai;
 
+import com.bitdubai.fermat_api.FermatException;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.abstract_classes.AbstractPluginDeveloper;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.exceptions.CantRegisterVersionException;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.exceptions.CantStartPluginDeveloperException;
@@ -25,7 +26,7 @@ public class DeveloperBitDubai extends AbstractPluginDeveloper implements Plugin
         } catch (CantRegisterVersionException e) {
 
             throw new CantStartPluginDeveloperException(
-                    e,
+                    FermatException.wrapException(e),
                     "",
                     "Error registering plugin versions for the developer.");
         }

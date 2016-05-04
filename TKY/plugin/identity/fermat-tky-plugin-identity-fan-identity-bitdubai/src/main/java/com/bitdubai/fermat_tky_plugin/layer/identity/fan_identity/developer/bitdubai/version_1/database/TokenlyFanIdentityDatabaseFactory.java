@@ -1,6 +1,7 @@
 package com.bitdubai.fermat_tky_plugin.layer.identity.fan_identity.developer.bitdubai.version_1.database;
 
 import com.bitdubai.fermat_api.FermatException;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.Database;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseDataType;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseFactory;
@@ -10,7 +11,9 @@ import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseS
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantCreateDatabaseException;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantCreateTableException;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.DealsWithErrors;
+import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
+import com.bitdubai.fermat_tky_plugin.layer.identity.fan_identity.developer.bitdubai.version_1.exceptions.CantGetTokenlyFanIdentityPrivateKeyException;
 
 import java.util.UUID;
 
@@ -93,9 +96,24 @@ public class TokenlyFanIdentityDatabaseFactory implements DealsWithErrors, Deals
 
             throw new CantCreateDatabaseException(message, cause, context, possibleReason);
 
-        } catch (Exception exception) {
-            throw new CantCreateDatabaseException(CantCreateDatabaseException.DEFAULT_MESSAGE, FermatException.wrapException(exception), null, null);
+        } catch (NullPointerException ex){
+            throw new CantCreateDatabaseException(
+                    CantCreateDatabaseException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Database error",
+                    "Connection Failure.");
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            throw new CantCreateDatabaseException(
+                    CantCreateDatabaseException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "Database error",
+                    "Connection failure.");
         }
+
         return database;
     }
 

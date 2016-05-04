@@ -1,6 +1,7 @@
 package com.bitdubai.fermat_tky_plugin.layer.identity.fan_identity.developer.bitdubai.version_1;
 
 import com.bitdubai.fermat_api.CantStartPluginException;
+import com.bitdubai.fermat_api.FermatException;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.abstract_classes.AbstractPlugin;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededAddonReference;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededPluginReference;
@@ -19,6 +20,7 @@ import com.bitdubai.fermat_api.layer.all_definition.enums.ServiceStatus;
 import com.bitdubai.fermat_api.layer.all_definition.util.Version;
 import com.bitdubai.fermat_api.layer.all_definition.util.XMLParser;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseSystem;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantLoadTableToMemoryException;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
 import com.bitdubai.fermat_api.layer.osa_android.logger_system.LogLevel;
 import com.bitdubai.fermat_api.layer.osa_android.logger_system.LogManager;
@@ -105,20 +107,31 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
             System.out.println("############\n TKY IDENTITY FAN STARTED\n");
             //testCreateArtist();
             //testAskForConnection();
-        } catch (Exception e) {
-            errorManager.reportUnexpectedPluginException(Plugins.ARTIST_IDENTITY, UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN, e);
-            throw new CantStartPluginException(e, Plugins.ARTIST_IDENTITY);
+
+        }catch (NullPointerException ex){
+            throw new CantStartPluginException(
+                    CantStartPluginException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "TKY IDENTITY FAN error",
+                    "Unknown Failure.");
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_IDENTITY,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    ex);
+            throw new CantStartPluginException(
+                    CantStartPluginException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "TKY IDENTITY FAN error",
+                    "unknown failure.");
         }
 
-//        try {
-//            registerIdentitiesANS();
-//        } catch (Exception e) {
-//            errorManager.reportUnexpectedPluginException(Plugins.BITDUBAI_DAP_REDEEM_POINT_IDENTITY, UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN, e);
-//        }
+
     }
 
-    private void testCreateArtist(){
+    private void testCreateArtist() throws CantCreateFanIdentityException{
         try {
+
             String username = "perezilla";
             byte[] image = new byte[0];
             String password = "milestone";
@@ -127,10 +140,23 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
             Fan fan1 = getFanIdentity(fan.getId());
             System.out.println("##############################\n");
             System.out.println("fan1 = " + XMLParser.parseObject(new TokenlyFanIdentityImp(fan1.getId(),fan1.getTokenlyId(),fan1.getPublicKey(),fan1.getProfileImage(),fan1.getUsername(),fan1.getApiToken(),fan1.getApiSecretKey(), fan1.getUserPassword(),fan1.getExternalPlatform(),fan1.getEmail())));
-        } catch (CantCreateFanIdentityException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        } catch (CantCreateFanIdentityException | IdentityNotFoundException | CantGetFanIdentityException | NullPointerException e) {
+            throw new CantCreateFanIdentityException(
+                    CantCreateFanIdentityException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(e),
+                    "CreateArtist error",
+                    "Unknown Failure.");
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_IDENTITY,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    ex);
+            throw new CantCreateFanIdentityException(
+                    CantCreateFanIdentityException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "CreateArtist error",
+                    "unknown failure.");
         }
     }
 //    private void testUpdateArtist(Artist artist){
@@ -154,16 +180,36 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
     public Fan createFanIdentity(String userName, byte[] profileImage, String externalPassword, ExternalPlatform externalPlatform) throws  CantCreateFanIdentityException {
         //TODO: Fix this Gabo. Manuel
         User user=null;
+
         try{
+
             if(externalPlatform == ExternalPlatform.DEFAULT_EXTERNAL_PLATFORM)
                 user = tokenlyApiManager.validateTokenlyUser(userName, externalPassword);
-        } catch (CantGetUserException |InterruptedException | ExecutionException  e) {
-            e.printStackTrace();
-        }
-        if(user!=null){
-            return identityFanManager.createNewIdentityFan(user, externalPassword,profileImage, externalPlatform);
-        }else{
-            return null;
+
+        } catch (CantGetUserException |InterruptedException | ExecutionException | NullPointerException e) {
+
+            throw new CantCreateFanIdentityException(
+                    CantCreateFanIdentityException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(e),
+                    "createFanIdentity error",
+                    "Unknown Failure.");
+
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    ex);
+            throw new CantCreateFanIdentityException(
+                    CantCreateFanIdentityException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "createFanIdentity error",
+                    "unknown failure.");
+        } finally {
+            if(user!=null){
+                return identityFanManager.createNewIdentityFan(user, externalPassword,profileImage, externalPlatform);
+            }else{
+                return null;
+            }
         }
     }
 
@@ -171,14 +217,31 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
     @Override
     public void updateFanIdentity(String userName,String password, UUID id,String publicKey, byte[] profileImage,ExternalPlatform externalPlatform) throws CantUpdateFanIdentityException {
         User user=null;
+
         try{
             if(externalPlatform == ExternalPlatform.DEFAULT_EXTERNAL_PLATFORM)
                 user = tokenlyApiManager.validateTokenlyUser(userName, password);
         } catch (CantGetUserException |InterruptedException | ExecutionException  e) {
-            e.printStackTrace();
+            throw new CantUpdateFanIdentityException(
+                    CantUpdateFanIdentityException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(e),
+                    "updateFanIdentity error",
+                    "Unknown Failure.");
+
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    ex);
+            throw new CantUpdateFanIdentityException(
+                    CantUpdateFanIdentityException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "updateFanIdentity error",
+                    "unknown failure.");
+        } finally {
+            if(user != null)
+                identityFanManager.updateIdentityFan(user,password, id, publicKey, profileImage,externalPlatform);
         }
-        if(user != null)
-            identityFanManager.updateIdentityFan(user,password, id, publicKey, profileImage,externalPlatform);
     }
 
     /**
@@ -190,13 +253,27 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
      */
     public void updateFanIdentity(Fan fan) throws CantUpdateFanIdentityException{
         try{
+
             ObjectChecker.checkArgument(fan, "The Fan identity is null");
             identityFanManager.updateIdentityFan(fan);
-        } catch (ObjectNotSetException e){
+
+        } catch (ObjectNotSetException | NullPointerException e){
             throw new CantUpdateFanIdentityException(
-                    e,
+                    CantUpdateFanIdentityException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(e),
                     "Cannot update the fan identity",
                     "The fan identity is probably null");
+
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    ex);
+            throw new CantUpdateFanIdentityException(
+                    CantUpdateFanIdentityException.DEFAULT_MESSAGE,
+                    FermatException.wrapException(ex),
+                    "updateFanIdentity error",
+                    "unknown failure.");
         }
     }
 
@@ -219,15 +296,27 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
 
     @Override
     public List<DeveloperDatabaseTableRecord> getDatabaseTableContent(DeveloperObjectFactory developerObjectFactory, DeveloperDatabase developerDatabase, DeveloperDatabaseTable developerDatabaseTable) {
+        List<DeveloperDatabaseTableRecord> databaseTableContent= null;
+
         try {
             TokenlyFanIdentityDeveloperDatabaseFactory dbFactory = new TokenlyFanIdentityDeveloperDatabaseFactory(this.pluginDatabaseSystem, this.pluginId);
             dbFactory.initializeDatabase();
-            return dbFactory.getDatabaseTableContent(developerObjectFactory, developerDatabaseTable);
-        } catch (CantInitializeTokenlyFanIdentityDatabaseException e) {
+            databaseTableContent = dbFactory.getDatabaseTableContent(developerObjectFactory, developerDatabaseTable);
+
+        } catch (CantInitializeTokenlyFanIdentityDatabaseException | NullPointerException e) {
             this.errorManager.reportUnexpectedPluginException(Plugins.TOKENLY_FAN, UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
+        } catch (CantLoadTableToMemoryException e) {
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    e);
+        } finally {
+          if(databaseTableContent == null){
+            databaseTableContent = new ArrayList<>(); // If we are here the database could not be opened, so we return an empty list
+          }
         }
-        // If we are here the database could not be opened, so we return an empty list
-        return new ArrayList<>();
+
+        return databaseTableContent;
     }
 
     @Override
@@ -263,9 +352,18 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
                 }
             }
 
-        } catch (Exception exception) {
-            //FermatException e = new CantGetLogTool(CantGetLogTool.DEFAULT_MESSAGE, FermatException.wrapException(exception), "setLoggingLevelPerClass: " + ActorIssuerPluginRoot.newLoggingLevel, "Check the cause");
-            // this.errorManager.reportUnexpectedAddonsException(Addons.EXTRA_USER, UnexpectedAddonsExceptionSeverity.DISABLES_THIS_ADDONS, e);
+        } catch (NullPointerException ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    ex);
+
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    ex);
+
         }
     }
 }
