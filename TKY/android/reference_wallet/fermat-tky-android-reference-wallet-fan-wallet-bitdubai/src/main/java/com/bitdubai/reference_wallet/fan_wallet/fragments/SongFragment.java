@@ -79,6 +79,8 @@ public class SongFragment extends AbstractFermatFragment {
     String code;
     FermatBundle bundle;
     PresentationDialog presentationDialog;
+    Boolean firstTime=true;
+    Boolean downloading=false;
     /**
      * This flag represents if this fragment can access to the Fan identity.
      */
@@ -106,6 +108,21 @@ public class SongFragment extends AbstractFermatFragment {
             errorManager = appSession.getErrorManager();
             System.out.println("HERE START SONG");
 
+            if(fanwalletSession.getDownloading()!=null){
+                System.out.println("MUSIC IS BEEN DOWNLOADING");
+                swipeContainer=fanwalletSession.getSwipeRefreshLayout();
+                downloadThread=fanwalletSession.getDownloadThreadClass();
+                syncThread=fanwalletSession.getSyncThreadClass();
+                view=fanwalletSession.getView();
+                adapter=fanwalletSession.getSongAdapter();
+                recyclerView=fanwalletSession.getRecyclerView();
+                downloading=fanwalletSession.getDownloading();
+                items=fanwalletSession.getItems();
+                firstTime=false;
+            }
+
+            fanWalletModule=fanwalletSession.getModuleManager();
+
             try {
                 fanWalletSettings =  fanwalletSession.getModuleManager().getSettingsManager().loadAndGetSettings(appSession.getAppPublicKey());
             } catch (Exception e) {
@@ -131,14 +148,10 @@ public class SongFragment extends AbstractFermatFragment {
     }
 
     void initValues(){
-        fanWalletModule=fanwalletSession.getModuleManager();
+
         compareViewAndDatabase();
         syncTokenlyAndUpdateThreads(true);
-      /*  if(items.isEmpty()){
-            recyclerView.setBackgroundResource(R.drawable.nosong);
-        }else{
-            recyclerView.setBackgroundResource(R.drawable.fanwallet_background_viewpager);
-        }*/
+
 
     }
 
@@ -147,11 +160,11 @@ public class SongFragment extends AbstractFermatFragment {
         if (swipeContainer.isRefreshing()){
             swipeContainer.setRefreshing(false);
         }
-        Toast.makeText(
+     /*   Toast.makeText(
                 getActivity(),
                 "Connection Problem With External Platform",
                 Toast.LENGTH_LONG)
-                .show();
+                .show();*/
     }
 
     @Override
@@ -160,7 +173,10 @@ public class SongFragment extends AbstractFermatFragment {
         if (swipeContainer.isRefreshing()){
             swipeContainer.setRefreshing(false);
         }
+
         myHandler.post(myRunnableBundle);
+
+
     }
 
     final Runnable myRunnableBundle = new Runnable() {
@@ -172,45 +188,83 @@ public class SongFragment extends AbstractFermatFragment {
 
 
     @Override
+    public void onBackPressed() {
+        System.out.println("BACK");
+        fanwalletSession.setView(view);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        System.out.println("DESTROY FAN WALLET");
+   //     fanwalletSession.setRecyclerView(recyclerView);
+        fanwalletSession.setDownloadThreadClass(downloadThread);
+        fanwalletSession.setSyncThreadClass(syncThread);
+  //      fanwalletSession.setSwipeRefreshLayout(swipeContainer);
+   //     fanwalletSession.setSongAdapter(adapter);
+        fanwalletSession.setDownloading(downloading);
+    //
+
+        fanwalletSession.setItems(items);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view= inflater.inflate(R.layout.tky_fan_wallet_song_fragment, container, false);
-
-        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
-        swipeContainer.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW);
-        recyclerView = (RecyclerView) view.findViewById(R.id.rv);
-        lManager = new LinearLayoutManager(view.getContext());
-        recyclerView.setLayoutManager(lManager);
-        adapter = new SongAdapter(items);
-        recyclerView.setAdapter(adapter);
-        initValues();
-
-        swipeEffect();
 
 
-        getActivity().getWindow().setBackgroundDrawableResource(R.drawable.fanwallet_background_viewpager);
+        if(true) {
+            view = inflater.inflate(R.layout.tky_fan_wallet_song_fragment, container, false);
 
-        recyclerView.addOnItemTouchListener(
-                new ManageRecyclerviewClick(view.getContext(), new ManageRecyclerviewClick.OnItemClickListener() {
-                    @Override
+            swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
+            swipeContainer.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW);
+            recyclerView = (RecyclerView) view.findViewById(R.id.rv);
+            lManager = new LinearLayoutManager(view.getContext());
+            recyclerView.setLayoutManager(lManager);
 
-                    public void onItemClick(View view, int position) {
+     //       recyclerView.setItemAnimator(null);
 
-                        System.out.println("click position:" + position);
-                        if (items.get(position).getStatus().equals(SongStatus.AVAILABLE.getFriendlyName()) ||items.get(position).getStatus().equals(SongStatus.DELETED.getFriendlyName())) {
-                            askQuestion(position, null, 1);
-                        } else if (items.get(position).getStatus().equals(SongStatus.DOWNLOADED.getFriendlyName())) {
-                            playSong();
-                        } else if (items.get(position).getStatus().equals(SongStatus.DOWNLOADING.getFriendlyName())) {
-                            askQuestion(position, null, 2);
-                        }
+            adapter = new SongAdapter(items);
+            recyclerView.setAdapter(adapter);
+            recyclerView.getItemAnimator().setChangeDuration(0);
+            recyclerView.setBackgroundResource(R.drawable.fanwallet_background_viewpager);
+
+            if(firstTime){
+                initValues();
+            }else{
+                compareViewAndDatabase();
+
+                if( syncThread!=null) {
+                    if (syncThread.getStatus() != AsyncTask.Status.RUNNING
+                            && syncThread.getStatus() != AsyncTask.Status.FINISHED) {
+                        initValues();
                     }
-                })
-        );
+                }
+            }
 
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                //just for Demo
+            swipeEffect();
+
+            recyclerView.addOnItemTouchListener(
+                    new ManageRecyclerviewClick(view.getContext(), new ManageRecyclerviewClick.OnItemClickListener() {
+                        @Override
+
+                        public void onItemClick(View view, int position) {
+
+                            System.out.println("click position:" + position);
+                            if (items.get(position).getStatus().equals(SongStatus.AVAILABLE.getFriendlyName()) || items.get(position).getStatus().equals(SongStatus.DELETED.getFriendlyName())) {
+                                askQuestion(position, null, 1);
+                            } else if (items.get(position).getStatus().equals(SongStatus.DOWNLOADED.getFriendlyName())) {
+                                playSong();
+                            } else if (items.get(position).getStatus().equals(SongStatus.DOWNLOADING.getFriendlyName())) {
+                                askQuestion(position, null, 2);
+                            }
+                        }
+                    })
+            );
+
+            swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    //just for Demo
                 /*(new Handler()).postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -218,20 +272,24 @@ public class SongFragment extends AbstractFermatFragment {
 
                     }
                 }, 1500);*/
-                syncTokenlyAndUpdateThreads(false);
+                    syncTokenlyAndUpdateThreads(false);
 
-                //
-                // updatesonglist();
+                    //
+                    // updatesonglist();
 
+                }
+            });
+
+            if (fanWalletSettings.isHomeTutorialDialogEnabled() == true) {
+                setUpHelpFanWallet(false);
             }
-        });
 
-        if (fanWalletSettings.isHomeTutorialDialogEnabled() == true)
-        {
-            setUpHelpFanWallet(false);
+        }else{
+
+
+
+
         }
-
-
 
         return view;
     }
@@ -269,15 +327,6 @@ public class SongFragment extends AbstractFermatFragment {
                 syncThread.execute();
             }
 
-       /* monitorThreadClass=new MonitorThreadClass(); // Secondthread
-        if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)// Above Api Level 13
-        {
-            monitorThreadClass.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
-        else // Below Api Level 13
-        {
-            monitorThreadClass.execute();
-        }*/
 
     }
 
@@ -304,7 +353,14 @@ public class SongFragment extends AbstractFermatFragment {
         songInfo=songOfBroadcast.getComposers()+"@#@#"+songOfBroadcast.getName();
         if(!listComposerAndSongNameOnView.contains(songInfo)){
             items.add(new SongItems(R.drawable.tky_tokenly_album, songOfBroadcast.getName(), songOfBroadcast.getComposers(), SongStatus.DOWNLOADING.getFriendlyName(),song_Id, 0, false));
-            adapter.setFilter(items,false,0);
+            adapter.setFilter(new SongItems(R.drawable.tky_tokenly_album,
+                    songOfBroadcast.getName(),
+                    songOfBroadcast.getComposers(),
+                    SongStatus.DOWNLOADING.getFriendlyName(),
+                    song_Id,
+                    0,
+                    false)
+                    ,false,items.size()-1);
 
         }
 
@@ -316,7 +372,7 @@ public class SongFragment extends AbstractFermatFragment {
         List<WalletSong> songsInDatabase=new ArrayList<>();
 
         try {
-            songsInDatabase=fanWalletModule.getAvailableSongs();
+            songsInDatabase = fanWalletModule.getAvailableSongs();
         } catch (CantGetSongListException e) {
             e.printStackTrace();
         }
@@ -335,7 +391,13 @@ public class SongFragment extends AbstractFermatFragment {
                     listComposerAndSongNameOnView.add("TKY_WALLET songs" + walletitems.getComposers() + "@#@#" + walletitems.getName());
                     //System.out.println("TKY_NOT in view" + walletitems.getComposers() + "@#@#" + walletitems.getName());
                     items.add(new SongItems(R.drawable.tky_tokenly_album, walletitems.getName(), walletitems.getComposers(), walletitems.getSongStatus().getFriendlyName(), walletitems.getSongId(), 0, false));
-                    adapter.setFilter(items,false,0);
+                    adapter.setFilter(new SongItems(R.drawable.tky_tokenly_album,
+                            walletitems.getName(),
+                            walletitems.getComposers(),
+                            walletitems.getSongStatus().getFriendlyName(),
+                            walletitems.getSongId(),
+                            0,
+                            false), false,  items.size()-1);
                 }
             }
 
@@ -432,7 +494,7 @@ public class SongFragment extends AbstractFermatFragment {
                 });
                 dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog1, int id) {
-                        adapter.setFilter(original, false, 0);
+                        adapter.setFilter(items.get(position), true, position);
                     }
                 });
                 dialog1.show();
@@ -482,7 +544,7 @@ public class SongFragment extends AbstractFermatFragment {
             fanWalletModule.deleteSong(items.get(position).getSong_id());
             items.get(position).setStatus(SongStatus.DELETED.getFriendlyName());
             items.get(position).setProgress(0);
-            adapter.setFilter(items,false,0);
+            adapter.setFilter(items.get(position),true,position);
         } catch (CantDeleteSongException e) {
             errorManager.reportUnexpectedWalletException(Wallets.TKY_FAN_WALLET, UnexpectedWalletExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_FRAGMENT, e);
         } catch (CantUpdateSongStatusException e) {
@@ -526,30 +588,34 @@ public class SongFragment extends AbstractFermatFragment {
         int position=0;
 
             try {
-                System.out.println("TKY_Broad_Arrive:");
+                if(bundle.contains(BroadcasterNotificationType.FAN_WALLET_BROADCAST_NOTIFICATION.getCode())) {
+                    System.out.println("TKY_Broad_Arrive:");
 
-                if (bundle.contains(BroadcasterNotificationType.SONG_INFO.getCode())) {
-                    System.out.println("TKY_BROAD_SONGINFO:"+ ((Song)bundle.getSerializable(BroadcasterNotificationType.SONG_INFO.getCode())).getName());
-                    searchInViewPosition((Song) bundle.getSerializable(BroadcasterNotificationType.SONG_INFO.getCode()),
-                            (UUID) bundle.getSerializable(BroadcasterNotificationType.SONG_ID.getCode()));
-                }
+                    if (bundle.contains(BroadcasterNotificationType.SONG_INFO.getCode())) {
+                        System.out.println("TKY_BROAD_SONGINFO:" + ((Song) bundle.getSerializable(BroadcasterNotificationType.SONG_INFO.getCode())).getName());
+                        searchInViewPosition((Song) bundle.getSerializable(BroadcasterNotificationType.SONG_INFO.getCode()),
+                                (UUID) bundle.getSerializable(BroadcasterNotificationType.SONG_ID.getCode()));
+                    }
 
-                if (bundle.contains(BroadcasterNotificationType.DOWNLOAD_PERCENTAGE.getCode())) {
-                    System.out.println("TKY_BROAD_DOWNLOAD_PERCENTAGE:"+bundle.getString(BroadcasterNotificationType.DOWNLOAD_PERCENTAGE.getCode()));
-                    position=searchInViewBySongId((UUID) bundle.getSerializable(BroadcasterNotificationType.SONG_ID.getCode()));
-                    updateProgress(position, bundle.getString(BroadcasterNotificationType.DOWNLOAD_PERCENTAGE.getCode()).split("%")[0]);
-                }
+                    if (bundle.contains(BroadcasterNotificationType.DOWNLOAD_PERCENTAGE.getCode())) {
+                        System.out.println("TKY_BROAD_DOWNLOAD_PERCENTAGE:" + bundle.getString(BroadcasterNotificationType.DOWNLOAD_PERCENTAGE.getCode()));
+                        position = searchInViewBySongId((UUID) bundle.getSerializable(BroadcasterNotificationType.SONG_ID.getCode()));
+                        updateProgress(position, bundle.getString(BroadcasterNotificationType.DOWNLOAD_PERCENTAGE.getCode()).split("%")[0]);
+                    }
 
-                if (bundle.contains(BroadcasterNotificationType.DOWNLOAD_EXCEPTION.getCode())) {
-                    System.out.println("TKY_BROAD_DOWNLOAD_EXCEPTION:"+bundle.getString(BroadcasterNotificationType.DOWNLOAD_EXCEPTION.getCode()));
-                    position=searchInViewBySongId((UUID) bundle.getSerializable(BroadcasterNotificationType.SONG_ID.getCode()));
-                    downloadproblem(position);
-                }
+                    if (bundle.contains(BroadcasterNotificationType.DOWNLOAD_EXCEPTION.getCode())) {
+                        System.out.println("TKY_BROAD_DOWNLOAD_EXCEPTION:" + bundle.getString(BroadcasterNotificationType.DOWNLOAD_EXCEPTION.getCode()));
+                        position = searchInViewBySongId((UUID) bundle.getSerializable(BroadcasterNotificationType.SONG_ID.getCode()));
+                        downloadproblem(position);
+                    }
 
-                if (bundle.contains(BroadcasterNotificationType.SONG_CANCEL.getCode())) {
-                    System.out.println("TKY_BROAD_SONG_CANCEL:"+bundle.getString(BroadcasterNotificationType.SONG_CANCEL.getCode()));
-                    position=searchInViewBySongId((UUID) bundle.getSerializable(BroadcasterNotificationType.SONG_ID.getCode()));
-                    cancelNotification(position);
+                    if (bundle.contains(BroadcasterNotificationType.SONG_CANCEL.getCode())) {
+                        System.out.println("TKY_BROAD_SONG_CANCEL:" + bundle.getString(BroadcasterNotificationType.SONG_CANCEL.getCode()));
+                        position = searchInViewBySongId((UUID) bundle.getSerializable(BroadcasterNotificationType.SONG_ID.getCode()));
+                        cancelNotification(position);
+                    }
+
+                    downloading=true;
                 }
 
 
@@ -570,14 +636,14 @@ public class SongFragment extends AbstractFermatFragment {
             items.get(position).setProgressbarvissible(false);
             items.get(position).setStatus(SongStatus.DOWNLOADED.getFriendlyName());
         }
-        adapter.setFilter(items,true,position);
+        adapter.setFilter(items.get(position),true,position);
     }
 
     void cancelNotification(int position){
         items.get(position).setProgressbarvissible(false);
         items.get(position).setProgress(Integer.valueOf(0));
         items.get(position).setStatus(SongStatus.AVAILABLE.getFriendlyName());
-        adapter.setFilter(items,false,0);
+        adapter.setFilter(items.get(position),true,position);
     }
     // TODO: 04/04/16 what happen here?
     void downloadproblem(int position){
@@ -616,7 +682,7 @@ public class SongFragment extends AbstractFermatFragment {
             items.get(position).setProgressbarvissible(true);
             songId=items.get(position).getSong_id();
             Log.v(TAG, "Before start download");
-            adapter.setFilter(items,true,position);
+            adapter.setFilter(items.get(position),true,position);
 
         }
 
@@ -826,109 +892,5 @@ public class SongFragment extends AbstractFermatFragment {
     }
 
 
-    /* AsyncTask
-  Variable type
-  Void for the parameters
-  Float for the onprogressupdate
-  Boolen for the  onPostExecute   */
-
-   /* public class MonitorThreadClass extends AsyncTask<Void, WalletSong, Boolean> {
-
-        boolean unfinish=true;
-
-        List<WalletSong> songlistofthread=new ArrayList<>();
-        List<String> listComposerAndSongNameOnView=new ArrayList<>();
-        *//**
-         * parameters position
-         *//*
-        public MonitorThreadClass() {
-
-        }
-
-        *//**
-         * Before start thread
-         *//*
-        @Override
-        protected void onPreExecute() {
-
-        }
-
-        *//**
-         * Se ejecuta después de "onPreExecute". Se puede llamar al hilo Principal con el método "publishProgress" que ejecuta el método "onProgressUpdate" en hilo Principal
-         *//*
-        @Override
-        protected Boolean doInBackground(Void... variableNoUsada) {
-
-            while(syncThread.unfinish){
-                try {
-                    songlistofthread=fanwalletmoduleManager.getFanWalletModule().getAvailableSongs();
-                    compareViewAndDatabase(songlistofthread, items);
-           //         System.out.println("TKY_Monitor ok");
-                } catch (CantGetSongListException e) {
-                    System.out.println("tky_monitorthread:"+e);;
-                }
-            }
-
-
-            return true;
-        }
-
-        void compareViewAndDatabase(List<WalletSong> listAvailableSongs,List<SongItems> listSongInView ){
-            String databaseInfo;
-
-            for(SongItems songitems : listSongInView){
-                if(!listComposerAndSongNameOnView.contains(songitems.getUsername()+"@#@#"+songitems.getSong_name())){
-                    System.out.println("TKY_VIEW songs"+songitems.getUsername()+"@#@#"+songitems.getSong_name());
-                    listComposerAndSongNameOnView.add(songitems.getUsername()+"@#@#"+songitems.getSong_name());
-                }
-            }
-            if(listAvailableSongs.size()>listComposerAndSongNameOnView.size()){
-                for (WalletSong walletitems :listAvailableSongs){
-                    databaseInfo=walletitems.getComposers()+"@#@#"+walletitems.getName();
-                    System.out.println("TKY_WALLET songs"+walletitems.getComposers()+"@#@#"+walletitems.getName());
-                    if(!listComposerAndSongNameOnView.contains(databaseInfo)){
-                        listComposerAndSongNameOnView.add("TKY_WALLET songs"+walletitems.getComposers()+"@#@#"+walletitems.getName());
-                        System.out.println("TKY_NOT in view"+walletitems.getComposers()+"@#@#"+walletitems.getName());
-                        publishProgress(walletitems);
-                    }
-                }
-
-            }
-        }
-
-        *//**
-         * To update the view
-         *//*
-        @Override
-        protected void onProgressUpdate(WalletSong... walletitems) {
-            System.out.println("TKY_PUBLISHPROGRESS"+Arrays.toString(walletitems));
-            items.add(new SongItems(R.drawable.tky_tokenly_album, walletitems[0].getName(), walletitems[0].getComposers(),SongStatus.DED.getCode(),walletitems[0].getSongId(),0,false));
-            adapter.setFilter(items);
-        }
-
-
-        *//**
-         * afte finish receive the value of doinbackground
-         *//*
-
-        protected void onPostExecute(Boolean ready) {
-
-            swipeContainer.setRefreshing(false);
-            Log.v(TAG, "Game Over MonitoringThreadClass");
-
-        }
-        *//**
-         * when the method cancel is called
-         *//*
-        @Override
-        protected void onCancelled() {
-
-        }
-
-
-
-
-
-    }*/
 
 }

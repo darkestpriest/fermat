@@ -77,6 +77,8 @@ public class FollowingFragment extends AbstractFermatFragment implements SearchV
     List<Fan> fanList=new ArrayList<>();
     Bot artistBot;
     final Handler myHandler = new Handler();
+
+
     public static FollowingFragment newInstance(){
         return new FollowingFragment();
     }
@@ -92,6 +94,7 @@ public class FollowingFragment extends AbstractFermatFragment implements SearchV
             fanWalletModuleManager =  fanwalletSession.getModuleManager();
             errorManager = appSession.getErrorManager();
             System.out.println("HERE START FOLLOWING");
+
 
             try {
                 fanWalletSettings =  fanWalletModuleManager.getSettingsManager().loadAndGetSettings(appSession.getAppPublicKey());
@@ -121,7 +124,6 @@ public class FollowingFragment extends AbstractFermatFragment implements SearchV
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.tky_fan_wallet_menu, menu);
-        getActivity().getWindow().setBackgroundDrawableResource(R.drawable.fanwallet_background_viewpager);
         final MenuItem item = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
         searchView.setOnQueryTextListener(this);
@@ -158,8 +160,6 @@ public class FollowingFragment extends AbstractFermatFragment implements SearchV
     }
 
 
-
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -171,13 +171,7 @@ public class FollowingFragment extends AbstractFermatFragment implements SearchV
         loaditems();
         adapter = new FollowingAdapter(items);
         recyclerView.setAdapter(adapter);
-
-       /* if(items.isEmpty()){
-            recyclerView.setBackgroundResource(R.drawable.nocconnect);
-        }else{
-            recyclerView.setBackgroundResource(R.drawable.fanwallet_background_viewpager);
-        }*/
-
+        recyclerView.setBackgroundResource(R.drawable.fanwallet_background_viewpager);
         swipe_effect();
 
         recyclerView.addOnItemTouchListener(
@@ -334,6 +328,7 @@ public class FollowingFragment extends AbstractFermatFragment implements SearchV
     void getMyConnection(){
         //TODO: to implement
     }
+
 
     private List<FollowingItems> filter(List<FollowingItems> models, String query) {
         query = query.toLowerCase();

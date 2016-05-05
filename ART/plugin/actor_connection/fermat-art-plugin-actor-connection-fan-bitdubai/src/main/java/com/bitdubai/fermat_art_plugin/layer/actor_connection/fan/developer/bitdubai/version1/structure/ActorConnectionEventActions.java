@@ -104,6 +104,9 @@ public class ActorConnectionEventActions {
                     for (final FanConnectionRequest request : fanConnectionRequests)
                         this.handleFanRequestConnection(request, Actors.ART_FAN);
                     break;
+                case ACTOR_NETWORK_SERVICE_ARTIST:
+                    //Nothing to do here
+                    break;
                 default:
                     throw new CantHandleNewsEventException(
                             "Unexpected event source when processing News Event in Fan Actor " +
@@ -309,10 +312,16 @@ public class ActorConnectionEventActions {
                         request.getSenderActorType() == PlatformComponentType.ART_FAN*/) {
                     switch (request.getRequestAction()) {
                         case ACCEPT:
-                            this.handleAcceptConnection(request.getRequestId());
+                            this.handleAcceptConnection(request.getRequestId(),EventSource.ACTOR_NETWORK_SERVICE_ARTIST);
                             break;
                         case DISCONNECT:
-                            this.handleDisconnect(request.getRequestId());
+                            this.handleDisconnect(request.getRequestId(), Actors.ART_ARTIST);
+                            break;
+                        case CANCEL:
+                            this.handleCancelConnection(request.getRequestId());
+                            break;
+                        case DENY:
+                            this.handleDenyConnection(request.getRequestId());
                             break;
                     }
                 }
@@ -321,7 +330,9 @@ public class ActorConnectionEventActions {
                 ActorConnectionNotFoundException |
                 UnexpectedConnectionStateException |
                 CantDisconnectFromActorException |
-                CantAcceptActorConnectionRequestException e) {
+                CantAcceptActorConnectionRequestException |
+                CantDenyActorConnectionRequestException |
+                CantCancelActorConnectionRequestException e) {
             throw new CantHandleNewsEventException(
                     e,
                     "",
@@ -339,17 +350,17 @@ public class ActorConnectionEventActions {
             final List<FanConnectionRequest> list = fanNetworkService.
                     listPendingConnectionUpdates();
             for (final FanConnectionRequest request : list) {
-                if (request.getRequestType() == RequestType.SENT  /*&&
-                        request.getSenderActorType() == PlatformComponentType.ART_FAN*/) {
+                /*if (request.getRequestType() == RequestType.SENT  &&
+                        request.getSenderActorType() == PlatformComponentType.ART_FAN) {*/
                     switch (request.getRequestAction()) {
                         case ACCEPT:
-                            this.handleAcceptConnection(request.getRequestId());
+                            this.handleAcceptConnection(request.getRequestId(),EventSource.ACTOR_NETWORK_SERVICE_FAN);
                             break;
                         case DISCONNECT:
-                            this.handleDisconnect(request.getRequestId());
+                            this.handleDisconnect(request.getRequestId(), Actors.ART_FAN);
                             break;
                     }
-                }
+                //}
             }
         } catch(CantListPendingConnectionRequestsException |
                 ActorConnectionNotFoundException |
@@ -370,7 +381,7 @@ public class ActorConnectionEventActions {
      * @throws ActorConnectionNotFoundException
      * @throws UnexpectedConnectionStateException
      */
-    public void handleDisconnect(final UUID connectionId) throws
+    public void handleDisconnect(final UUID connectionId, Actors actorSource) throws
             CantDisconnectFromActorException ,
             ActorConnectionNotFoundException   ,
             UnexpectedConnectionStateException {
@@ -385,7 +396,14 @@ public class ActorConnectionEventActions {
                             connectionId,
                             ConnectionState.DISCONNECTED_REMOTELY
                     );
-                    artistNetworkService.confirm(connectionId);
+                    switch (actorSource){
+                        case ART_ARTIST:
+                            artistNetworkService.confirm(connectionId);
+                            break;
+                        case ART_FAN:
+                            fanNetworkService.confirm(connectionId);
+                            break;
+                    }
                     break;
                 default:
                     throw new UnexpectedConnectionStateException(
@@ -599,7 +617,7 @@ public class ActorConnectionEventActions {
      * @throws ActorConnectionNotFoundException
      * @throws UnexpectedConnectionStateException
      */
-    public void handleAcceptConnection(final UUID connectionId) throws
+    public void handleAcceptConnection(final UUID connectionId, final EventSource eventSource) throws
             CantAcceptActorConnectionRequestException,
             ActorConnectionNotFoundException,
             UnexpectedConnectionStateException{
@@ -614,7 +632,10 @@ public class ActorConnectionEventActions {
                             connectionId,
                             ConnectionState.CONNECTED
                     );
-                    artistNetworkService.confirm(connectionId);
+                    if (eventSource == EventSource.ACTOR_NETWORK_SERVICE_ARTIST)
+                        artistNetworkService.confirm(connectionId);
+                    else
+                        fanNetworkService.confirm(connectionId);
                     break;
                 default:
                     throw new UnexpectedConnectionStateException(
