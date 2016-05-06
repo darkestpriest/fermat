@@ -25,10 +25,12 @@ public class DeveloperBitDubai extends AbstractPluginDeveloper implements Plugin
 
         } catch (CantRegisterVersionException e) {
 
-            throw new CantStartPluginDeveloperException(
-                    FermatException.wrapException(e),
-                    "",
-                    "Error registering plugin versions for the developer.");
+                throw new CantStartPluginDeveloperException(
+                        "Error registering plugin versions for the developer. start - Message: " + e.getMessage(),
+                        FermatException.wrapException(e),
+                        e.getCause().toString(),
+                        "start. Can't Register Version."
+                );
         }
     }
 

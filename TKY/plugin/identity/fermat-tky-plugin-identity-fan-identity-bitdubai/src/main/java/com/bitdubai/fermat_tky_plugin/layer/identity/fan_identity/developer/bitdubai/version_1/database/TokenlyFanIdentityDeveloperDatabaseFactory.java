@@ -88,8 +88,12 @@ public class TokenlyFanIdentityDeveloperDatabaseFactory implements DealsWithPlug
              /*
               * The database exists but cannot be open. I can not handle this situation.
               */
-            throw new CantInitializeTokenlyFanIdentityDatabaseException(cantOpenDatabaseException.getMessage());
-
+            throw new CantInitializeTokenlyFanIdentityDatabaseException(
+                    "Error. can't create database. initializeDatabase - Message: " + cantOpenDatabaseException.getMessage(),
+                    FermatException.wrapException(cantOpenDatabaseException),
+                    cantOpenDatabaseException.getCause().toString(),
+                    "initializeDatabase. The database exists but cannot be open."
+            );
         } catch (DatabaseNotFoundException e) {
 
              /*
@@ -108,24 +112,25 @@ public class TokenlyFanIdentityDeveloperDatabaseFactory implements DealsWithPlug
                   /*
                    * The database cannot be created. I can not handle this situation.
                    */
-                throw new CantInitializeTokenlyFanIdentityDatabaseException(cantCreateDatabaseException.getMessage());
+                throw new CantInitializeTokenlyFanIdentityDatabaseException(
+                        "Error. can't find database. initializeDatabase - Message: " + cantCreateDatabaseException.getMessage(),
+                        FermatException.wrapException(cantCreateDatabaseException),
+                        cantCreateDatabaseException.getCause().toString(),
+                        "initializeDatabase. Database doesn't exist."
+                );
+
             }
-        } catch (NullPointerException ex){
-            throw new CantInitializeTokenlyFanIdentityDatabaseException(
-                    CantInitializeTokenlyFanIdentityDatabaseException.DEFAULT_MESSAGE,
-                    FermatException.wrapException(ex),
-                    "Database error",
-                    "Unknown Failure.");
         } catch (Exception ex){
             errorManager.reportUnexpectedPluginException(
                     Plugins.TOKENLY_FAN_SUB_APP_MODULE,
                     UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
                     ex);
             throw new CantInitializeTokenlyFanIdentityDatabaseException(
-                    CantInitializeTokenlyFanIdentityDatabaseException.DEFAULT_MESSAGE,
+                    "Error. can't create dabase. initializeDatabase - Message: " + ex.getMessage(),
                     FermatException.wrapException(ex),
-                    "Database error",
-                    "unknown failure.");
+                    ex.getCause().toString(),
+                    "initializeDatabase. error connection."
+            );
         }
     }
 
@@ -200,22 +205,17 @@ public class TokenlyFanIdentityDeveloperDatabaseFactory implements DealsWithPlug
             /**
              * return the list of DeveloperRecords for the passed table.
              */
-        }catch (NullPointerException ex){
-            throw new CantLoadTableToMemoryException(
-                    CantLoadTableToMemoryException.DEFAULT_MESSAGE,
-                    FermatException.wrapException(ex),
-                    "Database error",
-                    "Unknown Failure.");
         } catch (Exception ex){
             errorManager.reportUnexpectedPluginException(
                     Plugins.TOKENLY_FAN_SUB_APP_MODULE,
                     UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
                     ex);
             throw new CantLoadTableToMemoryException(
-                    CantLoadTableToMemoryException.DEFAULT_MESSAGE,
+                    "Error getting list. CantLoadTableToMemoryException - Message: " + ex.getMessage(),
                     FermatException.wrapException(ex),
-                    "Database error",
-                    "unknown failure.");
+                    ex.getCause().toString(),
+                    "CantLoadTableToMemoryException."
+            );
         } finally {
             if(database != null){
                 database.closeDatabase();

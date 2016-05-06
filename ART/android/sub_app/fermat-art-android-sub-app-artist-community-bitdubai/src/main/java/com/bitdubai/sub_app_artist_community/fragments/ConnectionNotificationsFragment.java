@@ -19,6 +19,8 @@ import com.bitdubai.fermat_android_api.layer.definition.wallet.AbstractFermatFra
 import com.bitdubai.fermat_android_api.ui.interfaces.FermatListItemListeners;
 import com.bitdubai.fermat_android_api.ui.interfaces.FermatWorkerCallBack;
 import com.bitdubai.fermat_android_api.ui.util.FermatWorker;
+import com.bitdubai.fermat_api.FermatException;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
 import com.bitdubai.fermat_api.layer.modules.exceptions.ActorIdentityNotSelectedException;
 import com.bitdubai.fermat_api.layer.modules.exceptions.CantGetSelectedActorIdentityException;
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.exceptions.CantListArtistsException;
@@ -26,6 +28,7 @@ import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.interfa
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.interfaces.ArtistCommunitySubAppModuleManager;
 import com.bitdubai.fermat_ccp_api.layer.module.intra_user.exceptions.CantGetActiveLoginIdentityException;
 import com.bitdubai.fermat_pip_api.layer.network_service.subapp_resources.SubAppResourcesProviderManager;
+import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
 import com.bitdubai.sub_app.artist_community.R;
 import com.bitdubai.sub_app_artist_community.adapters.AppNotificationAdapter;
@@ -126,18 +129,35 @@ public class ConnectionNotificationsFragment extends AbstractFermatFragment<Arti
 
             dataSet.addAll(moduleManager.listArtistsPendingLocalAction(moduleManager.getSelectedActorIdentity(), MAX, offset));
 
-        } catch (CantGetSelectedActorIdentityException e) {
-            e.printStackTrace();
-        } catch (ActorIdentityNotSelectedException e) {
-            e.printStackTrace();
-        } catch (CantListArtistsException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (CantGetSelectedActorIdentityException | ActorIdentityNotSelectedException | CantListArtistsException | ArrayIndexOutOfBoundsException e) {
+            String possibleReason = null;
+            if(e instanceof CantGetSelectedActorIdentityException) possibleReason = "Can't Get Selected Actor Identity.";
+            if(e instanceof ActorIdentityNotSelectedException) possibleReason = "Actor Identity Not Selected.";
+            if(e instanceof CantListArtistsException) possibleReason = "Can't List Artists.";
+            if(e instanceof ArrayIndexOutOfBoundsException) possibleReason = "Array Index Out Of Bounds.";
+
+            FermatException ex = new CantListArtistsException(
+                    "Exception not catched correctly. getMoreData. - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "getMoreData. Problem to get the information. "+possibleReason);
+
+        } catch (Exception e){
+            FermatException ex = new CantListArtistsException(
+                    "Exception not catched correctly. getMoreData - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "getMoreData. Unknown Failure");
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    FermatException.wrapException(ex));
+        } finally{
+            return dataSet;
         }
 
-        return dataSet;
     }
+
     private void setUpScreen(LayoutInflater layoutInflater) throws CantGetActiveLoginIdentityException {
     }
 
@@ -183,14 +203,24 @@ public class ConnectionNotificationsFragment extends AbstractFermatFragment<Arti
                 public void onErrorOccurred(Exception ex) {
                     notificationsProgressDialog.dismiss();
                     try {
+
                         isRefreshing = false;
                         if (swipeRefresh != null)
                             swipeRefresh.setRefreshing(false);
                         if (getActivity() != null)
                             Toast.makeText(getActivity(), ex.getMessage(), Toast.LENGTH_LONG).show();
-                        ex.printStackTrace();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+
+                    } catch (Exception e){
+                        FermatException exception = new CantListArtistsException(
+                                "Exception not catched correctly. onErrorOccurred - Message: " + e.getMessage(),
+                                FermatException.wrapException(e),
+                                e.getCause().toString(),
+                                "onErrorOccurred. onRefresh error"
+                                );
+                        errorManager.reportUnexpectedPluginException(
+                                Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                                UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                                FermatException.wrapException(exception));
                     }
                 }
             });
@@ -202,13 +232,30 @@ public class ConnectionNotificationsFragment extends AbstractFermatFragment<Arti
     @Override
     public void onItemClickListener(ArtistCommunityInformation data, int position) {
         try {
+
             Toast.makeText(getActivity(), "TODO ACCEPT ->", Toast.LENGTH_LONG).show();
             //moduleManager.acceptCryptoBroker(moduleManager.getSelectedActorIdentity(), data.getName(), data.getPublicKey(), data.getProfileImage());
             AcceptDialog notificationAcceptDialog = new AcceptDialog(getActivity(), appSession, appResourcesProviderManager, data, moduleManager.getSelectedActorIdentity());
             notificationAcceptDialog.setOnDismissListener(this);
             notificationAcceptDialog.show();
-        } catch (CantGetSelectedActorIdentityException |ActorIdentityNotSelectedException e) {
-            e.printStackTrace();
+
+        } catch (CantGetSelectedActorIdentityException | ActorIdentityNotSelectedException | InstantiationException e) {
+            String possibleReason = null;
+            if(e instanceof CantGetSelectedActorIdentityException) possibleReason = "Can't Get Selected Actor Identity.";
+            if(e instanceof ActorIdentityNotSelectedException) possibleReason = "Actor Identity Not Selected.";
+            if(e instanceof InstantiationException) possibleReason = "Instantiation Problem.";
+
+            FermatException exception = new CantListArtistsException(
+                    "Error. onItemClickListener - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "onItemClickListener. "+possibleReason
+            );
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    FermatException.wrapException(e));
+
             Toast.makeText(getActivity(), "TODO ACCEPT but.. ERROR! ->", Toast.LENGTH_LONG).show();
         }
     }

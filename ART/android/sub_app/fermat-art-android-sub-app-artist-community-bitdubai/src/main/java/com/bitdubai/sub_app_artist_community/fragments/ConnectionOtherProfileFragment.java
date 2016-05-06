@@ -18,13 +18,17 @@ import android.widget.Toast;
 import com.bitdubai.fermat_android_api.layer.definition.wallet.AbstractFermatFragment;
 import com.bitdubai.fermat_android_api.layer.definition.wallet.utils.ImagesUtils;
 import com.bitdubai.fermat_android_api.layer.definition.wallet.views.FermatTextView;
+import com.bitdubai.fermat_api.FermatException;
 import com.bitdubai.fermat_api.layer.actor_connection.common.enums.ConnectionState;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
 import com.bitdubai.fermat_api.layer.all_definition.enums.UISource;
+import com.bitdubai.fermat_api.layer.all_definition.network_service.exceptions.CantGetImageResourceException;
 import com.bitdubai.fermat_api.layer.modules.exceptions.ActorIdentityNotSelectedException;
 import com.bitdubai.fermat_api.layer.modules.exceptions.CantGetSelectedActorIdentityException;
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.interfaces.ArtistCommunityInformation;
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.interfaces.ArtistCommunitySubAppModuleManager;
 import com.bitdubai.fermat_pip_api.layer.network_service.subapp_resources.SubAppResourcesProviderManager;
+import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedUIExceptionSeverity;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
 import com.bitdubai.sub_app.artist_community.R;
@@ -124,6 +128,18 @@ public class ConnectionOtherProfileFragment extends AbstractFermatFragment<Artis
             userProfileAvatar.setImageDrawable(ImagesUtils.getRoundedBitmap(getResources(), bitmap));
 
         } catch (Exception ex) {
+            FermatException exception = new CantGetImageResourceException(
+                    "Error with artist Community Information. onCreateView - Message: " + ex.getMessage(),
+                    FermatException.wrapException(ex),
+                    ex.getCause().toString(),
+                    "onCreateView. Can't get bitmap."
+            );
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    FermatException.wrapException(exception));
+
+
             Toast.makeText(getActivity().getApplicationContext(), "Oooops! recovering from system error", Toast.LENGTH_SHORT).show();
         }
         return rootView;
@@ -200,7 +216,20 @@ public class ConnectionOtherProfileFragment extends AbstractFermatFragment<Artis
                 connect.setVisibility(View.GONE);
                 cancel.setVisibility(View.GONE);
             }
-        }catch (Exception e) {}
+        }catch (Exception e) {
+            FermatException exception = new FermatException(
+                    "Error session connection. onDismiss - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "onDismiss. error connection."
+            );
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    FermatException.wrapException(exception));
+
+
+        }
 
     }
 

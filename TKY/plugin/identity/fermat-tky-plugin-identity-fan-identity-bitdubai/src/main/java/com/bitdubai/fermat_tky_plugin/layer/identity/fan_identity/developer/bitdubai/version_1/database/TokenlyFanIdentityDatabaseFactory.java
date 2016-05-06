@@ -96,22 +96,18 @@ public class TokenlyFanIdentityDatabaseFactory implements DealsWithErrors, Deals
 
             throw new CantCreateDatabaseException(message, cause, context, possibleReason);
 
-        } catch (NullPointerException ex){
-            throw new CantCreateDatabaseException(
-                    CantCreateDatabaseException.DEFAULT_MESSAGE,
-                    FermatException.wrapException(ex),
-                    "Database error",
-                    "Connection Failure.");
         } catch (Exception ex){
             errorManager.reportUnexpectedPluginException(
                     Plugins.TOKENLY_FAN_SUB_APP_MODULE,
                     UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
                     ex);
             throw new CantCreateDatabaseException(
-                    CantCreateDatabaseException.DEFAULT_MESSAGE,
+                    "Error. can't create database. createDatabase - Message: " + ex.getMessage(),
                     FermatException.wrapException(ex),
-                    "Database error",
-                    "Connection failure.");
+                    ex.getCause().toString(),
+                    "createDatabase. The exception is generated when creating the table Asset Issuer Identity"
+            );
+
         }
 
         return database;

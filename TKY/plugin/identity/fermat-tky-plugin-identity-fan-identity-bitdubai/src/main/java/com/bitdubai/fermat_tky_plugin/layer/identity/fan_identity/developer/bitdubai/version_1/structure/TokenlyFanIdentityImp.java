@@ -167,22 +167,24 @@ public class TokenlyFanIdentityImp implements DealsWithPluginFileSystem, DealsWi
             file.setContent(imageBytes);
             file.persistToMedia();
 
-        } catch (NullPointerException | CantPersistFileException | CantCreateFileException  e) {
+        } catch (CantPersistFileException | CantCreateFileException  e) {
             throw new CantCreateFileException(
-                    CantCreateFileException.DEFAULT_MESSAGE,
+                    "Error creating file. setNewProfileImage - Message: " + e.getMessage(),
                     FermatException.wrapException(e),
-                    "NewProfileImage error",
-                    "Unknown Failure.");
+                    e.getCause().toString(),
+                    "setNewProfileImage. Can't create new image profile"
+            );
         } catch (Exception ex){
             errorManager.reportUnexpectedPluginException(
                     Plugins.TOKENLY_FAN_SUB_APP_MODULE,
                     UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
                     ex);
             throw new CantCreateFileException(
-                    CantCreateFileException.DEFAULT_MESSAGE,
+                    "Error creating file. setNewProfileImage - Message: " + ex.getMessage(),
                     FermatException.wrapException(ex),
-                    "NewProfileImage error",
-                    "unknown failure.");
+                    ex.getCause().toString(),
+                    "setNewProfileImage. unknown failure"
+            );
         } finally {
             this.imageProfile = imageBytes;
         }
@@ -314,22 +316,17 @@ public class TokenlyFanIdentityImp implements DealsWithPluginFileSystem, DealsWi
     public void addNewArtistConnected(String userName) throws ObjectNotSetException{
         try {
             ObjectChecker.checkArgument(userName, "The user name is null");
-        }catch (NullPointerException ex){
-            throw new ObjectNotSetException(
-                    ObjectNotSetException.DEFAULT_MESSAGE,
-                    FermatException.wrapException(ex),
-                    "New Artist Argument error",
-                    "Unknown Failure.");
         } catch (Exception ex){
             errorManager.reportUnexpectedPluginException(
                     Plugins.TOKENLY_FAN_SUB_APP_MODULE,
                     UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
                     ex);
             throw new ObjectNotSetException(
-                    ObjectNotSetException.DEFAULT_MESSAGE,
+                    "Error adding new artist. addNewArtistConnected - Message: " + ex.getMessage(),
                     FermatException.wrapException(ex),
-                    "Database error",
-                    "unknown failure.");
+                    ex.getCause().toString(),
+                    "addNewArtistConnected. unknown failure"
+            );
         } finally {
             if(this.artistsConnectedList==null){
                 this.artistsConnectedList = new ArrayList<>();
