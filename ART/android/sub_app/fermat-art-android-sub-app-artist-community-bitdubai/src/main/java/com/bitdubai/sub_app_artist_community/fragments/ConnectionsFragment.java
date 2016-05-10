@@ -22,6 +22,8 @@ import com.bitdubai.fermat_android_api.layer.definition.wallet.AbstractFermatFra
 import com.bitdubai.fermat_android_api.ui.interfaces.FermatListItemListeners;
 import com.bitdubai.fermat_android_api.ui.interfaces.FermatWorkerCallBack;
 import com.bitdubai.fermat_android_api.ui.util.FermatWorker;
+import com.bitdubai.fermat_api.FermatException;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
 import com.bitdubai.fermat_api.layer.all_definition.enums.UISource;
 import com.bitdubai.fermat_api.layer.modules.exceptions.ActorIdentityNotSelectedException;
 import com.bitdubai.fermat_api.layer.modules.exceptions.CantGetSelectedActorIdentityException;
@@ -33,6 +35,7 @@ import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.interfa
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.fan.exceptions.CantListIdentitiesToSelectException;
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.fan.exceptions.CantSelectIdentityException;
 import com.bitdubai.fermat_pip_api.layer.network_service.subapp_resources.SubAppResourcesProviderManager;
+import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedUIExceptionSeverity;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
 import com.bitdubai.sub_app.artist_community.R;
@@ -272,7 +275,16 @@ Updates the count of notifications in the ActionBar.
             artistCommunitySearch.addAlias(alias);
 
         } catch(Exception e) {
-            e.printStackTrace();
+            FermatException exception = new FermatException(
+                    "Error adding alias. onQueryTextSubmit - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "onQueryTextSubmit. unknown"
+            );
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    FermatException.wrapException(exception));
         }
 
         // This method does not exist
@@ -297,15 +309,34 @@ Updates the count of notifications in the ActionBar.
 
     @Override
     public boolean onNavigationItemSelected(int position, long idItem) {
-
+        ArtistCommunitySelectableIdentity selectableIdentity = null;
         try {
-            ArtistCommunitySelectableIdentity selectableIdentity = moduleManager.listSelectableIdentities().get(position);
+
+            selectableIdentity = moduleManager.listSelectableIdentities().get(position);
             selectableIdentity.select();
-            return true;
+
+
         } catch (CantSelectIdentityException |CantListIdentitiesToSelectException e) {
-            e.printStackTrace();
+            FermatException exception = new FermatException(
+                    "Error selecting identities. onNavigationItemSelected - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "onNavigationItemSelected. unknown"
+            );
+        } catch (Exception e){
+            FermatException exception = new FermatException(
+                    "Error selecting identities. onNavigationItemSelected - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "onNavigationItemSelected. unknown"
+            );
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    FermatException.wrapException(exception));
+        } finally {
+            if(selectableIdentity != null) return true; else return false;
         }
-        return false;
     }
 
 
@@ -316,15 +347,34 @@ Updates the count of notifications in the ActionBar.
 
             dataSet = moduleManager.listAllConnectedArtists(moduleManager.getSelectedActorIdentity(), MAX, offset);
             offset = dataSet.size();
-        } catch (CantGetSelectedActorIdentityException e) {
-            e.printStackTrace();
-        } catch (ActorIdentityNotSelectedException e) {
-            e.printStackTrace();
-        } catch (CantListArtistsException e) {
-            e.printStackTrace();
+
+        } catch (CantGetSelectedActorIdentityException | ActorIdentityNotSelectedException | CantListArtistsException e) {
+            String possibleReason = null;
+            if(e instanceof CantGetSelectedActorIdentityException) possibleReason = "Can't Get Selected Actor Identity.";
+            if(e instanceof ActorIdentityNotSelectedException) possibleReason = "Actor Identity Not Selected.";
+            if(e instanceof CantListArtistsException) possibleReason = "Can't List Artists.";
+
+            FermatException exception = new FermatException(
+                    "Error getting data. getMoreData - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "getMoreData. "+possibleReason
+            );
+        } catch (Exception e){
+            FermatException exception = new FermatException(
+                    "Error getting data. getMoreData - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "getMoreData. unknown"
+            );
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    FermatException.wrapException(exception));
+        } finally {
+            return dataSet;
         }
 
-        return dataSet;
     }
 
     @Override
@@ -334,7 +384,27 @@ Updates the count of notifications in the ActionBar.
             ConnectDialog connectDialog = new ConnectDialog(getActivity(), appSession, appResourcesProviderManager, data, moduleManager.getSelectedActorIdentity());
             connectDialog.show();
         } catch (CantGetSelectedActorIdentityException | ActorIdentityNotSelectedException e) {
-            e.printStackTrace();
+            String possibleReason = null;
+            if(e instanceof CantGetSelectedActorIdentityException) possibleReason = "Can't Get Selected Actor Identity.";
+            if(e instanceof ActorIdentityNotSelectedException) possibleReason = "Actor Identity Not Selected.";
+
+            FermatException exception = new FermatException(
+                    "Error showing windows. onItemClickListener - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "onItemClickListener. "+possibleReason
+            );
+        } catch (Exception e){
+            FermatException exception = new FermatException(
+                    "Error showing windows. onItemClickListener - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "onItemClickListener. unknown"
+            );
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    FermatException.wrapException(exception));
         }
 
     }

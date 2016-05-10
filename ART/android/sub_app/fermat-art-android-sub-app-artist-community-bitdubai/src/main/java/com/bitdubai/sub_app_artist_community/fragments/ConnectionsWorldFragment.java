@@ -22,6 +22,7 @@ import com.bitdubai.fermat_android_api.ui.interfaces.FermatListItemListeners;
 import com.bitdubai.fermat_android_api.ui.interfaces.FermatWorkerCallBack;
 import com.bitdubai.fermat_android_api.ui.util.FermatWorker;
 import com.bitdubai.fermat_api.FermatException;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
 import com.bitdubai.fermat_api.layer.all_definition.enums.UISource;
 import com.bitdubai.fermat_api.layer.all_definition.navigation_structure.enums.Activities;
 import com.bitdubai.fermat_api.layer.all_definition.settings.structure.SettingsManager;
@@ -31,6 +32,7 @@ import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.interfa
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.interfaces.ArtistCommunitySubAppModuleManager;
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.settings.ArtistCommunitySettings;
 import com.bitdubai.fermat_pip_api.layer.network_service.subapp_resources.SubAppResourcesProviderManager;
+import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedUIExceptionSeverity;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
 import com.bitdubai.sub_app.artist_community.R;
@@ -115,6 +117,16 @@ public class ConnectionsWorldFragment extends AbstractFermatFragment<ArtistSubAp
 
             } catch (Exception e) {
                 appSettings = null;
+                FermatException exception = new FermatException(
+                        "Error creating object. onCreate - Message: " + e.getMessage(),
+                        FermatException.wrapException(e),
+                        e.getCause().toString(),
+                        "onCreate. unknown"
+                );
+                errorManager.reportUnexpectedPluginException(
+                        Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                        UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                        FermatException.wrapException(exception));
             }
 
             if (appSettings == null) {
@@ -131,13 +143,25 @@ public class ConnectionsWorldFragment extends AbstractFermatFragment<ArtistSubAp
 
             //Check if a default identity is configured
             try{
+
                 moduleManager.getSelectedActorIdentity();
-            }catch (CantGetSelectedActorIdentityException e){
-                //There are no identities in device
+
+            }catch (CantGetSelectedActorIdentityException | ActorIdentityNotSelectedException e){
+                String possibleReason = null;
+                if(e instanceof CantGetSelectedActorIdentityException) possibleReason = "Can't Get Selected Actor Identity.";
+                if(e instanceof ActorIdentityNotSelectedException) possibleReason = "Actor Identity Not Selected.";
+
+                FermatException exception = new FermatException(
+                        "Error getting selected actor identity. onCreate - Message: " + e.getMessage(),
+                        FermatException.wrapException(e),
+                        e.getCause().toString(),
+                        "onCreate. "+possibleReason);
+                errorManager.reportUnexpectedPluginException(
+                        Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                        UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                        FermatException.wrapException(exception));
+
                 launchActorCreationDialog = true;
-            }catch (ActorIdentityNotSelectedException e){
-                //There are identities in device, but none selected
-                launchListIdentitiesDialog = true;
             }
 
             //Get notification requests count
@@ -147,6 +171,11 @@ public class ConnectionsWorldFragment extends AbstractFermatFragment<ArtistSubAp
 
         } catch (Exception ex) {
             CommonLogger.exception(TAG, ex.getMessage(), ex);
+            FermatException exception = new FermatException(
+                    "Error handling pluging manager. onCreate - Message: " + ex.getMessage(),
+                    FermatException.wrapException(ex),
+                    ex.getCause().toString(),
+                    "onCreate. Unknown.");
             errorManager.reportUnexpectedUIException(UISource.ACTIVITY, UnexpectedUIExceptionSeverity.CRASH, ex);
         }
     }
@@ -272,7 +301,16 @@ public class ConnectionsWorldFragment extends AbstractFermatFragment<ArtistSubAp
                         swipeRefresh.setRefreshing(false);
                     if (getActivity() != null)
                         Toast.makeText(getActivity(), ex.getMessage(), Toast.LENGTH_LONG).show();
-                    ex.printStackTrace();
+                    FermatException exception = new FermatException(
+                            "Error refreshing data. onRefresh - Message: " + ex.getMessage(),
+                            FermatException.wrapException(ex),
+                            ex.getCause().toString(),
+                            "getMoreData. unknown"
+                    );
+                    errorManager.reportUnexpectedPluginException(
+                            Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                            UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                            FermatException.wrapException(exception));
                 }
             });
             worker.execute();
@@ -299,14 +337,33 @@ public class ConnectionsWorldFragment extends AbstractFermatFragment<ArtistSubAp
         List<ArtistCommunityInformation> dataSet = new ArrayList<>();
 
         try {
+
             List<ArtistCommunityInformation> result = moduleManager.listWorldArtists(moduleManager.getSelectedActorIdentity(), MAX, offset);
             dataSet.addAll(result);
             offset = dataSet.size();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        return dataSet;
+        } catch (ArrayIndexOutOfBoundsException | ArrayStoreException e){
+            FermatException exception = new FermatException(
+                    "Error receiving array data. getMoreData - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "getMoreData. unknown"
+            );
+
+        } catch (Exception e) {
+            FermatException exception = new FermatException(
+                    "Error getting data. getMoreData - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "getMoreData. unknown"
+            );
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    FermatException.wrapException(exception));
+        } finally {
+            return dataSet;
+        }
     }
 
     @Override

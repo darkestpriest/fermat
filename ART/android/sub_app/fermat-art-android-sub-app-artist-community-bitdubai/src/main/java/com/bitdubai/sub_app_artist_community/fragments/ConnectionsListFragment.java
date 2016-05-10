@@ -18,6 +18,8 @@ import com.bitdubai.fermat_android_api.layer.definition.wallet.AbstractFermatFra
 import com.bitdubai.fermat_android_api.ui.interfaces.FermatListItemListeners;
 import com.bitdubai.fermat_android_api.ui.interfaces.FermatWorkerCallBack;
 import com.bitdubai.fermat_android_api.ui.util.FermatWorker;
+import com.bitdubai.fermat_api.FermatException;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
 import com.bitdubai.fermat_api.layer.all_definition.navigation_structure.enums.Activities;
 import com.bitdubai.fermat_api.layer.modules.exceptions.ActorIdentityNotSelectedException;
 import com.bitdubai.fermat_api.layer.modules.exceptions.CantGetSelectedActorIdentityException;
@@ -26,6 +28,7 @@ import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.excepti
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.interfaces.ArtistCommunityInformation;
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.interfaces.ArtistCommunitySubAppModuleManager;
 import com.bitdubai.fermat_pip_api.layer.network_service.subapp_resources.SubAppResourcesProviderManager;
+import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
 import com.bitdubai.sub_app.artist_community.R;
 import com.bitdubai.sub_app_artist_community.adapters.AppFriendsListAdapter;
@@ -86,6 +89,10 @@ public class ConnectionsListFragment extends AbstractFermatFragment<ArtistSubApp
             swipeRefresh.setColorSchemeColors(Color.BLUE, Color.BLUE);
             onRefresh();
         } catch (Exception ex) {
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    FermatException.wrapException(ex));
             CommonLogger.exception(TAG, ex.getMessage(), ex);
             Toast.makeText(getActivity().getApplicationContext(), "Oooops! recovering from system error", Toast.LENGTH_SHORT).show();
         }
@@ -144,8 +151,17 @@ public class ConnectionsListFragment extends AbstractFermatFragment<ArtistSubApp
                         if (getActivity() != null)
                             Toast.makeText(getActivity(), ex.getMessage(), Toast.LENGTH_LONG).show();
                         ex.printStackTrace();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (Exception e){
+                        FermatException exception = new FermatException(
+                                "Error traying to refresh data. onErrorOccurred - Message: " + e.getMessage(),
+                                FermatException.wrapException(e),
+                                e.getCause().toString(),
+                                "onItemClickListener. unknown"
+                        );
+                        errorManager.reportUnexpectedPluginException(
+                                Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                                UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                                FermatException.wrapException(exception));
                     }
                 }
             });
@@ -156,13 +172,39 @@ public class ConnectionsListFragment extends AbstractFermatFragment<ArtistSubApp
     private synchronized List<ArtistCommunityInformation> getMoreData() {
         List<ArtistCommunityInformation> dataSet = new ArrayList<>();
         try {
+
             dataSet.addAll(moduleManager.listAllConnectedArtists(moduleManager.getSelectedActorIdentity(), MAX, offset));
+
         } catch (CantListArtistsException | CantGetSelectedActorIdentityException |ActorIdentityNotSelectedException e) {
-            e.printStackTrace();
+            String possibleReason = null;
+            if(e instanceof CantListArtistsException) possibleReason = "Can't List Artists.";
+            if(e instanceof CantGetSelectedActorIdentityException) possibleReason = "Can't Get Selected Actor Identity.";
+            if(e instanceof ActorIdentityNotSelectedException) possibleReason = "Actor Identity Not Selected.";
+
+            FermatException exception = new FermatException(
+                    "Error getting data. getMoreData - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "getMoreData. "+possibleReason
+            );
+        } catch (Exception e){
+            FermatException exception = new FermatException(
+                    "Error getting data. getMoreData - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "getMoreData. unknown"
+            );
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN,
+                    FermatException.wrapException(exception));
+        } finally {
+            return dataSet;
         }
 
-        return dataSet;
+
     }
+
     public void showEmpty(boolean show, View emptyView) {
         Animation anim = AnimationUtils.loadAnimation(getActivity(),
                 show ? android.R.anim.fade_in : android.R.anim.fade_out);
