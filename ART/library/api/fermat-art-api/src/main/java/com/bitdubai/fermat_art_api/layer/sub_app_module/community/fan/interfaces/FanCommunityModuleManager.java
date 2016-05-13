@@ -7,6 +7,7 @@ import com.bitdubai.fermat_api.layer.modules.exceptions.CantGetSelectedActorIden
 import com.bitdubai.fermat_api.layer.modules.interfaces.ModuleManager;
 import com.bitdubai.fermat_art_api.all_definition.enums.ArtExternalPlatform;
 import com.bitdubai.fermat_art_api.layer.actor_network_service.exceptions.CantRequestConnectionException;
+import com.bitdubai.fermat_art_api.layer.sub_app_module.community.ArtCommunityInformation;
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.exceptions.ActorConnectionAlreadyRequestedException;
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.exceptions.ActorTypeNotSupportedException;
 import com.bitdubai.fermat_art_api.layer.sub_app_module.community.artist.interfaces.ArtistCommunityInformation;
@@ -85,7 +86,7 @@ public interface FanCommunityModuleManager extends
      * @return the list of fans connected to the logged in user
      * @throws CantGetFanListException if something goes wrong.
      */
-    List<FanCommunityInformation> listAllConnectedFans(
+    List<ArtCommunityInformation> listAllConnectedFans(
             final FanCommunitySelectableIdentity selectedIdentity,
             final int max,
             final int offset) throws
@@ -136,8 +137,12 @@ public interface FanCommunityModuleManager extends
      * @throws ActorConnectionAlreadyRequestedException if the connection already exists.
      * @throws ActorTypeNotSupportedException           if the actor type is not supported.
      */
-    void requestConnectionToFan(FanCommunitySelectableIdentity selectedIdentity,
-                                FanCommunityInformation artistToContact) throws CantRequestConnectionException,ActorConnectionAlreadyRequestedException,ActorTypeNotSupportedException;
+    void requestConnectionToFan(
+            FanCommunitySelectableIdentity selectedIdentity,
+            FanCommunityInformation artistToContact) throws
+            CantRequestConnectionException,
+            ActorConnectionAlreadyRequestedException,
+            ActorTypeNotSupportedException;
 
     /**
      * The method <code>disconnectFan</code> disconnect a fan from the list managed by this

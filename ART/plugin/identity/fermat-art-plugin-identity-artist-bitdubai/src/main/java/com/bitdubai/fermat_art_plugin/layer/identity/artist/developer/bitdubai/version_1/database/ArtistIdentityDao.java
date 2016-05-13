@@ -24,6 +24,8 @@ import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.CantLoad
 import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.CantPersistFileException;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.FileNotFoundException;
 import com.bitdubai.fermat_art_api.all_definition.enums.ArtExternalPlatform;
+import com.bitdubai.fermat_art_api.all_definition.enums.ArtistAcceptConnectionsType;
+import com.bitdubai.fermat_art_api.all_definition.enums.ExposureLevel;
 import com.bitdubai.fermat_art_api.layer.identity.artist.exceptions.CantCreateArtistIdentityException;
 import com.bitdubai.fermat_art_api.layer.identity.artist.exceptions.CantGetArtistIdentityException;
 import com.bitdubai.fermat_art_api.layer.identity.artist.exceptions.CantUpdateArtistIdentityException;
@@ -37,8 +39,6 @@ import com.bitdubai.fermat_art_plugin.layer.identity.artist.developer.bitdubai.v
 import com.bitdubai.fermat_art_plugin.layer.identity.artist.developer.bitdubai.version_1.exceptions.CantPersistProfileImageException;
 import com.bitdubai.fermat_art_plugin.layer.identity.artist.developer.bitdubai.version_1.structure.ArtistIdentityImp;
 import com.bitdubai.fermat_pip_api.layer.user.device_user.interfaces.DeviceUser;
-import com.bitdubai.fermat_tky_api.all_definitions.enums.ArtistAcceptConnectionsType;
-import com.bitdubai.fermat_tky_api.all_definitions.enums.ExposureLevel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -157,8 +157,11 @@ public class ArtistIdentityDao implements DealsWithPluginDatabaseSystem {
             String privateKey,
             DeviceUser deviceUser,
             byte[] profileImage,
-            ExposureLevel exposureLevel, ArtistAcceptConnectionsType acceptConnectionsType, UUID externalIdentityID,
-            ArtExternalPlatform artExternalPlatform,String externalUsername) throws CantCreateArtistIdentityException {
+            ExposureLevel exposureLevel,
+            ArtistAcceptConnectionsType acceptConnectionsType,
+            UUID externalIdentityID,
+            ArtExternalPlatform artExternalPlatform,
+            String externalUsername) throws CantCreateArtistIdentityException {
 
         try {
             if (aliasExists(alias)) {
@@ -275,7 +278,6 @@ public class ArtistIdentityDao implements DealsWithPluginDatabaseSystem {
                         ArtistIdentityDatabaseConstants.ARTIST_IDENTITY_ALIAS_COLUMN_NAME,
                         alias);
                 //External platform
-                record.setUUIDValue(ArtistIdentityDatabaseConstants.ARTIST_IDENTITY_EXTERNAL_IDENTITY_ID_COLUMN_NAME,externalIdentityID);
                 if(artExternalPlatform==null){
                     record.setStringValue(
                             ArtistIdentityDatabaseConstants.ARTIST_IDENTITY_EXTERNAL_PLATFORM_COLUMN_NAME,
@@ -285,6 +287,8 @@ public class ArtistIdentityDao implements DealsWithPluginDatabaseSystem {
                             ArtistIdentityDatabaseConstants.ARTIST_IDENTITY_EXTERNAL_PLATFORM_COLUMN_NAME,
                             artExternalPlatform.getCode());
                 }
+                if(externalIdentityID!= null)
+                    record.setUUIDValue(ArtistIdentityDatabaseConstants.ARTIST_IDENTITY_EXTERNAL_IDENTITY_ID_COLUMN_NAME, externalIdentityID);
 
                 record.setStringValue(
                         ArtistIdentityDatabaseConstants.ARTIST_IDENTITY_EXTERNAL_USERNAME_COLUMN_NAME,

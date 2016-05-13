@@ -33,7 +33,7 @@ public class ArtistCommunityFermatAppConnection extends AppConnections<ArtistSub
     @Override
     public PluginVersionReference getPluginVersionReference() {
         return  new PluginVersionReference(
-                Platforms.PLATFORM_ART,
+                Platforms.ART_PLATFORM,
                 Layers.SUB_APP_MODULE,
                 Plugins.ARTIST_COMMUNITY_SUB_APP_MODULE,
                 Developers.BITDUBAI,
@@ -62,7 +62,8 @@ public class ArtistCommunityFermatAppConnection extends AppConnections<ArtistSub
     @Override
     public NotificationPainter getNotificationPainter(String code) {
         return CommunityNotificationPainterBuilder.getNotification(
-                code
+                code,
+                getFullyLoadedSession()
         );
     }
 
