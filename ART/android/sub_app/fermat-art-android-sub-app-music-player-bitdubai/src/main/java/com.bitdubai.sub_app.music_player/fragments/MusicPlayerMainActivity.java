@@ -274,10 +274,10 @@ public class MusicPlayerMainActivity extends AbstractFermatFragment {
         try {
             mysong=musicPlayermoduleManager.getAvailableSongs();
             if(mysong.size()<1){
-                Toast.makeText(view.getContext(),"No song, dowload with the FanWallet",Toast.LENGTH_LONG).show();
+                Toast.makeText(view.getContext(),"No song, please, download with the FanWallet",Toast.LENGTH_LONG).show();
             }else{
                 for(WalletSong walletSong:mysong){
-                    songview.add(new MusicPlayerItems(walletSong.getComposers(), walletSong.getName(),R.drawable.adam,walletSong.getSongBytes(),walletSong.getSongId()));
+                    songview.add(new MusicPlayerItems(walletSong.getComposers(), walletSong.getName(),R.drawable.nomusic,walletSong.getSongBytes(),walletSong.getSongId()));
                 }
                 adapter.setFilter(songview);
             }

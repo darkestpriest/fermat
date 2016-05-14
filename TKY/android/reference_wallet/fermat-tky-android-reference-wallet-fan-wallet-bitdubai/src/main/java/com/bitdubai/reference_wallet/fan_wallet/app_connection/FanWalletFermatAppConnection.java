@@ -53,7 +53,8 @@ public class FanWalletFermatAppConnection extends AppConnections<FanWalletSessio
 
     @Override
     public HeaderViewPainter getHeaderViewPainter() {
-        return new FanWalletHeaderPainter(getContext(),getFullyLoadedSession());
+        return null;
+        //return new FanWalletHeaderPainter(getContext(),getFullyLoadedSession());
     }
 
     @Override

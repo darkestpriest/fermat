@@ -18,7 +18,7 @@ public class TokenlyConfiguration {
     /**
      * Represents the basic URL call for Tokenly swapbot API
      */
-    public static final String URL_TOKENLY_SWAPBOT_API = "http://swapbot"+USE_STAGE_SERVERS+".tokenly.com/api/v1/public/";
+    public static final String URL_TOKENLY_SWAPBOT_API = "http://swapbot.tokenly.com/api/v1/public/";
 
     /**
      * Represents the basic URL call for Tokenly Music API

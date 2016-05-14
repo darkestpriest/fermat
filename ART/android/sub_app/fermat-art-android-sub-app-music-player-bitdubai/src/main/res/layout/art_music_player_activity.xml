@@ -32,7 +32,7 @@
 
             <TextView
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="tiempo"
+                android:text="time"
                 android:id="@+id/tiempo"
                 android:textColor="@color/textviewcolor"
                 android:layout_column="4"
@@ -82,8 +82,8 @@
                 android:layout_alignParentTop="false" />
 
             <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:text="Back"
                 android:scaleType="centerCrop"
                 android:id="@+id/back"
@@ -98,8 +98,8 @@
                 android:layout_marginRight="60dp" />
 
             <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:scaleType="centerCrop"
                 android:text="Play"
                 android:id="@+id/play"
@@ -111,8 +111,8 @@
                 android:layout_centerHorizontal="true" />
 
             <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:scaleType="centerCrop"
                 android:text="forward"
                 android:id="@+id/forward"

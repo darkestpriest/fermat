@@ -106,6 +106,7 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
                     this.tokenlyApiManager);
 
             System.out.println("############\n TKY IDENTITY FAN STARTED\n");
+            createPrototypeFanIdentity();
             //testCreateArtist();
             //testAskForConnection();
         } catch (Exception e) {
@@ -270,6 +271,27 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
         } catch (Exception exception) {
             //FermatException e = new CantGetLogTool(CantGetLogTool.DEFAULT_MESSAGE, FermatException.wrapException(exception), "setLoggingLevelPerClass: " + ActorIssuerPluginRoot.newLoggingLevel, "Check the cause");
             // this.errorManager.reportUnexpectedAddonsException(Addons.EXTRA_USER, UnexpectedAddonsExceptionSeverity.DISABLES_THIS_ADDONS, e);
+        }
+    }
+
+    private void createPrototypeFanIdentity(){
+        try {
+            String username = "pereznator";
+            byte[] image = new byte[0];
+            String password = "milestone";
+            ExternalPlatform externalPlatform = ExternalPlatform.DEFAULT_EXTERNAL_PLATFORM;
+            Fan fan = createFanIdentity(
+                    username,
+                    image,
+                    password,
+                    externalPlatform);
+            Fan fan1 = getFanIdentity(fan.getId());
+            System.out.println("fan1 = " + XMLParser.parseObject(
+                    fan1));
+        } catch (CantCreateFanIdentityException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
