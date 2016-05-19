@@ -34,7 +34,6 @@ public class TokenlyUserImp implements MusicUser {
         this.apiToken = apiToken;
         this.apiSecretKey = apiSecretKey;
     }
-
     /**
      * This method returns the tokenly id.
      * @return

@@ -1,6 +1,7 @@
 package com.bitdubai.fermat_tky_plugin.layer.identity.fan_identity.developer.bitdubai.version_1;
 
 import com.bitdubai.fermat_api.CantStartPluginException;
+import com.bitdubai.fermat_api.FermatException;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.abstract_classes.AbstractPlugin;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededAddonReference;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededPluginReference;
@@ -20,6 +21,7 @@ import com.bitdubai.fermat_api.layer.all_definition.util.Version;
 import com.bitdubai.fermat_api.layer.all_definition.util.XMLParser;
 import com.bitdubai.fermat_api.layer.core.PluginInfo;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseSystem;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantLoadTableToMemoryException;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
 import com.bitdubai.fermat_api.layer.osa_android.logger_system.LogLevel;
 import com.bitdubai.fermat_api.layer.osa_android.logger_system.LogManager;
@@ -130,13 +132,28 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
             Fan fan1 = getFanIdentity(fan.getId());
             System.out.println("##############################\n");
             System.out.println("fan1 = " + XMLParser.parseObject(new TokenlyFanIdentityImp(fan1.getId(),fan1.getTokenlyId(),fan1.getPublicKey(),fan1.getProfileImage(),fan1.getUsername(),fan1.getApiToken(),fan1.getApiSecretKey(), fan1.getUserPassword(),fan1.getExternalPlatform(),fan1.getEmail())));
+
         } catch (CantCreateFanIdentityException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+            FermatException exception = new CantCreateFanIdentityException(
+                    "Error. CAN'T CREATE ARTIST. testCreateArtist - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "testCreateArtist. unknown failure."
+            );
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_IDENTITY,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            FermatException exception = new CantInitializeTokenlyFanIdentityDatabaseException(
+                    "Error. CAN'T CREATE ARTIST. testCreateArtist - Message: " + ex.getMessage(),
+                    FermatException.wrapException(ex),
+                    ex.getCause().toString(),
+                    "testCreateArtist. unknown failure."
+            );
         }
     }
-//    private void testUpdateArtist(Artist artist){
+    //    private void testUpdateArtist(Artist artist){
 //        String externalName = "El gabo artist que envia";
 //        String externalAccessToken = "El access token";
 //        ExternalPlatform externalPlatform = ExternalPlatform.TOKENLY;
@@ -157,32 +174,82 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
     public Fan createFanIdentity(String userName, byte[] profileImage, String externalPassword, ExternalPlatform externalPlatform) throws CantCreateFanIdentityException, WrongTokenlyUserCredentialsException {
 
         User user=null;
+
         try{
             if(externalPlatform == ExternalPlatform.DEFAULT_EXTERNAL_PLATFORM)
                 user = tokenlyApiManager.validateTokenlyUser(userName, externalPassword);
+
         } catch (CantGetUserException |InterruptedException | ExecutionException  e) {
-            e.printStackTrace();
+            String possibleReason = null;
+            if(e instanceof CantGetUserException) possibleReason = "Can't Get User.";
+            if(e instanceof InterruptedException) possibleReason = "Interrupted process.";
+            if(e instanceof ExecutionException) possibleReason = "Execution error.";
+
+            throw new CantCreateFanIdentityException(
+                    "Error. CAN'T CREATE FAN IDENTITY. createFanIdentity - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "createFanIdentity. "+possibleReason
+            );
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_IDENTITY,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            FermatException exception = new CantCreateFanIdentityException(
+                    "Error. CAN'T CREATE FAN IDENTITY. createFanIdentity - Message: " + ex.getMessage(),
+                    FermatException.wrapException(ex),
+                    ex.getCause().toString(),
+                    "createFanIdentity. unknown failure."
+            );
+        } finally {
+            if(user!=null){
+                return identityFanManager.createNewIdentityFan(user, externalPassword,profileImage, externalPlatform);
+            }else{
+                return null;
+            }
         }
-        if(user!=null){
-            return identityFanManager.createNewIdentityFan(user, externalPassword,profileImage, externalPlatform);
-        }else{
-            return null;
-        }
+
     }
 
 
     @Override
     public Fan updateFanIdentity(String userName, String password, UUID id, String publicKey, byte[] profileImage, ExternalPlatform externalPlatform) throws CantUpdateFanIdentityException, WrongTokenlyUserCredentialsException {
         User user=null;
+
         try{
+
             if(externalPlatform == ExternalPlatform.DEFAULT_EXTERNAL_PLATFORM)
                 user = tokenlyApiManager.validateTokenlyUser(userName, password);
+
         } catch (CantGetUserException |InterruptedException | ExecutionException  e) {
-            e.printStackTrace();
+            String possibleReason = null;
+            if(e instanceof CantGetUserException) possibleReason = "Can't Get User.";
+            if(e instanceof InterruptedException) possibleReason = "Interrupted process.";
+            if(e instanceof ExecutionException) possibleReason = "Execution error.";
+
+            throw new CantCreateFanIdentityException(
+                    "Error. CAN'T UPDATE FAN IDENTITY. updateFanIdentity - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "updateFanIdentity. "+possibleReason
+            );
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.ARTIST_IDENTITY,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            FermatException exception = new CantCreateFanIdentityException(
+                    "Error. CAN'T UPDATE FAN IDENTITY. createFanIdentity - Message: " + ex.getMessage(),
+                    FermatException.wrapException(ex),
+                    ex.getCause().toString(),
+                    "createFanIdentity. unknown failure."
+            );
+        } finally{
+            if(user != null)
+                return identityFanManager.updateIdentityFan(user,password, id, publicKey, profileImage,externalPlatform);
+            return null;
         }
-        if(user != null)
-            return identityFanManager.updateIdentityFan(user,password, id, publicKey, profileImage,externalPlatform);
-        return null;
     }
 
     /**
@@ -228,7 +295,28 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
             dbFactory.initializeDatabase();
             return dbFactory.getDatabaseTableContent(developerObjectFactory, developerDatabaseTable);
         } catch (CantInitializeTokenlyFanIdentityDatabaseException e) {
-            this.errorManager.reportUnexpectedPluginException(Plugins.TOKENLY_FAN, UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
+            this.errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+        } catch (CantLoadTableToMemoryException e) {
+            FermatException exception = new CantInitializeTokenlyFanIdentityDatabaseException(
+                    "Error. CAN'T GET DATA FROM TABLE. getDatabaseTableContent - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "getDatabaseTableContent. database connection error."
+            );
+        }catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            FermatException exception = new CantInitializeTokenlyFanIdentityDatabaseException(
+                    "Error. CAN'T GET DATA FROM TABLE. getDatabaseTableContent - Message: " + ex.getMessage(),
+                    FermatException.wrapException(ex),
+                    ex.getCause().toString(),
+                    "getDatabaseTableContent. unknown failure."
+            );
         }
         // If we are here the database could not be opened, so we return an empty list
         return new ArrayList<>();
@@ -268,8 +356,16 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
             }
 
         } catch (Exception exception) {
-            //FermatException e = new CantGetLogTool(CantGetLogTool.DEFAULT_MESSAGE, FermatException.wrapException(exception), "setLoggingLevelPerClass: " + ActorIssuerPluginRoot.newLoggingLevel, "Check the cause");
-            // this.errorManager.reportUnexpectedAddonsException(Addons.EXTRA_USER, UnexpectedAddonsExceptionSeverity.DISABLES_THIS_ADDONS, e);
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    exception);
+            FermatException e = new CantInitializeTokenlyFanIdentityDatabaseException(
+                    "Error. CAN'T set logging level for class. setLoggingLevelPerClass - Message: " + exception.getMessage(),
+                    FermatException.wrapException(exception),
+                    exception.getCause().toString(),
+                    "setLoggingLevelPerClass. unknown failure."
+            );
         }
     }
 }

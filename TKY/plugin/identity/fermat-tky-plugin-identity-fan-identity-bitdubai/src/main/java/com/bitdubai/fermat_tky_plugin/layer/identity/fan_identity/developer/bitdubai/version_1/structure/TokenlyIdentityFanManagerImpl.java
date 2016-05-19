@@ -1,7 +1,10 @@
 package com.bitdubai.fermat_tky_plugin.layer.identity.fan_identity.developer.bitdubai.version_1.structure;
 
+import com.bitdubai.fermat_api.CantStartPluginException;
 import com.bitdubai.fermat_api.FermatException;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_api.layer.all_definition.crypto.asymmetric.ECCKeyPair;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DealsWithPluginDatabaseSystem;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseSystem;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.DealsWithPluginFileSystem;
@@ -102,7 +105,7 @@ public class TokenlyIdentityFanManagerImpl implements DealsWithErrors, DealsWith
         this.tokenlyApiManager = tokenlyApiManager;
     }
 
-    private TokenlyFanIdentityDao getFanIdentityDao() throws CantInitializeTokenlyFanIdentityDatabaseException {
+    private TokenlyFanIdentityDao getFanIdentityDao() throws CantInitializeTokenlyFanIdentityDatabaseException, CantStartPluginException {
         return new TokenlyFanIdentityDao(this.pluginDatabaseSystem, this.pluginFileSystem, this.pluginId);
     }
 
@@ -134,20 +137,56 @@ public class TokenlyIdentityFanManagerImpl implements DealsWithErrors, DealsWith
     public Fan getIdentitFan() throws CantGetFanIdentityException {
         Fan fan = null;
         try {
+
             fan = getFanIdentityDao().getIdentityFan();
+
         } catch (CantInitializeTokenlyFanIdentityDatabaseException e) {
-            e.printStackTrace();
+            FermatException exception =  new CantInitializeTokenlyFanIdentityDatabaseException(
+                    "Error. CAN'T GET IDENTITY FAN. getIdentitFan - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "getIdentitFan. Error getting tokenly from database."
+            );
+        } catch (CantStartPluginException e) {
+            FermatException exception =  new CantStartPluginException(
+                    "Error. CAN'T GET IDENTITY FAN. getFanIdentityPrivateKey - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "getIdentitFan. Error starting plugin."
+            );
+        }catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            FermatException exception = new CantInitializeTokenlyFanIdentityDatabaseException(
+                    "Error. CAN'T GET IDENTITY FAN. getIdentitFan - Message: " + ex.getMessage(),
+                    FermatException.wrapException(ex),
+                    ex.getCause().toString(),
+                    "getIdentitFan. unknown failure."
+            );
         }
+
+
+
         return fan;
     }
     public Fan getIdentitFan(UUID id) throws CantGetFanIdentityException {
         Fan fan = null;
         try {
+
             fan = getFanIdentityDao().getIdentityFan(id);
+
         } catch (CantInitializeTokenlyFanIdentityDatabaseException e) {
-            e.printStackTrace();
+            FermatException exception = new CantInitializeTokenlyFanIdentityDatabaseException(
+                    "Error. CAN'T GET IDENTITY FAN. getIdentitFan - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "getIdentitFan. unknown failure."
+            );
+        } finally {
+            return fan;
         }
-        return fan;
     }
 
     public Fan createNewIdentityFan(User user,String password, byte[] profileImage, ExternalPlatform externalPlatform) throws CantCreateFanIdentityException {
@@ -171,28 +210,47 @@ public class TokenlyIdentityFanManagerImpl implements DealsWithErrors, DealsWith
     }
 
     public Fan updateIdentityFan(User user, String password, UUID id, String publicKey, byte[] profileImage, ExternalPlatform externalPlatform) throws CantUpdateFanIdentityException {
+        Fan fan = null;
         try {
             getFanIdentityDao().updateIdentityFanUser(user, password, id, publicKey, profileImage, externalPlatform);
-            return getFanIdentityDao().getIdentityFan(id);
-        } catch (CantInitializeTokenlyFanIdentityDatabaseException e) {
-            throw new CantUpdateFanIdentityException(
-                    e.getMessage(),
-                    e,
-                    "Can't update the fan identity",
-                    "Cannot initialize database");
-        } catch (CantUpdateFanIdentityException e) {
-            throw new CantUpdateFanIdentityException(
-                    e.getMessage(),
-                    e,
-                    "Can't update the fan identity",
-                    "Unexpected error in database");
+            fan = getFanIdentityDao().getIdentityFan(id);
+
         } catch (CantGetFanIdentityException e) {
+            FermatException exception = new CantInitializeTokenlyFanIdentityDatabaseException(
+                    "Error. Can't get the fan identity. updateIdentityFan - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "updateIdentityFan. Cannot initialize database."
+            );
+        } catch (CantInitializeTokenlyFanIdentityDatabaseException e) {
+            FermatException exception = new CantInitializeTokenlyFanIdentityDatabaseException(
+                    "Error. Can't update the fan identity. updateIdentityFan - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "updateIdentityFan. Cannot initialize database."
+            );
+        } catch (CantStartPluginException e) {
             throw new CantUpdateFanIdentityException(
-                    e.getMessage(),
-                    e,
-                    "Can't get the fan identity",
-                    "Unexpected error in database");
+                    "Error. Can't update the fan identity. updateIdentityFan - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "updateIdentityFan. Cannot initialize database."
+            );
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            FermatException exception = new CantInitializeTokenlyFanIdentityDatabaseException(
+                    "Error. CAN'T GET IDENTITY FAN. updateIdentityFan - Message: " + ex.getMessage(),
+                    FermatException.wrapException(ex),
+                    ex.getCause().toString(),
+                    "updateIdentityFan. unknown failure."
+            );
         }
+
+        return fan;
+
     }
 
     /**
@@ -202,19 +260,32 @@ public class TokenlyIdentityFanManagerImpl implements DealsWithErrors, DealsWith
      */
     public void updateIdentityFan(Fan fan) throws CantUpdateFanIdentityException{
         try{
+
             getFanIdentityDao().updateIdentityFanUser(fan);
-        } catch (CantInitializeTokenlyFanIdentityDatabaseException e) {
+
+        } catch (CantUpdateFanIdentityException | CantInitializeTokenlyFanIdentityDatabaseException | CantStartPluginException e) {
+            String possibleReason = null;
+            if(e instanceof CantUpdateFanIdentityException) possibleReason = "Can't Update Fan Identity.";
+            if(e instanceof CantInitializeTokenlyFanIdentityDatabaseException) possibleReason = "Can't Initialize Tokenly Fan Identity Database.";
+            if(e instanceof CantStartPluginException) possibleReason = "Can't Start Plugin";
+
             throw new CantUpdateFanIdentityException(
-                    e.getMessage(),
-                    e,
-                    "Can't update the fan identity",
-                    "Cannot initialize database");
-        } catch (CantUpdateFanIdentityException e) {
-            throw new CantUpdateFanIdentityException(
-                    e.getMessage(),
-                    e,
-                    "Can't update the fan identity",
-                    "Unexpected error in database");
+                    "Error. Can't update the fan identity. updateIdentityFan - Message: " + e.getMessage(),
+                    FermatException.wrapException(e),
+                    e.getCause().toString(),
+                    "updateIdentityFan. Cannot initialize database."+possibleReason
+            );
+        }catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            FermatException exception = new CantInitializeTokenlyFanIdentityDatabaseException(
+                    "Error. CAN'T GET IDENTITY FAN. updateIdentityFan - Message: " + ex.getMessage(),
+                    FermatException.wrapException(ex),
+                    ex.getCause().toString(),
+                    "updateIdentityFan. unknown failure."
+            );
         }
     }
 
