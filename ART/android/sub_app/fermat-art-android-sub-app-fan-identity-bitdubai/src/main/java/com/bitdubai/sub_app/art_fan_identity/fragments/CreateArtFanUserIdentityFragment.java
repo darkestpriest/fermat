@@ -1,15 +1,21 @@
 package com.bitdubai.sub_app.art_fan_identity.fragments;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,6 +23,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -100,6 +107,9 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
     private String WarningColor = "#DF0101";
     private String NormalColor  =  "#0080FF";
 
+    private boolean TheresPic = false;
+    private boolean TheresAlias = false;
+
     public static CreateArtFanUserIdentityFragment newInstance(){
         return new CreateArtFanUserIdentityFragment();
     }
@@ -182,7 +192,11 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
                 if (identitySelected != null) {
                     loadIdentity();
                     isUpdate = true;
-                    createButton.setText("Save changes");
+                    createButton.setBackgroundResource(R.drawable.button_save_active);
+                    TheresAlias = true;
+                    TheresPic = true;
+
+                    // createButton.setText("Save changes");
                 }
             }
         } catch (Exception e) {
@@ -279,8 +293,10 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
         fanImage = (ImageView) layout.findViewById(R.id.afi_fan_image);
         mFanExternalPlatform = (Spinner) layout.findViewById(R.id.afi_external_platform);
         mFanExternalUser = (Spinner) layout.findViewById(R.id.afi_external_platform_user_id);
-        relativeLayout = (RelativeLayout) layout.findViewById(R.id.afi_user_image);
-        createButton.setText((!isUpdate) ? "Create" : "Update");
+        //relativeLayout = (RelativeLayout) layout.findViewById(R.id.afi_user_image);
+       // createButton.setText((!isUpdate) ? "Create" : "Update");
+        createButton.setBackgroundResource((!isUpdate) ? R.drawable.button_save_inactive:R.drawable.button_save_active);
+
         mFanExternalUserName.requestFocus();
         List<String> arraySpinner = new ArrayList<>();
         arraySpinner.add("Select a Platform...");
@@ -293,10 +309,38 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
         fanImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
+                /*
                 WarningLabel.setVisibility(View.GONE);
                 //WarningCircle.setVisibility(View.GONE);
                 CommonLogger.debug(TAG, "get in on fanImage.setOnClickListener");
                 getActivity().openContextMenu(fanImage);
+                */
+
+
+                final Dialog dialog = new Dialog(getActivity());
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                dialog.setContentView(R.layout.custom_dialog);
+                dialog.findViewById(R.id.img_cam1).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dispatchTakePictureIntent();
+                        dialog.dismiss();
+                    }
+                });
+                dialog.findViewById(R.id.img_gallery1).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        loadImageFromGallery();
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+                //botonG.setVisibility(View.VISIBLE);
+                CommonLogger.debug("Chat identity", "Entrando en chatImg.setOnClickListener");
+
             }
         });
 
@@ -313,6 +357,27 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
             @Override
             public void onClick(View v) {
                 alias.setTextColor(Color.parseColor("#919090"));
+            }
+        });
+
+        mFanExternalUserName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!((mFanExternalUserName.getText().toString()).equals("")) || (mFanExternalUserName.getText() != null)) {
+                    TheresAlias = true;
+                    CheckTheres();
+                }
+
             }
         });
 
@@ -343,16 +408,31 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
                 }
             }
         });
+
+        configureToolbar();
     }
 
-    /**
-     * Creates a new Fan identity in Art platform .
-     *
-     * @return key */
+    private void configureToolbar() {
+        Toolbar toolbar = getToolbar();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            toolbar.setBackgroundColor(Color.WHITE);
+        else
+            toolbar.setBackgroundColor(Color.WHITE);
+
+         toolbar.setTitleTextColor(Color.BLACK);
+        if (toolbar.getMenu() != null) toolbar.getMenu().clear();
+    }
+
+
+
     private int createNewIdentity() {
         UUID externalIdentityID = null;
+        ArtExternalPlatform artExternalPlatform = ArtExternalPlatform.getDefaultExternalPlatform();
+        if(mFanExternalPlatform.getSelectedItem() != mFanExternalPlatform.getItemAtPosition(0)){
+            artExternalPlatform = ArtExternalPlatform.getArtExternalPlatformByLabel(
+                    mFanExternalPlatform.getSelectedItem().toString());
+        }
         if(!mFanExternalUser.getSelectedItem().equals(mFanExternalUser.getItemAtPosition(0))){
-            ArtExternalPlatform artExternalPlatform = ArtExternalPlatform.getArtExternalPlatformByLabel(mFanExternalPlatform.getSelectedItem().toString());
             if(artExternalPlatform !=null){
                 List<UUID> identityByPlatformList = new ArrayList<>();
                 try{
@@ -365,15 +445,11 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
             }
         }
         String fanExternalName = mFanExternalUserName.getText().toString();
-        ArtExternalPlatform externalPlatform = ArtExternalPlatform.getDefaultExternalPlatform();
         String externalUsername="";
-        if(mFanExternalPlatform.getSelectedItem() != mFanExternalPlatform.getItemAtPosition(0)){
-            externalPlatform = ArtExternalPlatform.getArtExternalPlatformByLabel(
-                    mFanExternalPlatform.getSelectedItem().toString());
-        }
-        if(mFanExternalUser.getCount()>1){
+
+        /*if(mFanExternalUser.getCount()>1){
             externalUsername=mFanExternalUser.getSelectedItem().toString();
-        }
+        }*/
         boolean dataIsValid = validateIdentityData(
                 fanExternalName,
                 fanImageByteArray,
@@ -386,7 +462,7 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
                                 fanExternalName,
                                 (fanImageByteArray == null) ? convertImage(R.drawable.ic_profile_male) : fanImageByteArray,
                                 externalIdentityID,
-                                externalPlatform,
+                                artExternalPlatform,
                                 externalUsername);
                     } else
                         if (updateProfileImage) {
@@ -395,7 +471,7 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
                                     identitySelected.getPublicKey(),
                                     fanImageByteArray,
                                     externalIdentityID,
-                                    externalPlatform,
+                                    artExternalPlatform,
                                     externalUsername);
 
                         }
@@ -404,7 +480,7 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
                                     identitySelected.getPublicKey(),
                                     identitySelected.getProfileImage(),
                                     externalIdentityID,
-                                    externalPlatform,
+                                    artExternalPlatform,
                                     externalUsername);
 
                 } catch (Exception e){
@@ -496,7 +572,8 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
 
         if(mFanExternalPlatform.getSelectedItemPosition()==0){
             //mFanExternalPlatform.setBackgroundColor(Color.parseColor(WarningColor));
-        }else{mFanExternalPlatform.setBackgroundColor(Color.parseColor(NormalColor));
+        }else{
+            //mFanExternalPlatform.setBackgroundColor(Color.parseColor(NormalColor));
         }
 /*
         if(mFanExternalUser.getSelectedItemPosition()==0){
@@ -536,6 +613,8 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
                     Uri selectedImage = data.getData();
                     try {
                         if (isAttached) {
+                            TheresPic = true;
+                            CheckTheres();
                             ContentResolver contentResolver = getActivity().getContentResolver();
                             imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImage);
                             imageBitmap = Bitmap.createScaledBitmap(imageBitmap, pictureView.getWidth(), pictureView.getHeight(), true);
@@ -553,8 +632,14 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
                 pictureView.setImageDrawable(
                         ImagesUtils.getRoundedBitmap(
                                 getResources(), imageBitmap));
+            contextMenuInUse = false;
         }
     }
+
+    private void CheckTheres() {
+        if(TheresAlias && TheresPic){createButton.setBackgroundResource(R.drawable.button_save_active);}
+    }
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
         menu.setHeaderTitle("Choose mode");
@@ -657,7 +742,7 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 try {
-                    mFanExternalPlatform.setBackgroundColor(Color.parseColor(NormalColor));
+                    //mFanExternalPlatform.setBackgroundColor(Color.parseColor(NormalColor));
                     if (!updateCheck) {
                         List<String> arraySpinner = new ArrayList<>();
                         arraySpinner.add("Select an Identity...");

@@ -851,6 +851,9 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
              * ART FAN IDENTITY
              */
 
+         /*
+             *TKY ARTIST IDENTITY
+             */
             runtimeSubApp = new RuntimeSubApp();
             runtimeSubApp.setType(SubApps.ART_FAN_IDENTITY);
             String artFanUserIdentityPublicKey = SubAppsPublicKeys.ART_FAN_IDENTITY.getCode();
@@ -883,9 +886,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
             listSubApp.put(runtimeSubApp.getPublicKey(), runtimeSubApp);
 
 
-            /*
-             *TKY ARTIST IDENTITY
-             */
+
             //createTkyArtistIdentityNavigationStructure();
             /**
              * Start ART
@@ -923,13 +924,13 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
             runtimeSubApp.changeActualStartActivity(Activities.TKY_ARTIST_IDENTITY_CREATE_PROFILE.getCode());
             runtimeTitleBar = new TitleBar();
             runtimeTitleBar.setLabel("Tokenly Artist Identity");
-            runtimeTitleBar.setColor("#1189a4");
+            runtimeTitleBar.setColor("#23056A");
             runtimeTitleBar.setTitleColor("#ffffff");
             runtimeTitleBar.setLabelSize(18);
             runtimeTitleBar.setIsTitleTextStatic(true);
             runtimeActivity.setTitleBar(runtimeTitleBar);
             statusBar = new StatusBar();
-            statusBar.setColor("#1189a4");
+            statusBar.setColor("#23056A");
             runtimeActivity.setStatusBar(statusBar);
             runtimeFragment = new Fragment();
             runtimeFragment.setType(Fragments.TKY_ARTIST_IDENTITY_ACTIVITY_CREATE_PROFILE.getKey());
@@ -995,14 +996,14 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
 
             runtimeTitleBar = new TitleBar();
             runtimeTitleBar.setLabel("Tokenly Fan Identity");
-            runtimeTitleBar.setColor("#1189a4");
+            runtimeTitleBar.setColor("#23056A");
             runtimeTitleBar.setTitleColor("#ffffff");
             runtimeTitleBar.setLabelSize(18);
             runtimeTitleBar.setIsTitleTextStatic(true);
             runtimeActivity.setTitleBar(runtimeTitleBar);
 
             statusBar = new StatusBar();
-            statusBar.setColor("#1189a4");
+            statusBar.setColor("#23056A");
             runtimeActivity.setStatusBar(statusBar);
 
             runtimeFragment = new Fragment();
@@ -2349,47 +2350,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         listSubApp.put(dapAssetUserCommunity.getPublicKey(), dapAssetUserCommunity);
     }
 
-    private void createTkyArtistIdentityNavigationStructure() throws InvalidParameterException {
-        RuntimeSubApp runtimeSubApp = new RuntimeSubApp();
-        Activity runtimeActivity;
-        StatusBar statusBar;
-        
-        
-        
-        runtimeSubApp.setType(SubApps.TKY_ARTIST_IDENTITY_SUB_APP);
-        String tkyFanUserIdentityPublicKey = SubAppsPublicKeys.TKY_ARTIST_IDENTITY.getCode();
-        runtimeSubApp.setPublicKey(tkyFanUserIdentityPublicKey);
-        // Activity: Create New Identity
-         runtimeActivity = new Activity();
-        
-        runtimeActivity.setType(Activities.TKY_ARTIST_IDENTITY);
-        runtimeActivity.setActivityType(Activities.TKY_ARTIST_IDENTITY.getCode());
-        //runtimeActivity.setBackActivity(Activities.CCP_SUB_APP_INTRA_USER_IDENTITY);
-        runtimeActivity.setColor("#03A9F4");
-        runtimeSubApp.addActivity(runtimeActivity);
-        runtimeSubApp.changeActualStartActivity(Activities.TKY_ARTIST_IDENTITY.getCode());
 
-        TitleBar runtimeTitleBar = new TitleBar();
-        runtimeTitleBar.setLabel("Tokenly Identity");
-        runtimeTitleBar.setColor("#1189a4");
-        runtimeTitleBar.setTitleColor("#ffffff");
-        runtimeTitleBar.setLabelSize(18);
-        runtimeTitleBar.setIsTitleTextStatic(true);
-        runtimeActivity.setTitleBar(runtimeTitleBar);
-
-         statusBar = new StatusBar();
-        statusBar.setColor("#1189a4");
-        runtimeActivity.setStatusBar(statusBar);
-
-        Fragment runtimeFragment = new Fragment();
-        runtimeFragment.setType(Fragments.TKY_ARTIST_IDENTITY_ACTIVITY_CREATE_PROFILE.getKey());
-        runtimeActivity.addFragment(Fragments.TKY_ARTIST_IDENTITY_ACTIVITY_CREATE_PROFILE.getKey(), runtimeFragment);
-        runtimeActivity.setStartFragment(Fragments.TKY_ARTIST_IDENTITY_ACTIVITY_CREATE_PROFILE.getKey());
-
-        listSubApp.put(runtimeSubApp.getPublicKey(), runtimeSubApp);
-
-
-    }
 
     private void createArtArtistIdentitySubAgracppNavigationStructure() throws InvalidParameterException {
         RuntimeSubApp artArtistIdentity;
@@ -4384,8 +4345,9 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeTitleBar = new TitleBar();
         runtimeTitleBar.setLabel("Fermat Music Player");
         runtimeTitleBar.setLabelSize(titleBarLabelSize);
-        runtimeTitleBar.setTitleColor("#000000");
-        runtimeTitleBar.setColor("#fafafa");
+        runtimeTitleBar.setTitleColor("#6D6F71");
+        runtimeTitleBar.setColor("#E6E7E8");
+        runtimeTitleBar.setIsTitleTextStatic(true);
         runtimeActivity.setTitleBar(runtimeTitleBar);
 
         runtimeFragment = new Fragment();
