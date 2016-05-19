@@ -1,6 +1,9 @@
 package com.bitdubai.fermat_tky_plugin.layer.identity.fan_identity.developer.bitdubai.version_1.database;
 
 import com.bitdubai.fermat_api.FermatException;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.ErrorManager;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.error_manager.enums.UnexpectedPluginExceptionSeverity;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.Database;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseDataType;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseFactory;
@@ -10,7 +13,7 @@ import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseS
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantCreateDatabaseException;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantCreateTableException;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.DealsWithErrors;
-import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.ErrorManager;
+import com.bitdubai.fermat_tky_plugin.layer.identity.fan_identity.developer.bitdubai.version_1.exceptions.CantGetTokenlyFanIdentityPrivateKeyException;
 
 import java.util.UUID;
 
@@ -40,7 +43,7 @@ public class TokenlyFanIdentityDatabaseFactory implements DealsWithErrors, Deals
      * @throws CantCreateDatabaseException
      */
     public Database createDatabase(UUID pluginId) throws CantCreateDatabaseException {
-        Database database;
+        Database database = null;
         /**
          * I will create the database where I am going to store the information of this User.
          */
@@ -93,10 +96,20 @@ public class TokenlyFanIdentityDatabaseFactory implements DealsWithErrors, Deals
 
             throw new CantCreateDatabaseException(message, cause, context, possibleReason);
 
-        } catch (Exception exception) {
-            throw new CantCreateDatabaseException(CantCreateDatabaseException.DEFAULT_MESSAGE, FermatException.wrapException(exception), null, null);
+        } catch (Exception ex){
+            errorManager.reportUnexpectedPluginException(
+                    Plugins.TOKENLY_FAN_SUB_APP_MODULE,
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    ex);
+            throw new CantCreateDatabaseException(
+                    "Error. can't create database. createDatabase - Message: " + ex.getMessage(),
+                    FermatException.wrapException(ex),
+                    ex.getCause().toString(),
+                    "createDatabase. The exception is generated when creating the table Asset Issuer Identity"
+            );
+        }finally{
+            return database;
         }
-        return database;
     }
 
     @Override
@@ -107,5 +120,6 @@ public class TokenlyFanIdentityDatabaseFactory implements DealsWithErrors, Deals
     @Override
     public void setErrorManager(ErrorManager errorManager) {
         this.errorManager = errorManager;
+
     }
 }
