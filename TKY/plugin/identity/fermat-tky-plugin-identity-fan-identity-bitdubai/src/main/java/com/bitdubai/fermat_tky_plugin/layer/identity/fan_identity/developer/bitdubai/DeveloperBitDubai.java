@@ -16,6 +16,7 @@ public class DeveloperBitDubai extends AbstractPluginDeveloper implements Plugin
         super(new PluginDeveloperReference(Developers.BITDUBAI));
     }
 
+
     @Override
     public void start() throws CantStartPluginDeveloperException {
         try {
@@ -30,6 +31,7 @@ public class DeveloperBitDubai extends AbstractPluginDeveloper implements Plugin
                     "Error registering plugin versions for the developer.");
         }
     }
+
 
     @Override
     public int getAmountToPay() {
