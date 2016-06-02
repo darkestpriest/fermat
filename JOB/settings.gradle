@@ -1,0 +1,12 @@
+/**
+ * Please, keep the elements ordered alphabetically.
+ * -Type (addon/android/plugin)
+ * -Layer name.
+ * -Name.
+ */
+
+include ':fermat-job-api'
+project(':fermat-job-api').projectDir = new File('JOB/library/api/fermat-job-api')
+
+include ':fermat-job-core'
+project(':fermat-job-core').projectDir = new File('JOB/library/core/fermat-job-core')
