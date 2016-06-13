@@ -1,11 +1,13 @@
-package org.fermat.fermat_job_api.all_definition.exceptions;
+package org.fermat.fermat_job_api.layer.identity.common.exceptions;
+
+import org.fermat.fermat_job_api.all_definition.exceptions.JOBException;
 
 /**
- * Created by Manuel Perez (darkpriestrelative@gmail.com) on 03/06/16.
+ * Created by Manuel Perez (darkpriestrelative@gmail.com) on 13/06/16.
  */
-public class CantConfirmException extends JOBException {
+public class CantCreateJobPlatformIdentityException extends JOBException {
 
-    public static final String DEFAULT_MESSAGE = "CANNOT CONFIRM AN ACTOR NETWORK SERVICE MESSAGE";
+    public static final String DEFAULT_MESSAGE = "CANNOT CREATE A JOB PLATFORM IDENTITY";
 
     /**
      * Constructor with parameters
@@ -14,7 +16,7 @@ public class CantConfirmException extends JOBException {
      * @param context
      * @param possibleReason
      */
-    public CantConfirmException(
+    public CantCreateJobPlatformIdentityException(
             final String message,
             final Exception cause,
             final String context,
@@ -28,7 +30,7 @@ public class CantConfirmException extends JOBException {
      * @param context
      * @param possibleReason
      */
-    public CantConfirmException(
+    public CantCreateJobPlatformIdentityException(
             Exception cause,
             String context,
             String possibleReason) {
@@ -40,7 +42,7 @@ public class CantConfirmException extends JOBException {
      * @param message
      * @param cause
      */
-    public CantConfirmException(
+    public CantCreateJobPlatformIdentityException(
             final String message,
             final Exception cause) {
         this(message, cause, "", "");
@@ -50,7 +52,7 @@ public class CantConfirmException extends JOBException {
      * Constructor with parameters
      * @param message
      */
-    public CantConfirmException(final String message) {
+    public CantCreateJobPlatformIdentityException(final String message) {
         this(message, null);
     }
 
@@ -58,7 +60,7 @@ public class CantConfirmException extends JOBException {
      * Constructor with parameters
      * @param exception
      */
-    public CantConfirmException(final Exception exception) {
+    public CantCreateJobPlatformIdentityException(final Exception exception) {
         this(exception.getMessage());
         setStackTrace(exception.getStackTrace());
     }
@@ -66,7 +68,7 @@ public class CantConfirmException extends JOBException {
     /**
      * Constructor with parameters
      */
-    public CantConfirmException() {
+    public CantCreateJobPlatformIdentityException() {
         this(DEFAULT_MESSAGE);
     }
 }

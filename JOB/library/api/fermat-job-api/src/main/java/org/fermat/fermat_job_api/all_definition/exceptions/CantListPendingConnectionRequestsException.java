@@ -1,11 +1,9 @@
 package org.fermat.fermat_job_api.all_definition.exceptions;
 
-import com.bitdubai.fermat_api.FermatException;
-
 /**
  * Created by Manuel Perez (darkpriestrelative@gmail.com) on 03/06/16.
  */
-public class CantListPendingConnectionRequestsException extends FermatException {
+public class CantListPendingConnectionRequestsException extends JOBException {
     
     public static final String DEFAULT_MESSAGE = "CANNOT LIST THE PENDING CONNECTION REQUEST";
 

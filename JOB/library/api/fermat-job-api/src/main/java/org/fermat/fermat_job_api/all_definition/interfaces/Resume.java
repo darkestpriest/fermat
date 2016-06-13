@@ -1,6 +1,6 @@
 package org.fermat.fermat_job_api.all_definition.interfaces;
 
-import org.fermat.fermat_job_api.layer.identity.job_seeker.interfaces.JobSeeker;
+import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.utils.JobSeekerExposingData;
 
 import java.io.Serializable;
 
@@ -14,6 +14,6 @@ public interface Resume extends Serializable {
      * This method returns the Job Seeker identity.
      * @return
      */
-    JobSeeker getJobSeekerIdentity();
+    JobSeekerExposingData getJobSeekerIdentity();
 
 }
