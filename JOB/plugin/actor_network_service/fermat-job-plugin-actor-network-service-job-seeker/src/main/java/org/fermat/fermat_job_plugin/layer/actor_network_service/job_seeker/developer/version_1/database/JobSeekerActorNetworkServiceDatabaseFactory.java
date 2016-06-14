@@ -35,8 +35,9 @@ public class JobSeekerActorNetworkServiceDatabaseFactory {
      * @return Database
      * @throws CantCreateDatabaseException
      */
-    protected Database createDatabase(final UUID ownerId     ,
-                                      final String databaseName) throws CantCreateDatabaseException {
+    protected Database createDatabase(
+            final UUID ownerId,
+            final String databaseName) throws CantCreateDatabaseException {
 
         Database database;
 
