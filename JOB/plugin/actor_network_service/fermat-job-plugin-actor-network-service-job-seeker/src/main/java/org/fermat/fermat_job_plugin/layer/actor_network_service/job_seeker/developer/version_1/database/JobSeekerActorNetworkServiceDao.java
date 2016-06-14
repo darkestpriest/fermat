@@ -30,6 +30,10 @@ import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.FileNotF
 import org.fermat.fermat_job_api.all_definition.enums.ConnectionRequestAction;
 import org.fermat.fermat_job_api.all_definition.enums.ProtocolState;
 import org.fermat.fermat_job_api.all_definition.enums.RequestType;
+import org.fermat.fermat_job_api.all_definition.exceptions.CantAcceptConnectionRequestException;
+import org.fermat.fermat_job_api.all_definition.exceptions.CantConfirmConnectionRequestException;
+import org.fermat.fermat_job_api.all_definition.exceptions.CantDisconnectException;
+import org.fermat.fermat_job_api.all_definition.exceptions.CantFindRequestException;
 import org.fermat.fermat_job_api.all_definition.exceptions.CantListPendingConnectionRequestsException;
 import org.fermat.fermat_job_api.all_definition.exceptions.ConnectionRequestNotFoundException;
 import org.fermat.fermat_job_api.layer.actor_network_service.common.JobActorConnectionRequest;
@@ -525,6 +529,307 @@ public class JobSeekerActorNetworkServiceDao {
                     e,
                     "Denying a connection request",
                     "Exception not handled by the plugin, there is a problem in database and I cannot load the table.");
+        }
+    }
+
+    /**
+     * This method disconnects a connection
+     * @param requestId
+     * @param state
+     * @throws CantDisconnectException
+     * @throws ConnectionRequestNotFoundException
+     */
+    public void disconnectConnection(
+            final UUID requestId,
+            final ProtocolState state)
+            throws CantDisconnectException,
+            ConnectionRequestNotFoundException {
+        if (requestId == null)
+            throw new CantDisconnectException("The requestId is required, can not be null");
+        if (state == null)
+            throw new CantDisconnectException("The state is required, can not be null");
+        try {
+            final ConnectionRequestAction action = ConnectionRequestAction.DISCONNECT;
+            final DatabaseTable connectionNewsTable = database.getTable(
+                    JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_TABLE_NAME);
+            connectionNewsTable.addUUIDFilter(
+                    JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_REQUEST_ID_COLUMN_NAME,
+                    requestId,
+                    DatabaseFilterType.EQUAL);
+            connectionNewsTable.loadToMemory();
+            final List<DatabaseTableRecord> records = connectionNewsTable.getRecords();
+            if (!records.isEmpty()) {
+                final DatabaseTableRecord record = records.get(0);
+                record.setFermatEnum(
+                        JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_REQUEST_STATE_COLUMN_NAME,
+                        state );
+                record.setFermatEnum(
+                        JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_REQUEST_ACTION_COLUMN_NAME,
+                        action);
+                connectionNewsTable.updateRecord(record);
+            } else
+                throw new ConnectionRequestNotFoundException(
+                        null,
+                        "RequestId: "+requestId,
+                        "Cannot find an actor connection request with that requestId.");
+        } catch (final CantUpdateRecordException e) {
+            throw new CantDisconnectException(
+                    e,
+                    "Disconnect a connection",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot update the record.");
+        } catch (final CantLoadTableToMemoryException e) {
+            throw new CantDisconnectException(
+                    e,
+                    "Disconnect a connection",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot load the table.");
+        }
+    }
+
+    /**
+     * This method returns a JobActorConnectionRequest by a given request Id.
+     * @param requestId
+     * @return
+     * @throws CantFindRequestException
+     * @throws ConnectionRequestNotFoundException
+     */
+    public JobActorConnectionRequest getConnectionRequest(
+            final UUID requestId)
+            throws CantFindRequestException,
+            ConnectionRequestNotFoundException {
+        if (requestId == null)
+            throw new CantFindRequestException("The requestId is required, can not be null");
+        try {
+            final DatabaseTable connectionRequestTable = database.getTable(
+                    JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_TABLE_NAME);
+            connectionRequestTable.addUUIDFilter(
+                    JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_REQUEST_ID_COLUMN_NAME,
+                    requestId,
+                    DatabaseFilterType.EQUAL);
+            connectionRequestTable.loadToMemory();
+            final List<DatabaseTableRecord> records = connectionRequestTable.getRecords();
+            if (!records.isEmpty())
+                return buildConnectionNewRecord(records.get(0));
+            else
+                throw new ConnectionRequestNotFoundException(
+                        null,
+                        "requestId: "+requestId,
+                        "Cannot find an actor Connection request with that requestId.");
+        } catch (final CantLoadTableToMemoryException e) {
+            throw new CantFindRequestException(
+                    e,
+                    "Getting a connection request by Id:"+requestId,
+                    "Exception not handled by the plugin, there is a problem in database and I cannot load the table.");
+        } catch (final InvalidParameterException e) {
+            throw new CantFindRequestException(
+                    e,
+                    "Getting a connection request by Id:"+requestId,
+                    "Exception reading records of the table Cannot recognize the codes of the currencies.");
+        }
+    }
+
+    /**
+     * This method confirms a connection request
+     * @param requestId
+     * @throws CantConfirmConnectionRequestException
+     * @throws ConnectionRequestNotFoundException
+     */
+    public void confirmActorConnectionRequest(final UUID requestId)
+            throws CantConfirmConnectionRequestException,
+            ConnectionRequestNotFoundException{
+        if (requestId == null) {
+            throw new CantConfirmConnectionRequestException(
+                    "The requestId is required, can not be null");
+        }
+        try {
+            ProtocolState state = ProtocolState.DONE;
+            ConnectionRequestAction action = ConnectionRequestAction.NONE;
+            DatabaseTable actorConnectionRequestTable = database.getTable(
+                    JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_TABLE_NAME);
+            actorConnectionRequestTable.addUUIDFilter(
+                    JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_REQUEST_ID_COLUMN_NAME,
+                    requestId,
+                    DatabaseFilterType.EQUAL);
+            actorConnectionRequestTable.loadToMemory();
+            List<DatabaseTableRecord> records = actorConnectionRequestTable.getRecords();
+            if (!records.isEmpty()) {
+                DatabaseTableRecord record = records.get(0);
+                record.setStringValue(
+                        JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_REQUEST_STATE_COLUMN_NAME,
+                        state.getCode());
+                record.setStringValue(
+                        JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_REQUEST_ACTION_COLUMN_NAME,
+                        action.getCode());
+                actorConnectionRequestTable.updateRecord(record);
+            } else
+                throw new ConnectionRequestNotFoundException(
+                        null,
+                        "requestId: "+requestId,
+                        "Cannot find an address exchange request with that requestId.");
+        } catch (CantUpdateRecordException e) {
+            throw new CantConfirmConnectionRequestException(
+                    e,
+                    "Confirming a connection request",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot update the record.");
+        } catch (CantLoadTableToMemoryException e) {
+            throw new CantConfirmConnectionRequestException(
+                    e,
+                    "Confirming a connection request",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot load the table.");
+        }
+    }
+
+    /**
+     * This method contains the logic to accept connections.
+     * @param requestId
+     * @param state
+     * @throws CantAcceptConnectionRequestException
+     * @throws ConnectionRequestNotFoundException
+     */
+    public void acceptConnection(
+            final UUID requestId,
+            final ProtocolState state)
+            throws CantAcceptConnectionRequestException,
+            ConnectionRequestNotFoundException{
+        if (requestId == null)
+            throw new CantAcceptConnectionRequestException(
+                    "The requestId is required, can not be null");
+        if (state == null)
+            throw new CantAcceptConnectionRequestException(
+                    "The state is required, can not be null");
+        try {
+            final ConnectionRequestAction action = ConnectionRequestAction.ACCEPT;
+            final DatabaseTable connectionNewsTable = database.getTable(
+                    JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_TABLE_NAME);
+            connectionNewsTable.addUUIDFilter(
+                    JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_REQUEST_ID_COLUMN_NAME,
+                    requestId,
+                    DatabaseFilterType.EQUAL);
+            connectionNewsTable.loadToMemory();
+            final List<DatabaseTableRecord> records = connectionNewsTable.getRecords();
+            if (!records.isEmpty()) {
+                final DatabaseTableRecord record = records.get(0);
+                record.setFermatEnum(
+                        JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_REQUEST_STATE_COLUMN_NAME,
+                        state);
+                record.setFermatEnum(
+                        JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_REQUEST_ACTION_COLUMN_NAME,
+                        action);
+                connectionNewsTable.updateRecord(record);
+            } else
+                throw new ConnectionRequestNotFoundException(
+                        null,
+                        "requestId: "+requestId,
+                        "Cannot find an actor connection request with that requestId.");
+        } catch (final CantUpdateRecordException e) {
+            throw new CantAcceptConnectionRequestException(
+                    e,
+                    "Accepting a connection",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot update the record.");
+        } catch (final CantLoadTableToMemoryException e) {
+            throw new CantAcceptConnectionRequestException(
+                    e,
+                    "Accepting a connection",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot load the table.");
+        }
+    }
+
+    /**
+     * This method returns the destination public key from a given connection Id.
+     * @param connectionId
+     * @return
+     * @throws CantListPendingConnectionRequestsException
+     * @throws ConnectionRequestNotFoundException
+     */
+    public String getDestinationPublicKey(
+            final UUID connectionId)
+            throws CantListPendingConnectionRequestsException,
+            ConnectionRequestNotFoundException {
+        if (connectionId == null)
+            throw new CantListPendingConnectionRequestsException(
+                    "The connectionId is required, can not be null");
+        try {
+            final DatabaseTable actorConnectionsTable = database.getTable(
+                    JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_TABLE_NAME);
+            actorConnectionsTable.addUUIDFilter(
+                    JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_REQUEST_ID_COLUMN_NAME,
+                    connectionId,
+                    DatabaseFilterType.EQUAL);
+            actorConnectionsTable.loadToMemory();
+            final List<DatabaseTableRecord> records = actorConnectionsTable.getRecords();
+            if (!records.isEmpty()) {
+                final DatabaseTableRecord record = records.get(0);
+                return record.getStringValue(
+                        JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_DESTINATION_PUBLIC_KEY_COLUMN_NAME);
+            } else
+                throw new ConnectionRequestNotFoundException(
+                        null,
+                        "connectionId: "+connectionId,
+                        "Cannot find an actor connection request with that requestId."
+                );
+        } catch (final CantLoadTableToMemoryException cantLoadTableToMemoryException) {
+            throw new CantListPendingConnectionRequestsException(
+                    cantLoadTableToMemoryException,
+                    "ConnectionId: "+connectionId,
+                    "Exception not handled by the plugin, there is a problem in database and I cannot load the table.");
+        }
+    }
+
+    /**
+     * This method returns if exists a connection request.
+     * @param requestId
+     * @return
+     * @throws CantFindRequestException
+     */
+    public boolean existsConnectionRequest(final UUID requestId) throws CantFindRequestException {
+        if (requestId == null)
+            throw new CantFindRequestException("The requestId is required, can not be null");
+        try {
+            final DatabaseTable connectionNewsTable = database.getTable(
+                    JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_TABLE_NAME);
+            connectionNewsTable.addUUIDFilter(
+                    JobSeekerActorNetworkServiceDatabaseConstants.CONNECTION_NEWS_REQUEST_ID_COLUMN_NAME,
+                    requestId,
+                    DatabaseFilterType.EQUAL);
+            connectionNewsTable.loadToMemory();
+            final List<DatabaseTableRecord> records = connectionNewsTable.getRecords();
+            return !records.isEmpty();
+        } catch (final CantLoadTableToMemoryException e) {
+            throw new CantFindRequestException(
+                    e,
+                    "Asking if exists a connection with Id: "+requestId,
+                    "Exception not handled by the plugin, there is a problem in database and I cannot load the table.");
+        }
+    }
+
+    public CryptoBrokerActorNetworkServiceQuotesRequest getQuotesRequest(final UUID requestId) throws CantFindRequestException, QuotesRequestNotFoundException {
+
+        if (requestId == null)
+            throw new CantFindRequestException(null, "", "The requestId is required, can not be null");
+
+        try {
+
+            final DatabaseTable quotesRequestTable = database.getTable(CryptoBrokerActorNetworkServiceDatabaseConstants.QUOTES_REQUEST_TABLE_NAME);
+
+            quotesRequestTable.addUUIDFilter(CryptoBrokerActorNetworkServiceDatabaseConstants.QUOTES_REQUEST_REQUEST_ID_COLUMN_NAME, requestId, DatabaseFilterType.EQUAL);
+
+            quotesRequestTable.loadToMemory();
+
+            final List<DatabaseTableRecord> records = quotesRequestTable.getRecords();
+
+            if (!records.isEmpty())
+                return buildQuotesRequestObject(records.get(0));
+            else
+                throw new QuotesRequestNotFoundException(null, "", "Cannot find a quotes request with that id.");
+
+        } catch (final CantLoadTableToMemoryException e) {
+
+            throw new CantFindRequestException(e, "", "Exception not handled by the plugin, there is a problem in database and i cannot load the table.");
+        } catch (CantListPendingQuotesRequestsException e) {
+
+            throw new CantFindRequestException(e, "", "Exception in dao trying to list the pending request.");
+        } catch (final InvalidParameterException e) {
+
+            throw new CantFindRequestException(e, "", "Exception reading records of the table Cannot recognize the codes of the currencies.");
         }
     }
 
