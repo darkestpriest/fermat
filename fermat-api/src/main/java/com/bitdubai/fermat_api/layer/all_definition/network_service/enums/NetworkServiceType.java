@@ -34,6 +34,7 @@ public enum NetworkServiceType implements FermatEnum {
     CRYPTO_PAYMENT_REQUEST           ("CPR"),
     CRYPTO_TRANSMISSION              ("CRY_TRANS"),
     INTRA_USER                       ("INT_USR"),
+    JOB_SEEKER                       ("JOBS"),
     FERMAT_MONITOR                   ("FER_MON"),
     TRANSACTION_TRANSMISSION         ("TRTX"),
     NEGOTIATION_TRANSMISSION         ("NGTR"),

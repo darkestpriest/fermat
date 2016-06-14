@@ -10,3 +10,7 @@ project(':fermat-job-api').projectDir = new File('JOB/library/api/fermat-job-api
 
 include ':fermat-job-core'
 project(':fermat-job-core').projectDir = new File('JOB/library/core/fermat-job-core')
+
+//Plugins
+include ':fermat-job-plugin-actor-network-service-job-seeker'
+project(':fermat-job-plugin-actor-network-service-job-seeker').projectDir = new File('JOB/plugin/actor_network_service/fermat-job-plugin-actor-network-service-job-seeker')
