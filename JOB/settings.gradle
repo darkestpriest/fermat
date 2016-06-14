@@ -5,6 +5,18 @@
  * -Name.
  */
 
+//Android-sub-app-community
+
+include ':fermat-job-android-sub-app-job-community-bitdubai'
+project(':fermat-job-android-sub-app-job-community-bitdubai').projectDir = new File('JOB/android/sub_app/fermat-job-android-sub-app-job-community-bitdubai')
+
+//Android-sub-app-identity
+include ':fermat-job-android-sub-app-job-seeker-identity-bitdubai'
+project(':fermat-job-android-sub-app-job-seeker-identity-bitdubai').projectDir = new File('JOB/android/sub_app/fermat-job-android-sub-app-job-seeker-identity-bitdubai')
+
+include ':fermat-job-android-sub-app-job-provider-identity-bitdubai'
+project(':fermat-job-android-sub-app-job-provider-identity-bitdubai').projectDir = new File('JOB/android/sub_app/fermat-job-android-sub-app-job-provider-identity-bitdubai')
+
 include ':fermat-job-api'
 project(':fermat-job-api').projectDir = new File('JOB/library/api/fermat-job-api')
 
