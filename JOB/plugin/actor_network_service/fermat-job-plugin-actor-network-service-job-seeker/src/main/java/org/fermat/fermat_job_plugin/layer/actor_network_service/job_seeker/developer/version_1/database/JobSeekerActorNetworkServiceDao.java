@@ -4,6 +4,7 @@ import com.bitdubai.fermat_api.layer.actor_connection.common.exceptions.CantPers
 import com.bitdubai.fermat_api.layer.all_definition.enums.Actors;
 import com.bitdubai.fermat_api.layer.all_definition.enums.DeviceDirectory;
 import com.bitdubai.fermat_api.layer.all_definition.exceptions.InvalidParameterException;
+import com.bitdubai.fermat_api.layer.all_definition.util.XMLParser;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.Database;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseFilterOperator;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseFilterType;
@@ -36,12 +37,18 @@ import org.fermat.fermat_job_api.all_definition.exceptions.CantDisconnectExcepti
 import org.fermat.fermat_job_api.all_definition.exceptions.CantFindRequestException;
 import org.fermat.fermat_job_api.all_definition.exceptions.CantListPendingConnectionRequestsException;
 import org.fermat.fermat_job_api.all_definition.exceptions.ConnectionRequestNotFoundException;
+import org.fermat.fermat_job_api.all_definition.interfaces.Resume;
 import org.fermat.fermat_job_api.layer.actor_network_service.common.JobActorConnectionRequest;
+import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantListPendingResumeRequestsException;
+import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.ResumeRequestNotFoundException;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.utils.JobSeekerConnectionInformation;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantDenyConnectionRequestException;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantGetProfileImageException;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantInitializeDatabaseException;
+import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantListPendingResumesRequestsException;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantRequestConnectionException;
+import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.structure.JobActorActorNetworkServiceResumesRequest;
+import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.structure.ResumeRecord;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -801,21 +808,26 @@ public class JobSeekerActorNetworkServiceDao {
         }
     }
 
-    public CryptoBrokerActorNetworkServiceQuotesRequest getQuotesRequest(final UUID requestId) throws CantFindRequestException, QuotesRequestNotFoundException {
-
+    /**
+     * This method returns a JobActorActorNetworkServiceResumesRequest by a given request Id
+     * @param requestId
+     * @return
+     * @throws CantFindRequestException
+     * @throws ResumeRequestNotFoundException
+     */
+    public JobActorActorNetworkServiceResumesRequest getResumeRequest(final UUID requestId)
+            throws CantFindRequestException, ResumeRequestNotFoundException {
         if (requestId == null)
-            throw new CantFindRequestException(null, "", "The requestId is required, can not be null");
-
+            throw new CantFindRequestException("The requestId is required, can not be null");
         try {
-
-            final DatabaseTable quotesRequestTable = database.getTable(CryptoBrokerActorNetworkServiceDatabaseConstants.QUOTES_REQUEST_TABLE_NAME);
-
-            quotesRequestTable.addUUIDFilter(CryptoBrokerActorNetworkServiceDatabaseConstants.QUOTES_REQUEST_REQUEST_ID_COLUMN_NAME, requestId, DatabaseFilterType.EQUAL);
-
+            final DatabaseTable quotesRequestTable = database.getTable(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_TABLE_NAME);
+            quotesRequestTable.addUUIDFilter(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_REQUEST_ID_COLUMN_NAME,
+                    requestId,
+                    DatabaseFilterType.EQUAL);
             quotesRequestTable.loadToMemory();
-
             final List<DatabaseTableRecord> records = quotesRequestTable.getRecords();
-
             if (!records.isEmpty())
                 return buildQuotesRequestObject(records.get(0));
             else
@@ -830,6 +842,74 @@ public class JobSeekerActorNetworkServiceDao {
         } catch (final InvalidParameterException e) {
 
             throw new CantFindRequestException(e, "", "Exception reading records of the table Cannot recognize the codes of the currencies.");
+        }
+    }
+
+    private JobActorActorNetworkServiceResumesRequest buildResumeRequestObject(
+            final DatabaseTableRecord record)
+            throws CantListPendingResumeRequestsException, InvalidParameterException {
+        UUID requestId = record.getUUIDValue(
+                JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_REQUEST_ID_COLUMN_NAME);
+        String requesterPublicKey = record.getStringValue(
+                JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_REQUESTER_PUBLIC_KEY_COLUMN_NAME);
+        String requesterActorTypeString = record.getStringValue(
+                JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_REQUESTER_ACTOR_TYPE_COLUMN_NAME);
+        String cryptoBrokerPublicKey = record.getStringValue(
+                JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_JOB_SEEKER_PUBLIC_KEY_COLUMN_NAME);
+        Long updateTime = record.getLongValue(
+                JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_UPDATE_TIME_COLUMN_NAME);
+        String typeString = record.getStringValue(
+                JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_TYPE_COLUMN_NAME);
+        String stateString = record.getStringValue(
+                JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_STATE_COLUMN_NAME);
+        Actors requesterActorType = Actors.getByCode(requesterActorTypeString);
+        RequestType type = RequestType.getByCode(typeString);
+        ProtocolState state = ProtocolState.getByCode(stateString);
+        return new JobActorActorNetworkServiceResumesRequest(
+                requestId            ,
+                requesterPublicKey   ,
+                requesterActorType   ,
+                cryptoBrokerPublicKey,
+                updateTime           ,
+                listResume(requestId),
+                type                 ,
+                state
+        );
+    }
+
+    private ArrayList<Resume> listResume(UUID requestId)
+            throws CantListPendingResumeRequestsException {
+        try {
+            final DatabaseTable quotesTable = database.getTable(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_TABLE_NAME);
+            quotesTable.addUUIDFilter(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_ID_COLUMN_NAME,
+                    requestId,
+                    DatabaseFilterType.EQUAL);
+            quotesTable.loadToMemory();
+            final List<DatabaseTableRecord> records = quotesTable.getRecords();
+
+            ArrayList<Resume> resumeList = new ArrayList<>();
+
+            for(DatabaseTableRecord record : records) {
+
+
+                String resumeString = record.getStringValue(JobSeekerActorNetworkServiceDatabaseConstants.RESUME_XML_STRING_COLUMN_NAME);
+                Resume resume = null;
+                Object xmlObject = XMLParser.parseXML(resumeString,resume);
+                resume = (Resume) xmlObject;
+                resumeList.add(
+                        resume
+                );
+            }
+
+            return resumeList;
+
+        } catch (final CantLoadTableToMemoryException e) {
+            throw new CantListPendingResumeRequestsException(
+                    e,
+                    "",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot load the table.");
         }
     }
 
