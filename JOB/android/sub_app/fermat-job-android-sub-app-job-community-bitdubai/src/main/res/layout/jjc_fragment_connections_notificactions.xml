@@ -3,17 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#010c12"
     android:orientation="vertical">
 
-    <com.bitdubai.fermat_android_api.layer.definition.wallet.views.FermatTextView
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:layout_marginTop="10dp"
-        android:layout_gravity="center"
-        android:text="Please, select an identity"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -26,22 +17,24 @@
 
 
         <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/accswipe_refresh"
+            android:id="@+id/aac_swipeRefresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/accrecycler_view"
+                android:id="@+id/aac_recyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:listitem="@layout/aac_row_connection_list" />
+                android:scrollbars="vertical"
+                tools:listitem="@layout/jjc_row_connection_notification" />
         </android.support.v4.widget.SwipeRefreshLayout>
 
         <!--Empty view-->
         <LinearLayout
-            android:id="@+id/aac_empty_view"
+            android:id="@+id/aac_emptyview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#010c12"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="gone">
@@ -57,18 +50,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="You don't have any"
-                android:textColor="#000000"
-                android:textSize="16sp"
-                tools:ignore="HardcodedText" />
+                android:text="You don't have "
+                android:textColor="#ffffff"
+                android:textSize="16sp" />
 
             <com.bitdubai.fermat_android_api.layer.definition.wallet.views.FermatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="connections yet"
-                android:textColor="#000000"
-                android:textSize="16sp"
-                tools:ignore="HardcodedText" />
+                android:text="any notifications yet"
+                android:textColor="#ffffff"
+                android:textSize="16sp" />
 
         </LinearLayout>
 

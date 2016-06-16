@@ -17,7 +17,7 @@
         <RelativeLayout
             android:layout_width="42dp"
             android:layout_height="42dp"
-            android:background="@drawable/circular_friend_list">
+            android:background="@drawable/jjc_circular_friend_list">
 
             <ImageView
                 android:id="@+id/aac_selectable_identity_user_avatar"
@@ -29,12 +29,12 @@
                 tools:ignore="ContentDescription" />
             <ImageView
                 android:id="@+id/aac_recycler_icon"
-                android:src="@drawable/aac_people"
+                android:src="@drawable/jjc_people"
                 android:contentDescription="@string/app_name"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:scaleType="centerCrop"
-                tools:listitem="@layout/aac_row_connection_list"/>
+                tools:listitem="@layout/jjc_row_connection_list"/>
 
         </RelativeLayout>
 

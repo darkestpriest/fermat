@@ -6,6 +6,14 @@
     android:background="#010c12"
     android:orientation="vertical">
 
+    <com.bitdubai.fermat_android_api.layer.definition.wallet.views.FermatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:text="Please, select an identity"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -18,15 +26,15 @@
 
 
         <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/aac_swipe_refresh"
+            android:id="@+id/accswipe_refresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/aac_recycler_view"
+                android:id="@+id/accrecycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:listitem="@layout/aac_row_connection_list" />
+                tools:listitem="@layout/jjc_row_connection_list" />
         </android.support.v4.widget.SwipeRefreshLayout>
 
         <!--Empty view-->
@@ -50,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="You don't have any"
-                android:textColor="#ffffff"
+                android:textColor="#000000"
                 android:textSize="16sp"
                 tools:ignore="HardcodedText" />
 
@@ -58,7 +66,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="connections yet"
-                android:textColor="#ffffff"
+                android:textColor="#000000"
                 android:textSize="16sp"
                 tools:ignore="HardcodedText" />
 
