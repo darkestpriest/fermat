@@ -35,7 +35,11 @@ public enum Actors implements FermatEnum {
     CHAT                    ("CHT"),
 
     LOSS_PROTECTED_USER     ("LPU"),
-    BITCOIN_BASIC_USER    ("BBW");
+    BITCOIN_BASIC_USER      ("BBW"),
+
+    JOB_SEEKER              ("JJS"),
+    EMPLOYER                ("JEA"),
+    ;
 
 
     private final String code;
@@ -69,6 +73,9 @@ public enum Actors implements FermatEnum {
 
             case "LPU":     return LOSS_PROTECTED_USER;
             case "BBW":     return BITCOIN_BASIC_USER;
+
+            case "JJS":     return JOB_SEEKER;
+            case "JEA":     return EMPLOYER;
 
             default:
                 throw new IllegalArgumentException(

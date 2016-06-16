@@ -51,7 +51,7 @@ import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.devel
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantDenyConnectionRequestException;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantGetProfileImageException;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantInitializeDatabaseException;
-import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantRequestConnectionException;
+import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantRequestConnectionException;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.structure.JobActorActorNetworkServiceResumesRequest;
 
 

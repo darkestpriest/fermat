@@ -14,8 +14,10 @@ import org.fermat.fermat_job_api.all_definition.interfaces.Resume;
 import org.fermat.fermat_job_api.layer.actor_network_service.common.JobActorConnectionRequest;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantAnswerResumeRequestException;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantListPendingResumeRequestsException;
+import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantRequestConnectionException;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantRequestResumeException;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.ResumeRequestNotFoundException;
+import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.utils.JobSeekerConnectionInformation;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.utils.JobSeekerExposingData;
 
 import java.util.Collection;
@@ -174,6 +176,14 @@ public interface JobSeekerManager extends FermatManager {
      * @throws ConnectionRequestNotFoundException     if the connection request cannot be found.
      */
     void confirm(final UUID requestId) throws CantConfirmException, ConnectionRequestNotFoundException;
+
+    /**
+     * This method implements a connection request.
+     * @param jobSeekerConnectionInformation
+     * @throws CantRequestConnectionException
+     */
+    void requestConnection(final JobSeekerConnectionInformation jobSeekerConnectionInformation)
+            throws CantRequestConnectionException;
 
 }
 

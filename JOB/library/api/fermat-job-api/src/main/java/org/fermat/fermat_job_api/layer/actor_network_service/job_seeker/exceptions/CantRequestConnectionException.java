@@ -1,4 +1,4 @@
-package org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions;
+package org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions;
 
 import org.fermat.fermat_job_api.all_definition.exceptions.JOBException;
 
