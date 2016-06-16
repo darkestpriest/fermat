@@ -12,6 +12,7 @@ import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTable;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTableFilter;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTableFilterGroup;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTableRecord;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTransaction;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseSystem;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantCreateDatabaseException;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantInsertRecordException;
@@ -19,6 +20,7 @@ import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.Cant
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantOpenDatabaseException;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantUpdateRecordException;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.DatabaseNotFoundException;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.DatabaseTransactionFailedException;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.FileLifeSpan;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.FilePrivacy;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginBinaryFile;
@@ -39,16 +41,19 @@ import org.fermat.fermat_job_api.all_definition.exceptions.CantListPendingConnec
 import org.fermat.fermat_job_api.all_definition.exceptions.ConnectionRequestNotFoundException;
 import org.fermat.fermat_job_api.all_definition.interfaces.Resume;
 import org.fermat.fermat_job_api.layer.actor_network_service.common.JobActorConnectionRequest;
+import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantAnswerResumeRequestException;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantListPendingResumeRequestsException;
+import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantRequestResumeException;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.ResumeRequestNotFoundException;
+import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.interfaces.JobSeekerExtraData;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.utils.JobSeekerConnectionInformation;
+import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantConfirmResumeRequestException;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantDenyConnectionRequestException;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantGetProfileImageException;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantInitializeDatabaseException;
-import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantListPendingResumesRequestsException;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantRequestConnectionException;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.structure.JobActorActorNetworkServiceResumesRequest;
-import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.structure.ResumeRecord;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -829,22 +834,34 @@ public class JobSeekerActorNetworkServiceDao {
             quotesRequestTable.loadToMemory();
             final List<DatabaseTableRecord> records = quotesRequestTable.getRecords();
             if (!records.isEmpty())
-                return buildQuotesRequestObject(records.get(0));
+                return buildResumeRequestObject(records.get(0));
             else
-                throw new QuotesRequestNotFoundException(null, "", "Cannot find a quotes request with that id.");
-
+                throw new ResumeRequestNotFoundException("Cannot find a quotes request with that id.");
         } catch (final CantLoadTableToMemoryException e) {
-
-            throw new CantFindRequestException(e, "", "Exception not handled by the plugin, there is a problem in database and i cannot load the table.");
-        } catch (CantListPendingQuotesRequestsException e) {
-
-            throw new CantFindRequestException(e, "", "Exception in dao trying to list the pending request.");
+            throw new CantFindRequestException(
+                    e,
+                    "Getting the resume request",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot load the table.");
+        } catch (CantListPendingResumeRequestsException e) {
+            throw new CantFindRequestException(
+                    e,
+                    "Getting the resume request",
+                    "Exception in dao trying to list the pending request.");
         } catch (final InvalidParameterException e) {
-
-            throw new CantFindRequestException(e, "", "Exception reading records of the table Cannot recognize the codes of the currencies.");
+            throw new CantFindRequestException(
+                    e,
+                    "Getting the resume request",
+                    "Exception reading records of the table Cannot recognize the codes of the currencies.");
         }
     }
 
+    /**
+     * This method builds a JobActorActorNetworkServiceResumesRequest by a given DatabaseTableRecord
+     * @param record
+     * @return
+     * @throws CantListPendingResumeRequestsException
+     * @throws InvalidParameterException
+     */
     private JobActorActorNetworkServiceResumesRequest buildResumeRequestObject(
             final DatabaseTableRecord record)
             throws CantListPendingResumeRequestsException, InvalidParameterException {
@@ -877,6 +894,12 @@ public class JobSeekerActorNetworkServiceDao {
         );
     }
 
+    /**
+     * This method returns a resume list
+     * @param requestId
+     * @return
+     * @throws CantListPendingResumeRequestsException
+     */
     private ArrayList<Resume> listResume(UUID requestId)
             throws CantListPendingResumeRequestsException {
         try {
@@ -892,9 +915,8 @@ public class JobSeekerActorNetworkServiceDao {
             ArrayList<Resume> resumeList = new ArrayList<>();
 
             for(DatabaseTableRecord record : records) {
-
-
-                String resumeString = record.getStringValue(JobSeekerActorNetworkServiceDatabaseConstants.RESUME_XML_STRING_COLUMN_NAME);
+                String resumeString = record.getStringValue(
+                        JobSeekerActorNetworkServiceDatabaseConstants.RESUME_XML_STRING_COLUMN_NAME);
                 Resume resume = null;
                 Object xmlObject = XMLParser.parseXML(resumeString,resume);
                 resume = (Resume) xmlObject;
@@ -902,14 +924,226 @@ public class JobSeekerActorNetworkServiceDao {
                         resume
                 );
             }
-
             return resumeList;
-
         } catch (final CantLoadTableToMemoryException e) {
             throw new CantListPendingResumeRequestsException(
                     e,
-                    "",
+                    "Getting the resume list",
                     "Exception not handled by the plugin, there is a problem in database and I cannot load the table.");
+        }
+    }
+
+    /**
+     * This method creates a resume request
+     * @param requestId
+     * @param requesterPublicKey
+     * @param requesterActorType
+     * @param cryptoBrokerPublicKey
+     * @param state
+     * @param type
+     * @return
+     * @throws CantRequestResumeException
+     */
+    public final JobActorActorNetworkServiceResumesRequest createResumeRequest(
+            final UUID requestId,
+            final String requesterPublicKey,
+            final Actors requesterActorType,
+            final String cryptoBrokerPublicKey,
+            final ProtocolState state,
+            final RequestType type) throws CantRequestResumeException {
+        try {
+            final DatabaseTable quotesRequestTable = database.getTable(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_TABLE_NAME);
+            final DatabaseTableRecord quotesRequestRecord = quotesRequestTable.getEmptyRecord();
+            final JobActorActorNetworkServiceResumesRequest resumeRequest =
+                    new JobActorActorNetworkServiceResumesRequest(
+                            requestId,
+                            requesterPublicKey,
+                            requesterActorType,
+                            cryptoBrokerPublicKey,
+                            0,
+                            new ArrayList<Resume>(),
+                            type,
+                            state
+                    );
+
+            quotesRequestRecord.setUUIDValue(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_REQUEST_ID_COLUMN_NAME,
+                    resumeRequest.getRequestId());
+            quotesRequestRecord.setStringValue(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_REQUESTER_PUBLIC_KEY_COLUMN_NAME,
+                    resumeRequest.getRequesterPublicKey());
+            quotesRequestRecord.setFermatEnum(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_REQUESTER_ACTOR_TYPE_COLUMN_NAME,
+                    resumeRequest.getRequesterActorType());
+            quotesRequestRecord.setStringValue(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_JOB_SEEKER_PUBLIC_KEY_COLUMN_NAME,
+                    resumeRequest.getJobSeekerPublicKey());
+            quotesRequestRecord.setLongValue(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_UPDATE_TIME_COLUMN_NAME,
+                    resumeRequest.getUpdateTime());
+            quotesRequestRecord.setFermatEnum(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_TYPE_COLUMN_NAME,
+                    resumeRequest.getType());
+            quotesRequestRecord.setFermatEnum(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_STATE_COLUMN_NAME,
+                    resumeRequest.getState());
+            quotesRequestTable.insertRecord(quotesRequestRecord);
+            return resumeRequest;
+        } catch (final CantInsertRecordException e) {
+            throw new CantRequestResumeException(
+                    e,
+                    "Creating a resume request",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot insert all the records.");
+        }
+    }
+
+    /**
+     * This method answers a Resume request
+     * @param requestId
+     * @param updateTime
+     * @param resumes
+     * @param state
+     * @throws CantAnswerResumeRequestException
+     * @throws ResumeRequestNotFoundException
+     */
+    public final void answerResumeRequest(
+            final UUID requestId,
+            final long updateTime,
+            final List<Resume> resumes,
+            final ProtocolState state)
+            throws CantAnswerResumeRequestException, ResumeRequestNotFoundException {
+        try {
+            final DatabaseTable quotesRequestTable = database.getTable(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_TABLE_NAME);
+            quotesRequestTable.addUUIDFilter(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_ID_COLUMN_NAME,
+                    requestId,
+                    DatabaseFilterType.EQUAL);
+            quotesRequestTable.loadToMemory();
+            final List<DatabaseTableRecord> records = quotesRequestTable.getRecords();
+            DatabaseTableRecord quotesRequestRecord;
+            if (!records.isEmpty()) {
+                quotesRequestRecord = records.get(0);
+                quotesRequestRecord.setFermatEnum(
+                        JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_STATE_COLUMN_NAME,
+                        state);
+                quotesRequestRecord.setLongValue(
+                        JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_UPDATE_TIME_COLUMN_NAME,
+                        updateTime);
+            } else
+                throw new ResumeRequestNotFoundException("Cannot find a quotes request with that id:"+requestId);
+            DatabaseTransaction databaseTransaction = database.newTransaction();
+            databaseTransaction.addRecordToUpdate(quotesRequestTable, quotesRequestRecord);
+            for (final Resume resume : resumes) {
+
+                final DatabaseTable quotesTable = database.getTable(
+                        JobSeekerActorNetworkServiceDatabaseConstants.RESUME_TABLE_NAME);
+                final DatabaseTableRecord quotesRecord = quotesTable.getEmptyRecord();
+                quotesRecord.setUUIDValue(
+                        JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_ID_COLUMN_NAME,
+                        requestId);
+                quotesRecord.setUUIDValue(
+                        JobSeekerActorNetworkServiceDatabaseConstants.RESUME_INNER_ID_COLUMN_NAME,
+                        resume.getResumeId());
+                quotesRecord.setStringValue(
+                        JobSeekerActorNetworkServiceDatabaseConstants.RESUME_OWNER_PUBLIC_KEY_COLUMN_NAME,
+                        resume.getActorPublicKey());
+                quotesRecord.setStringValue(
+                        JobSeekerActorNetworkServiceDatabaseConstants.RESUME_XML_STRING_COLUMN_NAME, XMLParser.parseObject(resume));
+                databaseTransaction.addRecordToInsert(quotesTable, quotesRecord);
+            }
+            databaseTransaction.execute();
+
+        } catch (final CantLoadTableToMemoryException e) {
+            throw new CantAnswerResumeRequestException(
+                    e,
+                    "Answering a resume request",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot load the table.");
+        } catch (final DatabaseTransactionFailedException e) {
+            throw new CantAnswerResumeRequestException(
+                    e,
+                    "Answering a resume request",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot insert all the records.");
+        }
+    }
+
+    /**
+     * This method returns a JobSeekerExtraData list
+     * @param protocolState
+     * @param requestType
+     * @return
+     * @throws CantListPendingResumeRequestsException
+     */
+    public final List<JobSeekerExtraData<Resume>> listPendingQuotesRequests(
+            final ProtocolState protocolState,
+            final RequestType requestType)
+            throws CantListPendingResumeRequestsException {
+        try {
+            final DatabaseTable connectionNewsTable = database.getTable(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_TABLE_NAME);
+            connectionNewsTable.addFermatEnumFilter(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_TYPE_COLUMN_NAME,
+                    requestType,
+                    DatabaseFilterType.EQUAL);
+            connectionNewsTable.addFermatEnumFilter(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_STATE_COLUMN_NAME,
+                    protocolState,
+                    DatabaseFilterType.EQUAL);
+            connectionNewsTable.loadToMemory();
+            final List<DatabaseTableRecord> records = connectionNewsTable.getRecords();
+            final List<JobSeekerExtraData<Resume>> quotesRequestsList = new ArrayList<>();
+            for (final DatabaseTableRecord record : records)
+                quotesRequestsList.add(buildResumeRequestObject(record));
+            return quotesRequestsList;
+        } catch (final CantLoadTableToMemoryException e) {
+            throw new CantListPendingResumeRequestsException(
+                    e,
+                    "Listing pending resume request",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot load the table.");
+        } catch (final InvalidParameterException e) {
+            throw new CantListPendingResumeRequestsException(
+                    e,
+                    "Listing pending resume request",
+                    "Exception reading records of the table Cannot recognize the codes.");
+        }
+    }
+
+    public void confirmResumeRequest(final UUID requestId)
+            throws CantConfirmResumeRequestException,
+            ResumeRequestNotFoundException   {
+        if (requestId == null) {
+            throw new CantConfirmResumeRequestException("The requestId is required, can not be null");
+        }
+        try {
+            ProtocolState state  = ProtocolState.DONE;
+            DatabaseTable actorConnectionRequestTable = database.getTable(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_TABLE_NAME);
+            actorConnectionRequestTable.addUUIDFilter(
+                    JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_REQUEST_ID_COLUMN_NAME,
+                    requestId,
+                    DatabaseFilterType.EQUAL);
+            actorConnectionRequestTable.loadToMemory();
+            List<DatabaseTableRecord> records = actorConnectionRequestTable.getRecords();
+            if (!records.isEmpty()) {
+                DatabaseTableRecord record = records.get(0);
+                record.setFermatEnum(
+                        JobSeekerActorNetworkServiceDatabaseConstants.RESUME_REQUEST_STATE_COLUMN_NAME,
+                        state);
+                actorConnectionRequestTable.updateRecord(record);
+            } else
+                throw new ResumeRequestNotFoundException("Cannot find a quotes request with that requestId."+requestId);
+        } catch (CantUpdateRecordException e) {
+            throw new CantConfirmResumeRequestException(
+                    e,
+                    "Confirming resume request",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot update the record.");
+        } catch (CantLoadTableToMemoryException e) {
+            throw new CantConfirmResumeRequestException(
+                    e,
+                    "Confirming resume request",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot load the table.");
+
         }
     }
 
