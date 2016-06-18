@@ -203,7 +203,8 @@ public class JobSeekerActorNetworkServicePluginManager implements JobSeekerManag
                     protocolState
             );
 
-            JobActorConnectionRequest jobSeekerConnectionRequest = jobSeekerActorNetworkServiceDao.getConnectionRequest(requestId);
+            JobActorConnectionRequest jobSeekerConnectionRequest =
+                    jobSeekerActorNetworkServiceDao.getConnectionRequest(requestId);
 
             sendMessage(
                     buildJsonInformationMessage(jobSeekerConnectionRequest),
@@ -231,29 +232,184 @@ public class JobSeekerActorNetworkServicePluginManager implements JobSeekerManag
 
     }
 
+    /**
+     * This method returns a list of pending connection news.
+     * @param actorType type of the actor whom wants to be new notifications
+     *
+     * @return
+     * @throws CantListPendingConnectionRequestsException
+     */
     @Override
-    public List<JobActorConnectionRequest> listPendingConnectionNews(Actors actorType) throws CantListPendingConnectionRequestsException {
-        return null;
+    public List<JobActorConnectionRequest> listPendingConnectionNews(Actors actorType)
+            throws CantListPendingConnectionRequestsException {
+        try {
+            return jobSeekerActorNetworkServiceDao.listPendingConnectionNews(actorType);
+        } catch (final CantListPendingConnectionRequestsException e){
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw e;
+        } catch (final Exception e){
+            pluginRoot.reportError
+                    (UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                            e);
+            throw new CantListPendingConnectionRequestsException(
+                    e,
+                    "Listing pending connection news",
+                    "Unhandled Exception.");
+        }
     }
 
+    /**
+     * This method returns the pending connection updates.
+     * @return
+     * @throws CantListPendingConnectionRequestsException
+     */
     @Override
     public List<JobActorConnectionRequest> listPendingConnectionUpdates() throws CantListPendingConnectionRequestsException {
-        return null;
+        try {
+            return jobSeekerActorNetworkServiceDao.listPendingConnectionUpdates();
+        } catch (final CantListPendingConnectionRequestsException e){
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw e;
+        } catch (final Exception e){
+            pluginRoot.reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
+            throw new CantListPendingConnectionRequestsException(
+                    e,
+                    "Listing connection updates",
+                    "Unhandled Exception.");
+        }
     }
 
+    /**
+     * This method contains all the logic to request a resume
+     * @param requesterPublicKey     the public key of the actor that is requesting.
+     * @param requesterActorType     the actor type of the actor that is requesting.
+     * @param jobSeekerPublicKey  the public key of the job seeker whom information i'm looking for.
+     *
+     * @return
+     * @throws CantRequestResumeException
+     */
     @Override
-    public JobSeekerExtraData<Resume> requestResume(String requesterPublicKey, Actors requesterActorType, String jobSeekerPublicKey) throws CantRequestResumeException {
-        return null;
+    public JobSeekerExtraData<Resume> requestResume(
+            String requesterPublicKey,
+            Actors requesterActorType,
+            String jobSeekerPublicKey)
+            throws CantRequestResumeException {
+        try {
+            final UUID newId = UUID.randomUUID();
+            final ProtocolState state  = ProtocolState.PROCESSING_SEND;
+            final RequestType type = RequestType.SENT;
+
+            JobActorActorNetworkServiceResumesRequest resumeRequest =
+                    jobSeekerActorNetworkServiceDao.createResumeRequest(
+                            newId,
+                            requesterPublicKey,
+                            requesterActorType,
+                            jobSeekerPublicKey,
+                            state,
+                            type
+            );
+            sendMessage(
+                    resumeRequest.toJson(),
+                    resumeRequest.getRequesterPublicKey(),
+                    resumeRequest.getRequesterActorType(),
+                    resumeRequest.getJobSeekerPublicKey(),
+                    Actors.JOB_SEEKER
+            );
+            return resumeRequest;
+        } catch (final CantRequestResumeException e){
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw e;
+        } catch (final Exception e){
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw new CantRequestResumeException(
+                    e,
+                    "Requesting a resume",
+                    "Unhandled Exception.");
+        }
     }
 
+    /**
+     * This method returns a list
+     * @param requestType SENT or RECEIVED
+     *
+     * @return
+     * @throws CantListPendingResumeRequestsException
+     */
     @Override
-    public List<JobSeekerExtraData<Resume>> listPendingResumeRequests(RequestType requestType) throws CantListPendingResumeRequestsException {
-        return null;
+    public List<JobSeekerExtraData<Resume>> listPendingResumeRequests(RequestType requestType)
+            throws CantListPendingResumeRequestsException {
+        try {
+            return jobSeekerActorNetworkServiceDao.listPendingResumeRequests(
+                    ProtocolState.PENDING_LOCAL_ACTION,
+                    requestType);
+        } catch (final CantListPendingResumeRequestsException e){
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw e;
+        } catch (final Exception e){
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw new CantListPendingResumeRequestsException(
+                    e,
+                    "Listing Resume request",
+                    "Unhandled Exception.");
+        }
     }
 
+    /**
+     * This method contains all the logic to answer a resume request.
+     * @param requestId   request id that we want to answer.
+     * @param updateTime  update time of the sending information
+     * @param quotes      list of quotes of the job seeker.
+     *
+     * @throws CantAnswerResumeRequestException
+     * @throws ResumeRequestNotFoundException
+     */
     @Override
-    public void answerQuotesRequest(UUID requestId, long updateTime, List<Resume> quotes) throws CantAnswerResumeRequestException, ResumeRequestNotFoundException {
+    public void answerResumeRequest(UUID requestId, long updateTime, List<Resume> quotes)
+            throws CantAnswerResumeRequestException,
+            ResumeRequestNotFoundException {
+        try {
+            jobSeekerActorNetworkServiceDao.answerResumeRequest(
+                    requestId,
+                    updateTime,
+                    quotes,
+                    ProtocolState.PROCESSING_SEND
+            );
+            JobActorActorNetworkServiceResumesRequest resumeRequest =
+                    jobSeekerActorNetworkServiceDao.getResumeRequest(requestId);
+            sendMessage(
+                    resumeRequest.toJson(),
+                    resumeRequest.getJobSeekerPublicKey(),
+                    Actors.JOB_SEEKER,
+                    resumeRequest.getRequesterPublicKey(),
+                    resumeRequest.getRequesterActorType()
+            );
 
+        } catch (final ResumeRequestNotFoundException | CantAnswerResumeRequestException e){
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw e;
+        } catch (final Exception e){
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw new CantAnswerResumeRequestException(
+                    e,
+                    "AnsweringResumeRequest",
+                    "Unhandled Exception.");
+        }
     }
 
     @Override

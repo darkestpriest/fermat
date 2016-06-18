@@ -1075,7 +1075,7 @@ public class JobSeekerActorNetworkServiceDao {
      * @return
      * @throws CantListPendingResumeRequestsException
      */
-    public final List<JobSeekerExtraData<Resume>> listPendingQuotesRequests(
+    public final List<JobSeekerExtraData<Resume>> listPendingResumeRequests(
             final ProtocolState protocolState,
             final RequestType requestType)
             throws CantListPendingResumeRequestsException {

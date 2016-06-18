@@ -151,7 +151,7 @@ public interface JobSeekerManager extends FermatManager {
      * @throws CantAnswerResumeRequestException  if something goes wrong.
      * @throws ResumeRequestNotFoundException    if i cant find the request.
      */
-    void answerQuotesRequest(
+    void answerResumeRequest(
             UUID requestId,
             long updateTime,
             List<Resume> quotes) throws CantAnswerResumeRequestException, ResumeRequestNotFoundException;
