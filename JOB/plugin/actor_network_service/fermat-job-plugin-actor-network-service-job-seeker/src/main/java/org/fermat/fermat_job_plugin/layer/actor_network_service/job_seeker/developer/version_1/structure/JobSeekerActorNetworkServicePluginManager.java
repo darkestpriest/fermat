@@ -30,6 +30,7 @@ import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.utils.Jo
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.utils.JobSeekerExposingData;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.JobSeekerActorNetworkServicePluginRoot;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.database.JobSeekerActorNetworkServiceDao;
+import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.messages.InformationMessage;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.messages.RequestMessage;
 
 import java.util.Collection;
@@ -193,6 +194,41 @@ public class JobSeekerActorNetworkServicePluginManager implements JobSeekerManag
     public void acceptConnection(UUID requestId)
             throws CantAcceptConnectionRequestException, ConnectionRequestNotFoundException {
 
+        try {
+
+            final ProtocolState protocolState = ProtocolState.PROCESSING_SEND;
+
+            jobSeekerActorNetworkServiceDao.acceptConnection(
+                    requestId,
+                    protocolState
+            );
+
+            JobActorConnectionRequest jobSeekerConnectionRequest = jobSeekerActorNetworkServiceDao.getConnectionRequest(requestId);
+
+            sendMessage(
+                    buildJsonInformationMessage(jobSeekerConnectionRequest),
+                    jobSeekerConnectionRequest.getDestinationPublicKey(),
+                    Actors.JOB_SEEKER,
+                    jobSeekerConnectionRequest.getSenderPublicKey(),
+                    jobSeekerConnectionRequest.getSenderActorType()
+            );
+
+        } catch (final CantAcceptConnectionRequestException | ConnectionRequestNotFoundException e){
+            // ConnectionRequestNotFoundException - THIS SHOULD NOT HAPPEN.
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw e;
+        } catch (final Exception e){
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw new CantAcceptConnectionRequestException(
+                    e,
+                    "Accepting connection request",
+                    "Unhandled Exception.");
+        }
+
     }
 
     @Override
@@ -330,4 +366,13 @@ public class JobSeekerActorNetworkServicePluginManager implements JobSeekerManag
                 jobSeekerConnectionInformation.getSendingTime()
         ).toJson();
     }
+
+    private String buildJsonInformationMessage(final JobActorConnectionRequest jobSeekerConnectionRequest) {
+
+        return new InformationMessage(
+                jobSeekerConnectionRequest.getRequestId(),
+                jobSeekerConnectionRequest.getRequestAction()
+        ).toJson();
+    }
+
 }
