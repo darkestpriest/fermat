@@ -3,4 +3,7 @@ apply plugin: 'java'
 dependencies {
     compile project(':fermat-api')
     compile project(':fermat-core-api')
+
+    //Actor Network Service
+    compile project(':fermat-job-plugin-actor-network-service-job-seeker')
 }

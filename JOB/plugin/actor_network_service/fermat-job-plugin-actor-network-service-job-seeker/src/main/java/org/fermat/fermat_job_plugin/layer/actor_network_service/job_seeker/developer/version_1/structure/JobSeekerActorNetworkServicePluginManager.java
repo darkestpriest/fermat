@@ -11,6 +11,7 @@ import org.fermat.fermat_job_api.all_definition.enums.ConnectionRequestAction;
 import org.fermat.fermat_job_api.all_definition.enums.ProtocolState;
 import org.fermat.fermat_job_api.all_definition.enums.RequestType;
 import org.fermat.fermat_job_api.all_definition.exceptions.CantAcceptConnectionRequestException;
+import org.fermat.fermat_job_api.all_definition.exceptions.CantConfirmConnectionRequestException;
 import org.fermat.fermat_job_api.all_definition.exceptions.CantConfirmException;
 import org.fermat.fermat_job_api.all_definition.exceptions.CantExposeIdentitiesException;
 import org.fermat.fermat_job_api.all_definition.exceptions.CantExposeIdentityException;
@@ -30,6 +31,7 @@ import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.utils.Jo
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.utils.JobSeekerExposingData;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.JobSeekerActorNetworkServicePluginRoot;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.database.JobSeekerActorNetworkServiceDao;
+import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.exceptions.CantConfirmResumeRequestException;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.messages.InformationMessage;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.messages.RequestMessage;
 
@@ -311,7 +313,7 @@ public class JobSeekerActorNetworkServicePluginManager implements JobSeekerManag
                             jobSeekerPublicKey,
                             state,
                             type
-            );
+                    );
             sendMessage(
                     resumeRequest.toJson(),
                     resumeRequest.getRequesterPublicKey(),
@@ -412,14 +414,79 @@ public class JobSeekerActorNetworkServicePluginManager implements JobSeekerManag
         }
     }
 
+    /**
+     * This method contains all the logic to confirm a request
+     * @param requestId  id of the quotes request to confirm.
+     *
+     * @throws CantConfirmException
+     * @throws ResumeRequestNotFoundException
+     */
     @Override
-    public void confirmResumeRequest(UUID requestId) throws CantConfirmException, ResumeRequestNotFoundException {
+    public void confirmResumeRequest(UUID requestId)
+            throws CantConfirmException,
+            ResumeRequestNotFoundException {
 
+        try {
+            jobSeekerActorNetworkServiceDao.confirmResumeRequest(requestId);
+        } catch (final ResumeRequestNotFoundException e){
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw e;
+        } catch (final CantConfirmResumeRequestException e){
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw new CantConfirmException(
+                    e,
+                    "Confirming a resume request",
+                    "Error in DAO, trying to confirm the quotes request.");
+        } catch (final Exception e){
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw new CantConfirmException(
+                    e,
+                    "Confirming a resume request",
+                    "Unhandled Exception.");
+        }
     }
 
+    /**
+     * This method contains all the logic to confirm a message.
+     * @param requestId  id of the connection request to confirm.
+     *
+     * @throws CantConfirmException
+     * @throws ConnectionRequestNotFoundException
+     */
     @Override
-    public void confirm(UUID requestId) throws CantConfirmException, ConnectionRequestNotFoundException {
+    public void confirm(UUID requestId)
+            throws CantConfirmException, ConnectionRequestNotFoundException {
 
+        try {
+            jobSeekerActorNetworkServiceDao.confirmActorConnectionRequest(requestId);
+        } catch (final ConnectionRequestNotFoundException e){
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw e;
+        } catch (final CantConfirmConnectionRequestException e){
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw new CantConfirmException(
+                    e,
+                    "Confirming a message",
+                    "Error in DAO, trying to confirm the request.");
+        } catch (final Exception e){
+            pluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    e);
+            throw new CantConfirmException(
+                    e,
+                    "Confirming a message",
+                    "Unhandled Exception.");
+        }
     }
 
     /**
