@@ -14,7 +14,7 @@ import org.fermat.fermat_job_core.layer.actor_network_service.ActorNetworkServic
 public class JOBPlatform extends AbstractPlatform {
 
     public JOBPlatform() {
-        super(new PlatformReference(Platforms.CRYPTO_BROKER_PLATFORM));
+        super(new PlatformReference(Platforms.JOB_PLATFORM));
     }
 
     @Override
@@ -27,7 +27,7 @@ public class JOBPlatform extends AbstractPlatform {
 
             throw new CantStartPlatformException(
                     e,
-                    "CBP Platform.",
+                    "JOB Platform.",
                     "Problem trying to register a layer."
             );
         }
