@@ -5,8 +5,15 @@
  * -Name.
  */
 
-//Android-sub-app-community
+include ':fermat-job-api'
+project(':fermat-job-api').projectDir = new File('JOB/library/api/fermat-job-api')
 
+include ':fermat-job-core'
+project(':fermat-job-core').projectDir = new File('JOB/library/core/fermat-job-core')
+
+//Android
+
+//Android-sub-app-community
 include ':fermat-job-android-sub-app-job-community-bitdubai'
 project(':fermat-job-android-sub-app-job-community-bitdubai').projectDir = new File('JOB/android/sub_app/fermat-job-android-sub-app-job-community-bitdubai')
 
@@ -17,12 +24,13 @@ project(':fermat-job-android-sub-app-job-seeker-identity-bitdubai').projectDir =
 include ':fermat-job-android-sub-app-job-provider-identity-bitdubai'
 project(':fermat-job-android-sub-app-job-provider-identity-bitdubai').projectDir = new File('JOB/android/sub_app/fermat-job-android-sub-app-job-provider-identity-bitdubai')
 
-include ':fermat-job-api'
-project(':fermat-job-api').projectDir = new File('JOB/library/api/fermat-job-api')
-
-include ':fermat-job-core'
-project(':fermat-job-core').projectDir = new File('JOB/library/core/fermat-job-core')
 
 //Plugins
+
+//Actor Network Service
 include ':fermat-job-plugin-actor-network-service-job-seeker'
 project(':fermat-job-plugin-actor-network-service-job-seeker').projectDir = new File('JOB/plugin/actor_network_service/fermat-job-plugin-actor-network-service-job-seeker')
+
+//Identity
+include ':fermat-job-plugin-identity-job-seeker'
+project(':fermat-job-plugin-identity-job-seeker').projectDir = new File('JOB/plugin/identity/fermat-job-plugin-identity-job-seeker')

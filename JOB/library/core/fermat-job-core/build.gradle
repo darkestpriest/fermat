@@ -6,4 +6,7 @@ dependencies {
 
     //Actor Network Service
     compile project(':fermat-job-plugin-actor-network-service-job-seeker')
+
+    //Identity
+    compile project(':fermat-job-plugin-identity-job-seeker')
 }
