@@ -1,10 +1,18 @@
 package org.fermat.fermat_job_api.layer.identity.common.interfaces;
 
+import com.bitdubai.fermat_pip_api.layer.user.device_user.interfaces.DeviceUser;
+
+import org.fermat.fermat_job_api.all_definition.enums.ExposureLevel;
+import org.fermat.fermat_job_api.all_definition.enums.Frequency;
+import org.fermat.fermat_job_api.all_definition.exceptions.CantExposeIdentityException;
 import org.fermat.fermat_job_api.all_definition.interfaces.JobIdentity;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantCreateJobPlatformIdentityException;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantDeleteJobPlatformIdentityException;
+import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantHideIdentityException;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantListJobsPlatformIdentitiesException;
+import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantPublishIdentityException;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantUpdateJobPlatformIdentityException;
+import org.fermat.fermat_job_api.layer.identity.common.exceptions.IdentityNotFoundException;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.JobPlatformIdentityAlreadyExistsException;
 
 import java.util.List;
@@ -25,29 +33,43 @@ public interface JobPlatformIdentityManager<T extends JobIdentity> {
     /**
      * This method creates and register a new identity.
      * @param alias
-     * @param imageBytes
+     * @param deviceUser
+     * @param imageProfile
+     * @param exposureLevel
+     * @param accuracy
+     * @param frequency
      * @return
      * @throws CantCreateJobPlatformIdentityException
      * @throws JobPlatformIdentityAlreadyExistsException
      */
     T createNewIdentity(
             final String alias,
-            final byte[] imageBytes) throws
+            final DeviceUser deviceUser,
+            byte[] imageProfile,
+            ExposureLevel exposureLevel,
+            long accuracy,
+            Frequency frequency) throws
             CantCreateJobPlatformIdentityException,
             JobPlatformIdentityAlreadyExistsException;
 
     /**
      * This method updates an existing job platform
-     * @param publicKey
      * @param alias
-     * @param imageBytes
+     * @param publicKey
+     * @param imageProfile
+     * @param accuracy
+     * @param frequency
+     * @param exposureLevel
      * @return
      * @throws CantUpdateJobPlatformIdentityException
      */
     T updateIdentity(
-            final String publicKey,
-            final String alias,
-            final byte[] imageBytes) throws
+            String alias,
+            String publicKey,
+            byte[] imageProfile,
+            long accuracy,
+            Frequency frequency,
+            ExposureLevel exposureLevel) throws
             CantUpdateJobPlatformIdentityException;
 
     /**
@@ -63,4 +85,24 @@ public interface JobPlatformIdentityManager<T extends JobIdentity> {
      * @throws CantDeleteJobPlatformIdentityException
      */
     void deleteIdentity(final String publicKey) throws CantDeleteJobPlatformIdentityException;
+
+    /**
+     * This method contains the logic to publish an identity.
+     * @param publicKey
+     * @throws CantPublishIdentityException
+     * @throws IdentityNotFoundException
+     */
+    void publishIdentity(String publicKey)
+            throws CantPublishIdentityException,
+            IdentityNotFoundException, CantExposeIdentityException;
+
+    /**
+     * This method contains all the logic to hide an identity
+     * @param publicKey
+     * @throws CantHideIdentityException
+     * @throws IdentityNotFoundException
+     */
+    void hideIdentity(String publicKey)
+            throws CantHideIdentityException,
+            IdentityNotFoundException;
 }

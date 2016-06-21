@@ -32,11 +32,15 @@ import com.bitdubai.fermat_wpd_api.layer.wpd_identity.publisher.exceptions.CantC
 
 import org.fermat.fermat_job_api.all_definition.enums.ExposureLevel;
 import org.fermat.fermat_job_api.all_definition.enums.Frequency;
+import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantChangeExposureLevelException;
+import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantCreateJobPlatformIdentityException;
+import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantGetIdentityException;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantGetJobActorIdentityPrivateKeyException;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantGetJobActorIdentityProfileImageException;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantListJobsPlatformIdentitiesException;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantPersistProfileImageException;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantUpdateJobPlatformIdentityException;
+import org.fermat.fermat_job_api.layer.identity.common.exceptions.IdentityNotFoundException;
 import org.fermat.fermat_job_api.layer.identity.job_seeker.interfaces.JobSeeker;
 import org.fermat.fermat_job_api.layer.identity.job_seeker.util.JobSeekerRecord;
 import org.fermat.fermat_job_plugin.layer.identity.job_seeker.developer.version_1.JobSeekerIdentityPluginRoot;
@@ -109,13 +113,13 @@ public class JobSeekerIdentityDatabaseDao implements DealsWithPluginDatabaseSyst
      * @param frequency
      * @throws CantCreateNewDeveloperException
      */
-    public void createNewJobSeekerIdentity(
+    public JobSeeker createNewJobSeekerIdentity(
             final String alias,
             final DeviceUser deviceUser,
             byte[] imageProfile,
             ExposureLevel exposureLevel,
             long accuracy,
-            Frequency frequency) throws CantCreateNewDeveloperException {
+            Frequency frequency) throws CantCreateJobPlatformIdentityException {
         try {
             if (aliasExists (alias)) {
                 throw new CantCreateNewDeveloperException (
@@ -153,20 +157,27 @@ public class JobSeekerIdentityDatabaseDao implements DealsWithPluginDatabaseSyst
             persistNewJobSeekerIdentityProfileImage(
                     publicKey,
                     imageProfile);
+            return new JobSeekerRecord(
+                    alias,
+                    eccKeyPair,
+                    exposureLevel,
+                    accuracy,
+                    frequency,
+                    imageProfile);
         } catch (CantInsertRecordException e){
-            throw new CantCreateNewDeveloperException (
+            throw new CantCreateJobPlatformIdentityException (
                     e.getMessage(),
                     e,
                     "Job Seeker Identity",
                     "Cannot create new Job Seeker Identity, insert database problems.");
         } catch (CantPersistPrivateKeyException e){
-            throw new CantCreateNewDeveloperException (
+            throw new CantCreateJobPlatformIdentityException (
                     e.getMessage(), 
                     e, 
                     "Job Seeker Identity", 
                     "Cant create new Job Seeker Identity,persist private key error.");
         } catch (Exception e) {
-            throw new CantCreateNewDeveloperException (
+            throw new CantCreateJobPlatformIdentityException (
                     e.getMessage(), 
                     FermatException.wrapException(e),
                     "Job Seeker Identity", 
@@ -174,12 +185,13 @@ public class JobSeekerIdentityDatabaseDao implements DealsWithPluginDatabaseSyst
         }
     }
 
-    public void updateCryptoBrokerIdentity(
+    public JobSeeker updateCryptoBrokerIdentity(
             String alias, 
             String publicKey,
             byte[] imageProfile,
             long accuracy,
-            Frequency frequency) throws CantUpdateJobPlatformIdentityException {
+            Frequency frequency,
+            ExposureLevel exposureLevel) throws CantUpdateJobPlatformIdentityException {
         try {
             DatabaseTable table = this.database.getTable(
                     JobSeekerIdentityDatabaseConstants.JOB_SEEKER_TABLE_NAME);
@@ -197,8 +209,20 @@ public class JobSeekerIdentityDatabaseDao implements DealsWithPluginDatabaseSyst
             record.setFermatEnum(
                     JobSeekerIdentityDatabaseConstants.JOB_SEEKER_FREQUENCY_COLUMN_NAME,
                     frequency);
+            record.setFermatEnum(
+                    JobSeekerIdentityDatabaseConstants.JOB_SEEKER_EXPOSURE_LEVEL_COLUMN_NAME,
+                    exposureLevel);
             table.updateRecord(record);
             updateJobSeekerIdentityProfileImage(publicKey, imageProfile);
+            String privateKey = getJobSeekerIdentityPrivateKey(publicKey);
+            ECCKeyPair eccKeyPair = new ECCKeyPair(privateKey, publicKey);
+            return new JobSeekerRecord(
+                    alias,
+                    eccKeyPair,
+                    exposureLevel,
+                    accuracy,
+                    frequency,
+                    imageProfile);
         } catch (CantUpdateRecordException e) {
             throw new CantUpdateJobPlatformIdentityException(
                     e.getMessage(), 
@@ -211,6 +235,12 @@ public class JobSeekerIdentityDatabaseDao implements DealsWithPluginDatabaseSyst
                     e, 
                     "Updating Job Seeker Identity",
                     "Cannot persist the image");
+        } catch (CantGetJobActorIdentityPrivateKeyException e) {
+            throw new CantUpdateJobPlatformIdentityException(
+                    e.getMessage(),
+                    e,
+                    "Updating Job Seeker Identity",
+                    "Cannot get the private key from file");
         }
     }
 
@@ -262,12 +292,91 @@ public class JobSeekerIdentityDatabaseDao implements DealsWithPluginDatabaseSyst
         }
     }
 
+    /**
+     * This method contains all the logic to change the exposure level from an identity.
+     * @param publicKey
+     * @param exposureLevel
+     * @throws CantChangeExposureLevelException
+     * @throws IdentityNotFoundException
+     */
+    public final void changeExposureLevel(
+            final String publicKey,
+            final ExposureLevel exposureLevel) 
+            throws CantChangeExposureLevelException, IdentityNotFoundException {
+        try {
+            final DatabaseTable table = this.database.getTable (
+                    JobSeekerIdentityDatabaseConstants.JOB_SEEKER_TABLE_NAME);
+            table.addStringFilter(
+                    JobSeekerIdentityDatabaseConstants.JOB_SEEKER_PUBLIC_KEY_COLUMN_NAME,
+                    publicKey,
+                    DatabaseFilterType.EQUAL);
+            table.loadToMemory();
+            List<DatabaseTableRecord> records = table.getRecords();
+            if (!records.isEmpty()) {
+                DatabaseTableRecord record = records.get(0);
+                record.setFermatEnum(
+                        JobSeekerIdentityDatabaseConstants.JOB_SEEKER_EXPOSURE_LEVEL_COLUMN_NAME,
+                        exposureLevel);
+                table.updateRecord(record);
+            } else
+                throw new IdentityNotFoundException(
+                        "publicKey: "+publicKey+" Cannot find an Identity with that publicKey.");
+        } catch (final CantUpdateRecordException e) {
+            throw new CantChangeExposureLevelException(
+                    e,
+                    "Change the exposure level",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot update the record.");
+        } catch (final CantLoadTableToMemoryException e) {
+            throw new CantChangeExposureLevelException(
+                    e,
+                    "Change the exposure level",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot load the table.");
+        }
+    }
+
+    /**
+     * This method returns an identity by a given public key
+     * @param publicKey
+     * @return
+     * @throws CantGetIdentityException
+     * @throws IdentityNotFoundException
+     */
+    public final JobSeeker getIdentity(final String publicKey) 
+            throws CantGetIdentityException, 
+            IdentityNotFoundException {
+        try {
+            final DatabaseTable table = this.database.getTable(
+                    JobSeekerIdentityDatabaseConstants.JOB_SEEKER_TABLE_NAME);
+            table.addStringFilter(
+                    JobSeekerIdentityDatabaseConstants.JOB_SEEKER_PUBLIC_KEY_COLUMN_NAME,
+                    publicKey,
+                    DatabaseFilterType.EQUAL);
+            table.loadToMemory();
+            List<DatabaseTableRecord> records = table.getRecords();
+            if (!records.isEmpty())
+                return getIdentityFromRecord(records.get(0));
+            else
+                throw new IdentityNotFoundException("publicKey: "+publicKey+" Cannot find an Identity with that publicKey.");
+        } catch (
+                final CantGetJobActorIdentityPrivateKeyException |
+                CantGetJobActorIdentityProfileImageException   |
+                InvalidParameterException                        e) {
+            throw new CantGetIdentityException(
+                    e,
+                    "Getting an identity",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot update the record.");
+        } catch (final CantLoadTableToMemoryException e) {
+            throw new CantGetIdentityException(
+                    e,
+                    "Getting an identity",
+                    "Exception not handled by the plugin, there is a problem in database and I cannot load the table.");
+        }
+    }
+
     @Override
     public void setPluginDatabaseSystem(PluginDatabaseSystem pluginDatabaseSystem) {
         this.pluginDatabaseSystem = pluginDatabaseSystem;
     }
-
-
     
     /**
      * This method checks if an alias exists in database.

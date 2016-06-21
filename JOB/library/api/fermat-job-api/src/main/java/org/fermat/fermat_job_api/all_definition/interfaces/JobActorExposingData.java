@@ -1,5 +1,7 @@
 package org.fermat.fermat_job_api.all_definition.interfaces;
 
+import com.bitdubai.fermat_api.layer.osa_android.location_system.Location;
+
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -14,6 +16,7 @@ public abstract class JobActorExposingData implements Serializable{
     private final String publicKey;
     private final String alias;
     private final byte[] image;
+    private final Location location;
 
     /**
      * Constructor with parameters
@@ -24,10 +27,12 @@ public abstract class JobActorExposingData implements Serializable{
     public JobActorExposingData(
             final String publicKey,
             final String alias,
-            final byte[] image) {
+            final byte[] image,
+            Location location) {
         this.publicKey = publicKey;
         this.alias = alias;
         this.image = image;
+        this.location = location;
     }
 
     /**
@@ -38,17 +43,25 @@ public abstract class JobActorExposingData implements Serializable{
     }
 
     /**
-     * @return a string representing the alias of the crypto broker.
+     * @return a string representing the alias of the job seeker.
      */
     public final String getAlias() {
         return alias;
     }
 
     /**
-     * @return an array of bytes with the image exposed by the Crypto Broker.
+     * @return an array of bytes with the image exposed by the job seeker.
      */
     public final byte[] getImage() {
         return image;
+    }
+
+    /**
+     * This method returns the location
+     * @return
+     */
+    public Location getLocation() {
+        return location;
     }
 
     @Override
