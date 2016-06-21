@@ -543,7 +543,9 @@ public class JobSeekerIdentityDatabaseDao implements DealsWithPluginDatabaseSyst
         long accuracy = record.getLongValue(
                 JobSeekerIdentityDatabaseConstants.JOB_SEEKER_ACCURACY_COLUMN_NAME);
         Frequency frequency = Frequency.getByCode(
-                JobSeekerIdentityDatabaseConstants.JOB_SEEKER_FREQUENCY_COLUMN_NAME);
+                record.getStringValue(
+                        JobSeekerIdentityDatabaseConstants.JOB_SEEKER_FREQUENCY_COLUMN_NAME)
+                );
         return new JobSeekerRecord(
                 alias,
                 keyPair,

@@ -21,8 +21,11 @@ import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
 import com.bitdubai.fermat_api.layer.osa_android.location_system.LocationManager;
 import com.bitdubai.fermat_pip_api.layer.user.device_user.interfaces.DeviceUserManager;
 
+import org.fermat.fermat_job_api.all_definition.enums.ExposureLevel;
+import org.fermat.fermat_job_api.all_definition.enums.Frequency;
 import org.fermat.fermat_job_api.all_definition.exceptions.CantExposeIdentitiesException;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.interfaces.JobSeekerManager;
+import org.fermat.fermat_job_api.layer.identity.job_seeker.interfaces.JobSeeker;
 import org.fermat.fermat_job_plugin.layer.identity.job_seeker.developer.version_1.database.JobSeekerIdentityDatabaseDao;
 import org.fermat.fermat_job_plugin.layer.identity.job_seeker.developer.version_1.database.JobSeekerIdentityDeveloperDatabaseFactory;
 import org.fermat.fermat_job_plugin.layer.identity.job_seeker.developer.version_1.exceptions.CantInitializeJobSeekerIdentityDatabaseException;
@@ -84,6 +87,8 @@ public class JobSeekerIdentityPluginRoot
             initDatabaseDao();
             //Init Manager
             initManager();
+            //Test methods
+            //testCreateIdentity();
             //Expose identities
             jobSeekerIdentityPluginManager.exposeIdentities();
         } catch (CantInitializeJobSeekerIdentityDatabaseException e) {
@@ -162,4 +167,23 @@ public class JobSeekerIdentityPluginRoot
         }
         return new ArrayList<>();
     }
+
+    /**
+     * Test methods.
+     * Please, comment it when the tes is finished.
+     */
+    /*private void testCreateIdentity(){
+        try{
+            JobSeeker jobSeeker = jobSeekerIdentityPluginManager.createNewIdentity(
+                    "Manuel",
+                    deviceUserManager.getLoggedInDeviceUser(),
+                    new byte[0],
+                    ExposureLevel.PUBLISH, 10,
+                    Frequency.NORMAL);
+            System.out.println("Job Identity Test: "+jobSeeker);
+        } catch (Exception e){
+            System.out.println("Job Identity Test: "+e);
+            e.printStackTrace();
+        }
+    }*/
 }

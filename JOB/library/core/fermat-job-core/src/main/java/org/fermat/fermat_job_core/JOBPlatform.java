@@ -7,6 +7,7 @@ import com.bitdubai.fermat_core_api.layer.all_definition.system.exceptions.CantR
 import com.bitdubai.fermat_core_api.layer.all_definition.system.exceptions.CantStartPlatformException;
 
 import org.fermat.fermat_job_core.layer.actor_network_service.ActorNetworkServiceLayer;
+import org.fermat.fermat_job_core.layer.identity.IdentityLayer;
 
 /**
  * Created by Manuel Perez (darkpriestrelative@gmail.com) on 18/06/16.
@@ -22,6 +23,7 @@ public class JOBPlatform extends AbstractPlatform {
 
         try {
             registerLayer(new ActorNetworkServiceLayer());
+            registerLayer(new IdentityLayer());
 
         } catch (CantRegisterLayerException e) {
 

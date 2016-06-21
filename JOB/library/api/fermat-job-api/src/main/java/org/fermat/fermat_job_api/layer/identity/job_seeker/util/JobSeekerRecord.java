@@ -10,6 +10,7 @@ import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantCreateMess
 import org.fermat.fermat_job_api.layer.identity.job_seeker.interfaces.JobSeeker;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Created by Manuel Perez (darkpriestrelative@gmail.com) on 20/06/16.
@@ -156,4 +157,15 @@ public class JobSeekerRecord implements JobSeeker, Serializable {
         }
     }
 
+    @Override
+    public String toString() {
+        return "JobSeekerRecord{" +
+                "alias='" + alias + '\'' +
+                ", keyPair=" + keyPair +
+                ", profileImage=" + Arrays.toString(profileImage) +
+                ", exposureLevel=" + exposureLevel +
+                ", accuracy=" + accuracy +
+                ", frequency=" + frequency +
+                '}';
+    }
 }
