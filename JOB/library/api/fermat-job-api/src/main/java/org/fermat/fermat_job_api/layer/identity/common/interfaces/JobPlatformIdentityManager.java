@@ -1,5 +1,6 @@
 package org.fermat.fermat_job_api.layer.identity.common.interfaces;
 
+import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.FermatManager;
 import com.bitdubai.fermat_pip_api.layer.user.device_user.interfaces.DeviceUser;
 
 import org.fermat.fermat_job_api.all_definition.enums.ExposureLevel;
@@ -20,7 +21,7 @@ import java.util.List;
 /**
  * Created by Manuel Perez (darkpriestrelative@gmail.com) on 13/06/16.
  */
-public interface JobPlatformIdentityManager<T extends JobIdentity> {
+public interface JobPlatformIdentityManager<T extends JobIdentity> extends FermatManager {
 
     /**
      * This method returns all the identities registered in the device

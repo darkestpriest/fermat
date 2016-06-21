@@ -3,6 +3,7 @@ package org.fermat.fermat_job_plugin.layer.identity.job_seeker.developer.version
 import com.bitdubai.fermat_api.layer.all_definition.common.system.abstract_classes.AbstractPlugin;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededAddonReference;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededPluginReference;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.FermatManager;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.utils.PluginVersionReference;
 import com.bitdubai.fermat_api.layer.all_definition.developer.DatabaseManagerForDevelopers;
@@ -78,6 +79,14 @@ public class JobSeekerIdentityPluginRoot
      */
     public JobSeekerIdentityPluginRoot(){
         super(new PluginVersionReference(new Version()));
+    }
+
+    /**
+     * This method returns the plugin manager
+     * @return
+     */
+    public FermatManager getManager(){
+        return this.jobSeekerIdentityPluginManager;
     }
 
     @Override

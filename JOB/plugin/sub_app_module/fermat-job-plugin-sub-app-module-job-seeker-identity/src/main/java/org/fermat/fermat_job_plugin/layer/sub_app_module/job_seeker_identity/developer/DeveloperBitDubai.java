@@ -1,4 +1,4 @@
-package org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer;
+package org.fermat.fermat_job_plugin.layer.sub_app_module.job_seeker_identity.developer;
 
 import com.bitdubai.fermat_api.layer.all_definition.common.system.abstract_classes.AbstractPluginDeveloper;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.exceptions.CantRegisterVersionException;
@@ -9,7 +9,7 @@ import com.bitdubai.fermat_api.layer.all_definition.enums.Developers;
 import com.bitdubai.fermat_api.layer.all_definition.enums.TimeFrequency;
 import com.bitdubai.fermat_api.layer.all_definition.license.PluginLicensor;
 
-import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.JobSeekerActorNetworkServicePluginRoot;
+import org.fermat.fermat_job_plugin.layer.sub_app_module.job_seeker_identity.developer.version_1.JobSeekerIdentitySubAppModulePluginRoot;
 
 public class DeveloperBitDubai extends AbstractPluginDeveloper implements PluginLicensor {
     /**
@@ -23,7 +23,7 @@ public class DeveloperBitDubai extends AbstractPluginDeveloper implements Plugin
     @Override
     public void start() throws CantStartPluginDeveloperException {
         try {
-            this.registerVersion(new JobSeekerActorNetworkServicePluginRoot());
+            this.registerVersion(new JobSeekerIdentitySubAppModulePluginRoot());
         } catch (CantRegisterVersionException e) {
             throw new CantStartPluginDeveloperException(e, "", "Error registering plugin versions for the developer.");
         }

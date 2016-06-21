@@ -41,7 +41,7 @@ public class DeveloperBitDubai extends AbstractPluginDeveloper implements Plugin
 
     @Override
     public String getAddress() {
-        return "todo";
+        return "13gpMizSNvQCbJzAPyGCUnfUGqFD8ryzcv";
     }
 
     @Override
