@@ -32,6 +32,7 @@ import com.bitdubai.fermat_wpd_api.layer.wpd_identity.publisher.exceptions.CantC
 
 import org.fermat.fermat_job_api.all_definition.enums.ExposureLevel;
 import org.fermat.fermat_job_api.all_definition.enums.Frequency;
+import org.fermat.fermat_job_api.all_definition.enums.JobTitle;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantChangeExposureLevelException;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantCreateJobPlatformIdentityException;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantGetIdentityException;
@@ -119,7 +120,8 @@ public class JobSeekerIdentityDatabaseDao implements DealsWithPluginDatabaseSyst
             byte[] imageProfile,
             ExposureLevel exposureLevel,
             long accuracy,
-            Frequency frequency) throws CantCreateJobPlatformIdentityException {
+            Frequency frequency,
+            JobTitle jobTitle) throws CantCreateJobPlatformIdentityException {
         try {
             if (aliasExists (alias)) {
                 throw new CantCreateNewDeveloperException (
@@ -153,6 +155,8 @@ public class JobSeekerIdentityDatabaseDao implements DealsWithPluginDatabaseSyst
             record.setFermatEnum(
                     JobSeekerIdentityDatabaseConstants.JOB_SEEKER_FREQUENCY_COLUMN_NAME,
                     frequency);
+            record.setFermatEnum(JobSeekerIdentityDatabaseConstants.JOB_SEEKER_JOB_TITLE_COLUMN_NAME,
+                    jobTitle);
             table.insertRecord(record);
             persistNewJobSeekerIdentityProfileImage(
                     publicKey,
@@ -163,7 +167,8 @@ public class JobSeekerIdentityDatabaseDao implements DealsWithPluginDatabaseSyst
                     exposureLevel,
                     accuracy,
                     frequency,
-                    imageProfile);
+                    imageProfile,
+                    jobTitle);
         } catch (CantInsertRecordException e){
             throw new CantCreateJobPlatformIdentityException (
                     e.getMessage(),
@@ -191,7 +196,8 @@ public class JobSeekerIdentityDatabaseDao implements DealsWithPluginDatabaseSyst
             byte[] imageProfile,
             long accuracy,
             Frequency frequency,
-            ExposureLevel exposureLevel) throws CantUpdateJobPlatformIdentityException {
+            ExposureLevel exposureLevel,
+            JobTitle jobTitle) throws CantUpdateJobPlatformIdentityException {
         try {
             DatabaseTable table = this.database.getTable(
                     JobSeekerIdentityDatabaseConstants.JOB_SEEKER_TABLE_NAME);
@@ -212,6 +218,8 @@ public class JobSeekerIdentityDatabaseDao implements DealsWithPluginDatabaseSyst
             record.setFermatEnum(
                     JobSeekerIdentityDatabaseConstants.JOB_SEEKER_EXPOSURE_LEVEL_COLUMN_NAME,
                     exposureLevel);
+            record.setFermatEnum(JobSeekerIdentityDatabaseConstants.JOB_SEEKER_JOB_TITLE_COLUMN_NAME,
+                    jobTitle);
             table.updateRecord(record);
             updateJobSeekerIdentityProfileImage(publicKey, imageProfile);
             String privateKey = getJobSeekerIdentityPrivateKey(publicKey);
@@ -222,7 +230,8 @@ public class JobSeekerIdentityDatabaseDao implements DealsWithPluginDatabaseSyst
                     exposureLevel,
                     accuracy,
                     frequency,
-                    imageProfile);
+                    imageProfile,
+                    jobTitle);
         } catch (CantUpdateRecordException e) {
             throw new CantUpdateJobPlatformIdentityException(
                     e.getMessage(), 
@@ -545,14 +554,19 @@ public class JobSeekerIdentityDatabaseDao implements DealsWithPluginDatabaseSyst
         Frequency frequency = Frequency.getByCode(
                 record.getStringValue(
                         JobSeekerIdentityDatabaseConstants.JOB_SEEKER_FREQUENCY_COLUMN_NAME)
-                );
+        );
+        JobTitle jobTitle = JobTitle.getByCode(
+                record.getStringValue(
+                        JobSeekerIdentityDatabaseConstants.JOB_SEEKER_JOB_TITLE_COLUMN_NAME)
+        );
         return new JobSeekerRecord(
                 alias,
                 keyPair,
                 exposureLevel,
                 accuracy,
                 frequency,
-                profileImage);
+                profileImage,
+                jobTitle);
     }
 
     /**

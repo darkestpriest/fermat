@@ -63,7 +63,9 @@ public class JobSeekerPluginSearch extends JobSeekerSearch {
                                 actorProfile.getIdentityPublicKey(),
                                 actorProfile.getAlias(),
                                 actorProfile.getPhoto(),
-                                actorProfile.getLocation()));
+                                actorProfile.getLocation(),
+                                actorProfile.getExtraData()
+                                ));
             }
             return cryptoBrokerExposingDataList;
         } catch (final CantRequestProfileListException e) {

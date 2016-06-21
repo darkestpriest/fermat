@@ -16,6 +16,7 @@ public class JobSeekerIdentityDatabaseConstants {
     public static final String JOB_SEEKER_EXPOSURE_LEVEL_COLUMN_NAME = "exposure_level";
     public static final String JOB_SEEKER_ACCURACY_COLUMN_NAME = "accuracy";
     public static final String JOB_SEEKER_FREQUENCY_COLUMN_NAME = "frequency";
+    public static final String JOB_SEEKER_JOB_TITLE_COLUMN_NAME = "job_title";
 
     public static final String JOB_SEEKER_FIRST_KEY_COLUMN = "public_key";
 

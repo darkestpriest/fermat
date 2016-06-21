@@ -53,6 +53,7 @@ public class JobSeekerIdentityDatabaseFactory {
             table.addColumn(JobSeekerIdentityDatabaseConstants.JOB_SEEKER_EXPOSURE_LEVEL_COLUMN_NAME, DatabaseDataType.TEXT,  10, Boolean.FALSE);
             table.addColumn(JobSeekerIdentityDatabaseConstants.JOB_SEEKER_ACCURACY_COLUMN_NAME, DatabaseDataType.LONG_INTEGER, 0, Boolean.FALSE);
             table.addColumn(JobSeekerIdentityDatabaseConstants.JOB_SEEKER_FREQUENCY_COLUMN_NAME, DatabaseDataType.STRING,  10, Boolean.FALSE);
+            table.addColumn(JobSeekerIdentityDatabaseConstants.JOB_SEEKER_JOB_TITLE_COLUMN_NAME, DatabaseDataType.STRING,  10, Boolean.FALSE);
 
             table.addIndex(JobSeekerIdentityDatabaseConstants.JOB_SEEKER_FIRST_KEY_COLUMN);
 

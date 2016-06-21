@@ -6,6 +6,7 @@ import com.bitdubai.fermat_api.layer.all_definition.crypto.asymmetric.interfaces
 
 import org.fermat.fermat_job_api.all_definition.enums.ExposureLevel;
 import org.fermat.fermat_job_api.all_definition.enums.Frequency;
+import org.fermat.fermat_job_api.all_definition.enums.JobTitle;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantCreateMessageSignatureException;
 import org.fermat.fermat_job_api.layer.identity.job_seeker.interfaces.JobSeeker;
 
@@ -23,6 +24,7 @@ public class JobSeekerRecord implements JobSeeker, Serializable {
     private final ExposureLevel exposureLevel;
     private final long accuracy;
     private final Frequency frequency;
+    private final JobTitle jobTitle;
 
     /**
      * Default constructor with parameters.
@@ -38,13 +40,15 @@ public class JobSeekerRecord implements JobSeeker, Serializable {
             byte[] profileImage,
             ExposureLevel exposureLevel,
             long accuracy,
-            Frequency frequency) {
+            Frequency frequency,
+            JobTitle jobTitle) {
         this.alias = alias;
         this.profileImage = profileImage;
         this.exposureLevel = exposureLevel;
         this.accuracy = accuracy;
         this.frequency = frequency;
         this.keyPair = new ECCKeyPair();
+        this.jobTitle = jobTitle;
     }
 
     /**
@@ -63,13 +67,15 @@ public class JobSeekerRecord implements JobSeeker, Serializable {
             ExposureLevel exposureLevel,
             long accuracy,
             Frequency frequency,
-            byte[] profileImage) {
+            byte[] profileImage,
+            JobTitle jobTitle) {
         this.alias = alias;
         this.keyPair = keyPair;
         this.exposureLevel = exposureLevel;
         this.accuracy = accuracy;
         this.frequency = frequency;
         this.profileImage = profileImage;
+        this.jobTitle = jobTitle;
     }
 
     /**
@@ -155,6 +161,11 @@ public class JobSeekerRecord implements JobSeeker, Serializable {
                     "Message: "+ message,
                     "The message could be invalid");
         }
+    }
+
+    @Override
+    public JobTitle getJobTitle() {
+        return jobTitle;
     }
 
     @Override

@@ -89,7 +89,7 @@ public class JobSeekerActorNetworkServicePluginManager implements JobSeekerManag
                     jobSeekerExposingData.getPublicKey(),
                     jobSeekerExposingData.getAlias(),
                     jobSeekerExposingData.getAlias(),
-                    null,
+                    jobSeekerExposingData.getJobTitle().getCode(),
                     null,
                     Actors.JOB_SEEKER,
                     jobSeekerExposingData.getImage(),

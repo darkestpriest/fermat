@@ -9,6 +9,7 @@ import com.bitdubai.fermat_pip_api.layer.user.device_user.interfaces.DeviceUserM
 
 import org.fermat.fermat_job_api.all_definition.enums.ExposureLevel;
 import org.fermat.fermat_job_api.all_definition.enums.Frequency;
+import org.fermat.fermat_job_api.all_definition.enums.JobTitle;
 import org.fermat.fermat_job_api.all_definition.exceptions.CantExposeIdentitiesException;
 import org.fermat.fermat_job_api.all_definition.exceptions.CantExposeIdentityException;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.interfaces.JobSeekerManager;
@@ -108,7 +109,7 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
     }
 
     /**
-     * This method creates and register a new identity.
+     * This method creates and register a new identity with default JobTitle
      * @param alias
      * @param deviceUser
      * @param imageProfile
@@ -135,10 +136,57 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
                 imageProfile,
                 exposureLevel,
                 accuracy,
-                frequency
+                frequency,
+                JobTitle.getDefaultJobTitle()
         );
     }
 
+    /**
+     * This method creates a new identity with jobTitle
+     * @param alias
+     * @param deviceUser
+     * @param imageProfile
+     * @param exposureLevel
+     * @param accuracy
+     * @param frequency
+     * @param jobTitle
+     * @return
+     * @throws CantCreateJobPlatformIdentityException
+     * @throws JobPlatformIdentityAlreadyExistsException
+     */
+    @Override
+    public JobSeeker createNewIdentity(
+            final String alias,
+            final DeviceUser deviceUser,
+            byte[] imageProfile,
+            ExposureLevel exposureLevel,
+            long accuracy,
+            Frequency frequency,
+            JobTitle jobTitle)
+            throws CantCreateJobPlatformIdentityException,
+            JobPlatformIdentityAlreadyExistsException {
+        return jobSeekerIdentityDatabaseDao.createNewJobSeekerIdentity(
+                alias,
+                deviceUser,
+                imageProfile,
+                exposureLevel,
+                accuracy,
+                frequency,
+                jobTitle
+        );
+    }
+
+    /**
+     * This method updates an existing identity with default job title
+     * @param alias
+     * @param publicKey
+     * @param imageProfile
+     * @param accuracy
+     * @param frequency
+     * @param exposureLevel
+     * @return
+     * @throws CantUpdateJobPlatformIdentityException
+     */
     @Override
     public JobSeeker updateIdentity(
             String alias,
@@ -154,7 +202,40 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
                 imageProfile,
                 accuracy,
                 frequency,
-                exposureLevel);
+                exposureLevel,
+                JobTitle.getDefaultJobTitle());
+    }
+
+    /**
+     * This method updates an identity with jobTitle
+     * @param alias
+     * @param publicKey
+     * @param imageProfile
+     * @param accuracy
+     * @param frequency
+     * @param exposureLevel
+     * @param jobTitle
+     * @return
+     * @throws CantUpdateJobPlatformIdentityException
+     */
+    @Override
+    public JobSeeker updateIdentity(
+            String alias,
+            String publicKey,
+            byte[] imageProfile,
+            long accuracy,
+            Frequency frequency,
+            ExposureLevel exposureLevel,
+            JobTitle jobTitle
+    ) throws CantUpdateJobPlatformIdentityException {
+        return jobSeekerIdentityDatabaseDao.updateCryptoBrokerIdentity(
+                alias,
+                publicKey,
+                imageProfile,
+                accuracy,
+                frequency,
+                exposureLevel,
+                jobTitle);
     }
 
     /**
@@ -194,7 +275,8 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
                     publicKey,
                     jobSeeker.getAlias(),
                     jobSeeker.getProfileImage(),
-                    location);
+                    location,
+                    jobSeeker.getJobTitle());
             jobSeekerManager.exposeIdentity(jobSeekerExposingData);
         } catch (CantChangeExposureLevelException e) {
             throw new CantPublishIdentityException(
@@ -257,7 +339,8 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
                                         identity.getPublicKey(),
                                         identity.getAlias(),
                                         identity.getProfileImage(),
-                                        location
+                                        location,
+                                        identity.getJobTitle()
                                 )
                         );
                         break;

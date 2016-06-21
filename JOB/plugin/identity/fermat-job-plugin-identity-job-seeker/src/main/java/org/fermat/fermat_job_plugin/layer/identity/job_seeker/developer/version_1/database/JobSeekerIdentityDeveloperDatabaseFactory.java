@@ -121,6 +121,7 @@ public class JobSeekerIdentityDeveloperDatabaseFactory {
         cryptoBrokerColumns.add(JobSeekerIdentityDatabaseConstants.JOB_SEEKER_EXPOSURE_LEVEL_COLUMN_NAME);
         cryptoBrokerColumns.add(JobSeekerIdentityDatabaseConstants.JOB_SEEKER_ACCURACY_COLUMN_NAME);
         cryptoBrokerColumns.add(JobSeekerIdentityDatabaseConstants.JOB_SEEKER_FREQUENCY_COLUMN_NAME);
+        cryptoBrokerColumns.add(JobSeekerIdentityDatabaseConstants.JOB_SEEKER_JOB_TITLE_COLUMN_NAME);
         /**
          * Table Crypto Broker addition.
          */
