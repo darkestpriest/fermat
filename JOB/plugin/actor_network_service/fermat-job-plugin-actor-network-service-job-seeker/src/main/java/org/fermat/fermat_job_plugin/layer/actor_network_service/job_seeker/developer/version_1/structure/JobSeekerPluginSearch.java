@@ -7,7 +7,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.cl
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.DiscoveryQueryParameters;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 
-import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantListJobSeekersException;
+import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantListJobActorsException;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.interfaces.JobSeekerSearch;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.utils.JobSeekerExposingData;
 import org.fermat.fermat_job_plugin.layer.actor_network_service.job_seeker.developer.version_1.JobSeekerActorNetworkServicePluginRoot;
@@ -36,10 +36,10 @@ public class JobSeekerPluginSearch extends JobSeekerSearch {
     /**
      * This method returns the result of a searching process.
      * @return
-     * @throws CantListJobSeekersException
+     * @throws CantListJobActorsException
      */
     @Override
-    public List<JobSeekerExposingData> getResult() throws CantListJobSeekersException {
+    public List<JobSeekerExposingData> getResult() throws CantListJobActorsException {
         try {
             DiscoveryQueryParameters discoveryQueryParameters = new DiscoveryQueryParameters(
                     Actors.JOB_SEEKER.getCode(),
@@ -72,7 +72,7 @@ public class JobSeekerPluginSearch extends JobSeekerSearch {
             pluginRoot.reportError(
                     UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
                     e);
-            throw new CantListJobSeekersException(
+            throw new CantListJobActorsException(
                     e,
                     "Listing Job Seeker Actors",
                     "Problem trying to request list of registered components in communication layer.");
@@ -80,7 +80,7 @@ public class JobSeekerPluginSearch extends JobSeekerSearch {
             pluginRoot.reportError(
                     UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
                     e);
-            throw new CantListJobSeekersException(
+            throw new CantListJobActorsException(
                     e,
                     "Listing Job Seeker Actors",
                     "Unhandled error.");
@@ -88,7 +88,7 @@ public class JobSeekerPluginSearch extends JobSeekerSearch {
     }
 
     @Override
-    public List<JobSeekerExposingData> getResult(Integer max) throws CantListJobSeekersException {
+    public List<JobSeekerExposingData> getResult(Integer max) throws CantListJobActorsException {
         //TODO: to implement
         return null;
     }

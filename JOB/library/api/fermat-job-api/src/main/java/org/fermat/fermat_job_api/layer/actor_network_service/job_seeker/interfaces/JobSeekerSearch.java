@@ -1,6 +1,6 @@
 package org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.interfaces;
 
-import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantListJobSeekersException;
+import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantListJobActorsException;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.utils.JobSeekerExposingData;
 
 import java.util.ArrayList;
@@ -31,9 +31,9 @@ public abstract class JobSeekerSearch {
      *
      * @return a list of job seeker with their information.
      *
-     * @throws CantListJobSeekersException  if something goes wrong.
+     * @throws CantListJobActorsException  if something goes wrong.
      */
-    public abstract List<JobSeekerExposingData> getResult() throws CantListJobSeekersException;
+    public abstract List<JobSeekerExposingData> getResult() throws CantListJobActorsException;
 
     /**
      * Through the method <code>getResult</code> we can get the results of the search,
@@ -44,10 +44,10 @@ public abstract class JobSeekerSearch {
      *
      * @return a list of crypto brokers with their information.
      *
-     * @throws CantListJobSeekersException  if something goes wrong.
+     * @throws CantListJobActorsException  if something goes wrong.
      */
     public abstract List<JobSeekerExposingData> getResult(
-            final Integer max) throws CantListJobSeekersException;
+            final Integer max) throws CantListJobActorsException;
 
     /**
      * Through the method <code>resetFilters</code> you can reset the filters set,

@@ -5,7 +5,7 @@ import org.fermat.fermat_job_api.all_definition.exceptions.JOBException;
 /**
  * Created by Manuel Perez (darkpriestrelative@gmail.com) on 03/06/16.
  */
-public class CantListJobSeekersException extends JOBException {
+public class CantListJobActorsException extends JOBException {
 
     public static final String DEFAULT_MESSAGE = "CANNOT LIST JOB SEEKERS";
 
@@ -16,7 +16,7 @@ public class CantListJobSeekersException extends JOBException {
      * @param context
      * @param possibleReason
      */
-    public CantListJobSeekersException(
+    public CantListJobActorsException(
             final String message,
             final Exception cause,
             final String context,
@@ -30,7 +30,7 @@ public class CantListJobSeekersException extends JOBException {
      * @param context
      * @param possibleReason
      */
-    public CantListJobSeekersException(
+    public CantListJobActorsException(
             Exception cause,
             String context,
             String possibleReason) {
@@ -42,7 +42,7 @@ public class CantListJobSeekersException extends JOBException {
      * @param message
      * @param cause
      */
-    public CantListJobSeekersException(
+    public CantListJobActorsException(
             final String message,
             final Exception cause) {
         this(message, cause, "", "");
@@ -52,7 +52,7 @@ public class CantListJobSeekersException extends JOBException {
      * Constructor with parameters
      * @param message
      */
-    public CantListJobSeekersException(final String message) {
+    public CantListJobActorsException(final String message) {
         this(message, null);
     }
 
@@ -60,7 +60,7 @@ public class CantListJobSeekersException extends JOBException {
      * Constructor with parameters
      * @param exception
      */
-    public CantListJobSeekersException(final Exception exception) {
+    public CantListJobActorsException(final Exception exception) {
         this(exception.getMessage());
         setStackTrace(exception.getStackTrace());
     }
@@ -68,7 +68,7 @@ public class CantListJobSeekersException extends JOBException {
     /**
      * Constructor with parameters
      */
-    public CantListJobSeekersException() {
+    public CantListJobActorsException() {
         this(DEFAULT_MESSAGE);
     }
 }
