@@ -14,15 +14,15 @@ project(':fermat-job-core').projectDir = new File('JOB/library/core/fermat-job-c
 //Android
 
 //Android-sub-app-community
-include ':fermat-job-android-sub-app-job-community-bitdubai'
-project(':fermat-job-android-sub-app-job-community-bitdubai').projectDir = new File('JOB/android/sub_app/fermat-job-android-sub-app-job-community-bitdubai')
+include ':fermat-job-android-sub-app-job-seeker-community-bitdubai'
+project(':fermat-job-android-sub-app-job-seeker-community-bitdubai').projectDir = new File('JOB/android/sub_app/fermat-job-android-sub-app-job-seeker-community-bitdubai')
 
 //Android-sub-app-identity
 include ':fermat-job-android-sub-app-job-seeker-identity-bitdubai'
 project(':fermat-job-android-sub-app-job-seeker-identity-bitdubai').projectDir = new File('JOB/android/sub_app/fermat-job-android-sub-app-job-seeker-identity-bitdubai')
 
-include ':fermat-job-android-sub-app-job-provider-identity-bitdubai'
-project(':fermat-job-android-sub-app-job-provider-identity-bitdubai').projectDir = new File('JOB/android/sub_app/fermat-job-android-sub-app-job-provider-identity-bitdubai')
+include ':fermat-job-android-sub-app-employer-identity-bitdubai'
+project(':fermat-job-android-sub-app-employer-identity-bitdubai').projectDir = new File('JOB/android/sub_app/fermat-job-android-sub-app-employer-identity-bitdubai')
 
 
 //Plugins
