@@ -347,6 +347,7 @@ public enum Plugins implements FermatPluginsEnum {
     //End PIP
     
     //JOB
+    EMPLOYER                            ("EML"),
     JOB_SEEKER                          ("JOS"),
     ;
        

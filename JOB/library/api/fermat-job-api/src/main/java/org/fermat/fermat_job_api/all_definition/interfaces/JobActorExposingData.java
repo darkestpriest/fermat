@@ -8,7 +8,7 @@ import java.util.Arrays;
 /**
  * Created by Manuel Perez (darkpriestrelative@gmail.com) on 03/06/16.
  */
-public abstract class JobActorExposingData implements Serializable{
+public abstract class JobActorExposingData<T extends JobEnum> implements Serializable{
 
     /**
      * Class objects
@@ -17,6 +17,7 @@ public abstract class JobActorExposingData implements Serializable{
     private final String alias;
     private final byte[] image;
     private final Location location;
+    public T jobEnum;
 
     /**
      * Constructor with parameters
@@ -33,6 +34,19 @@ public abstract class JobActorExposingData implements Serializable{
         this.alias = alias;
         this.image = image;
         this.location = location;
+    }
+
+    public JobActorExposingData(
+            final String publicKey,
+            final String alias,
+            final byte[] image,
+            final Location location,
+            final T jobEnum){
+        this.publicKey = publicKey;
+        this.alias = alias;
+        this.image = image;
+        this.location = location;
+        this.jobEnum = jobEnum;
     }
 
     /**
@@ -63,6 +77,12 @@ public abstract class JobActorExposingData implements Serializable{
     public Location getLocation() {
         return location;
     }
+
+    /**
+     * This method returns the extra data enum
+     * @return
+     */
+    public abstract T getExtraDataEnum();
 
     @Override
     public String toString() {

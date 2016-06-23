@@ -5,6 +5,7 @@ import com.bitdubai.fermat_core_api.layer.all_definition.system.abstract_classes
 import com.bitdubai.fermat_core_api.layer.all_definition.system.exceptions.CantRegisterPluginException;
 import com.bitdubai.fermat_core_api.layer.all_definition.system.exceptions.CantStartLayerException;
 
+import org.fermat.fermat_job_core.layer.identity.employer.EmployerIdentityPluginSubsystem;
 import org.fermat.fermat_job_core.layer.identity.job_seeker.JobSeekerIdentityPluginSubsystem;
 
 /**
@@ -20,6 +21,7 @@ public class IdentityLayer extends AbstractLayer {
 
         try {
 
+            registerPlugin(new EmployerIdentityPluginSubsystem());
             registerPlugin(new JobSeekerIdentityPluginSubsystem());
 
         } catch(CantRegisterPluginException e) {

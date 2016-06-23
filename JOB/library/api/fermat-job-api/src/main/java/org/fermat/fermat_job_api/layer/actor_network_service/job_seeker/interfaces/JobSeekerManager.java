@@ -10,6 +10,7 @@ import org.fermat.fermat_job_api.all_definition.exceptions.CantExposeIdentitiesE
 import org.fermat.fermat_job_api.all_definition.exceptions.CantExposeIdentityException;
 import org.fermat.fermat_job_api.all_definition.exceptions.CantListPendingConnectionRequestsException;
 import org.fermat.fermat_job_api.all_definition.exceptions.ConnectionRequestNotFoundException;
+import org.fermat.fermat_job_api.all_definition.interfaces.JobActorExposingData;
 import org.fermat.fermat_job_api.all_definition.interfaces.Resume;
 import org.fermat.fermat_job_api.layer.actor_network_service.common.JobActorConnectionRequest;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantAnswerResumeRequestException;
@@ -35,31 +36,31 @@ public interface JobSeekerManager extends FermatManager {
      * the device.
      * The information given will be shown to all the job seekers.
      *
-     * @param jobSeekerExposingData  crypto broker exposing information.
+     * @param jobActorExposingData  crypto broker exposing information.
      *
      * @throws CantExposeIdentityException   if something goes wrong.
      */
     void exposeIdentity(
-            final JobSeekerExposingData jobSeekerExposingData) throws CantExposeIdentityException;
+            final JobActorExposingData jobActorExposingData) throws CantExposeIdentityException;
 
     /**
      * This method updates a identity in fermat network
-     * @param jobSeekerExposingData
+     * @param jobActorExposingData
      * @throws CantExposeIdentityException
      */
     void updateIdentity(
-            final JobSeekerExposingData jobSeekerExposingData) throws CantExposeIdentityException;
+            final JobActorExposingData jobActorExposingData) throws CantExposeIdentityException;
 
     /**
      * Through the method <code>exposeIdentities</code> we can expose the job identities created in the device.
      * The information given will be shown to all the Job Seekers.
      *
-     * @param jobSeekerExposingDataList  list of crypto broker exposing information.
+     * @param jobActorExposingDataList  list of crypto broker exposing information.
      *
      * @throws CantExposeIdentitiesException   if something goes wrong.
      */
     void exposeIdentities(
-            final Collection<JobSeekerExposingData> jobSeekerExposingDataList)
+            final Collection<JobActorExposingData> jobActorExposingDataList)
             throws CantExposeIdentitiesException;
 
     /**

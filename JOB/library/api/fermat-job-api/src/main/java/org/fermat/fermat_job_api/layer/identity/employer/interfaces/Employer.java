@@ -1,5 +1,6 @@
 package org.fermat.fermat_job_api.layer.identity.employer.interfaces;
 
+import org.fermat.fermat_job_api.all_definition.enums.Industry;
 import org.fermat.fermat_job_api.all_definition.interfaces.JobIdentity;
 
 /**
@@ -8,7 +9,9 @@ import org.fermat.fermat_job_api.all_definition.interfaces.JobIdentity;
 public interface Employer extends JobIdentity {
 
     /**
-     * In this version this interface only extends JOBIdentity, this can be change in the future
+     * This method returns the Industry.
+     * @return
      */
+    Industry getIndustry();
 
 }

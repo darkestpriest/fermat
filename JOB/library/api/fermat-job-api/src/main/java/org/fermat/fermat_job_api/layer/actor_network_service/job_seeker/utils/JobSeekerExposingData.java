@@ -11,8 +11,6 @@ import org.fermat.fermat_job_api.all_definition.interfaces.JobActorExposingData;
  */
 public class JobSeekerExposingData extends JobActorExposingData {
 
-    private final JobTitle jobTitle;
-
     /**
      * Constructor with parameters
      *
@@ -33,7 +31,7 @@ public class JobSeekerExposingData extends JobActorExposingData {
         } catch (InvalidParameterException e) {
             title = JobTitle.getDefaultJobTitle();
         }
-        this.jobTitle = title;
+        this.jobEnum = title;
     }
 
     /**
@@ -50,15 +48,14 @@ public class JobSeekerExposingData extends JobActorExposingData {
             byte[] image,
             Location location,
             JobTitle jobTitle) {
-        super(publicKey, alias, image, location);
-        this.jobTitle = jobTitle;
+        super(publicKey, alias, image, location, jobTitle);
     }
 
     /**
      * This method returns the JobTitle.
      * @return
      */
-    public JobTitle getJobTitle() {
-        return jobTitle;
+    public JobTitle getExtraDataEnum() {
+        return (JobTitle) jobEnum;
     }
 }

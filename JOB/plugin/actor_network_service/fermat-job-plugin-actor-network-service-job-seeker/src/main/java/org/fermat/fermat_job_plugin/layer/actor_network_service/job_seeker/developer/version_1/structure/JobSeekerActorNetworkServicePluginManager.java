@@ -17,6 +17,7 @@ import org.fermat.fermat_job_api.all_definition.exceptions.CantExposeIdentitiesE
 import org.fermat.fermat_job_api.all_definition.exceptions.CantExposeIdentityException;
 import org.fermat.fermat_job_api.all_definition.exceptions.CantListPendingConnectionRequestsException;
 import org.fermat.fermat_job_api.all_definition.exceptions.ConnectionRequestNotFoundException;
+import org.fermat.fermat_job_api.all_definition.interfaces.JobActorExposingData;
 import org.fermat.fermat_job_api.all_definition.interfaces.Resume;
 import org.fermat.fermat_job_api.layer.actor_network_service.common.JobActorConnectionRequest;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantAnswerResumeRequestException;
@@ -76,23 +77,23 @@ public class JobSeekerActorNetworkServicePluginManager implements JobSeekerManag
 
     /**
      * This method expose the given identity using the JobSeekerExposingData
-     * @param jobSeekerExposingData  crypto broker exposing information.
+     * @param jobActorExposingData  crypto broker exposing information.
      *
      * @throws CantExposeIdentityException
      */
     @Override
     public void exposeIdentity(
-            JobSeekerExposingData jobSeekerExposingData)
+            JobActorExposingData jobActorExposingData)
             throws CantExposeIdentityException {
         try {
             pluginRoot.registerActor(
-                    jobSeekerExposingData.getPublicKey(),
-                    jobSeekerExposingData.getAlias(),
-                    jobSeekerExposingData.getAlias(),
-                    jobSeekerExposingData.getJobTitle().getCode(),
+                    jobActorExposingData.getPublicKey(),
+                    jobActorExposingData.getAlias(),
+                    jobActorExposingData.getAlias(),
+                    jobActorExposingData.getExtraDataEnum().getCode(),
                     null,
                     Actors.JOB_SEEKER,
-                    jobSeekerExposingData.getImage(),
+                    jobActorExposingData.getImage(),
                     0,0
             );
         } catch (final ActorAlreadyRegisteredException | CantRegisterActorException e) {
@@ -116,20 +117,20 @@ public class JobSeekerActorNetworkServicePluginManager implements JobSeekerManag
 
     /**
      * This method updates an identity by a given JobSeekerExposingData
-     * @param jobSeekerExposingData
+     * @param jobActorExposingData
      * @throws CantExposeIdentityException
      */
     @Override
-    public void updateIdentity(JobSeekerExposingData jobSeekerExposingData)
+    public void updateIdentity(JobActorExposingData jobActorExposingData)
             throws CantExposeIdentityException {
         try {
             pluginRoot.updateRegisteredActor(
-                    jobSeekerExposingData.getPublicKey(),
-                    jobSeekerExposingData.getAlias(),
-                    jobSeekerExposingData.getAlias(),
+                    jobActorExposingData.getPublicKey(),
+                    jobActorExposingData.getAlias(),
+                    jobActorExposingData.getAlias(),
                     null,
-                    null,
-                    jobSeekerExposingData.getImage()
+                    jobActorExposingData.getExtraDataEnum().getCode(),
+                    jobActorExposingData.getImage()
             );
         }catch (Exception e){
             pluginRoot.reportError(
@@ -144,16 +145,16 @@ public class JobSeekerActorNetworkServicePluginManager implements JobSeekerManag
 
     /**
      * This method expose the identities contained in a JobSeekerExposingData list.
-     * @param jobSeekerExposingDataList  list of crypto broker exposing information.
+     * @param jobActorExposingDataList  list of crypto broker exposing information.
      *
      * @throws CantExposeIdentitiesException
      */
     @Override
     public void exposeIdentities(
-            Collection<JobSeekerExposingData> jobSeekerExposingDataList)
+            Collection<JobActorExposingData> jobActorExposingDataList)
             throws CantExposeIdentitiesException {
         try {
-            for (final JobSeekerExposingData jobSeekerExposingData : jobSeekerExposingDataList)
+            for (final JobActorExposingData jobSeekerExposingData : jobActorExposingDataList)
                 this.exposeIdentity(jobSeekerExposingData);
         } catch (final CantExposeIdentityException e){
             pluginRoot.reportError(

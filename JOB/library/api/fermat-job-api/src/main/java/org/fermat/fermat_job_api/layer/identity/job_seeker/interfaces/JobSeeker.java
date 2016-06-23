@@ -10,12 +10,6 @@ import org.fermat.fermat_job_api.all_definition.interfaces.JobIdentity;
 public interface JobSeeker extends JobIdentity {
 
     /**
-     * This method returns the exposure level from this identity.
-     * @return
-     */
-    ExposureLevel getExposureLevel();
-
-    /**
      * This method returns the Job Title
      * @return
      */

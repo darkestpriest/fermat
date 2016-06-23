@@ -1,5 +1,6 @@
 package org.fermat.fermat_job_api.all_definition.interfaces;
 
+import org.fermat.fermat_job_api.all_definition.enums.ExposureLevel;
 import org.fermat.fermat_job_api.all_definition.enums.Frequency;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantCreateMessageSignatureException;
 
@@ -52,5 +53,12 @@ public interface JobIdentity {
      * @return
      */
     Frequency getFrequency();
+
+    /**
+     * This method returns the exposure level from this identity.
+     * @return
+     */
+    ExposureLevel getExposureLevel();
+
 
 }

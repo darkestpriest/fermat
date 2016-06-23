@@ -5,37 +5,37 @@ import com.bitdubai.fermat_api.layer.all_definition.exceptions.InvalidParameterE
 import org.fermat.fermat_job_api.all_definition.interfaces.JobEnum;
 
 /**
- * Created by Manuel Perez (darkpriestrelative@gmail.com) on 21/06/16.
+ * Created by Manuel Perez (darkpriestrelative@gmail.com) on 22/06/16.
  */
-public enum JobTitle implements JobEnum {
+public enum Industry implements JobEnum {
 
-    ELECTRONIC_ENGINEER("EEE","Electronic Engineer"),
-    JAVA_DEVELOPER("JDV","Java Developer"),
+    EDUCATION("EDN","Education"),
+    SOFTWARE_DEVELOPMENT("SDT","Software Development"),
     ;
 
     private final String code;
     private final String friendlyName;
 
     /**
-     * Sets the default JobTitle.
+     * Sets the default Industry.
      */
-    private static final JobTitle DEFAULT_JOB_TITLE = JobTitle.JAVA_DEVELOPER;
+    private static final Industry DEFAULT_INDUSTRY = Industry.SOFTWARE_DEVELOPMENT;
 
-    JobTitle(final String code, final String friendlyName){
+    Industry(final String code, final String friendlyName){
         this.code = code;
         this.friendlyName = friendlyName;
     }
 
     //PUBLIC METHODS
 
-    public static JobTitle getByCode(final String code) throws InvalidParameterException {
-        for (JobTitle value : values()) {
+    public static Industry getByCode(final String code) throws InvalidParameterException {
+        for (Industry value : values()) {
             if (value.getCode().equals(code)) return value;
         }
         throw new InvalidParameterException(
                 InvalidParameterException.DEFAULT_MESSAGE,
                 null, "Code Received: " + code,
-                "This Code Is Not Valid for the JobTitle enum.");
+                "This Code Is Not Valid for the Industry enum.");
     }
 
     //GETTERS AND SETTERS
@@ -46,15 +46,15 @@ public enum JobTitle implements JobEnum {
     }
 
     /**
-     * Gets the default Job title.
-     * @return the default Job title
+     * Gets the default Industry.
+     * @return the default Industry
      */
-    public static JobTitle getDefaultJobTitle(){
-        return DEFAULT_JOB_TITLE;
+    public static Industry getDefaultIndustry(){
+        return DEFAULT_INDUSTRY;
     }
 
     /**
-     * This method returns the Job Title friendly name.
+     * This method returns the Industry friendly name.
      * @return
      */
     public String getFriendlyName() {

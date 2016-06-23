@@ -1,4 +1,4 @@
-package org.fermat.fermat_job_plugin.layer.identity.job_seeker.developer.version_1.structure;
+package org.fermat.fermat_job_plugin.layer.identity.employer.developer.version_1.structure;
 
 import com.bitdubai.fermat_api.layer.osa_android.location_system.Location;
 import com.bitdubai.fermat_api.layer.osa_android.location_system.LocationManager;
@@ -9,12 +9,12 @@ import com.bitdubai.fermat_pip_api.layer.user.device_user.interfaces.DeviceUserM
 
 import org.fermat.fermat_job_api.all_definition.enums.ExposureLevel;
 import org.fermat.fermat_job_api.all_definition.enums.Frequency;
-import org.fermat.fermat_job_api.all_definition.enums.JobTitle;
+import org.fermat.fermat_job_api.all_definition.enums.Industry;
 import org.fermat.fermat_job_api.all_definition.exceptions.CantExposeIdentitiesException;
 import org.fermat.fermat_job_api.all_definition.exceptions.CantExposeIdentityException;
 import org.fermat.fermat_job_api.all_definition.interfaces.JobActorExposingData;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.interfaces.JobSeekerManager;
-import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.utils.JobSeekerExposingData;
+import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.utils.EmployerExposingData;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantChangeExposureLevelException;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantCreateJobPlatformIdentityException;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantDeleteJobPlatformIdentityException;
@@ -25,10 +25,10 @@ import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantPublishIde
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.CantUpdateJobPlatformIdentityException;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.IdentityNotFoundException;
 import org.fermat.fermat_job_api.layer.identity.common.exceptions.JobPlatformIdentityAlreadyExistsException;
-import org.fermat.fermat_job_api.layer.identity.job_seeker.interfaces.JobSeeker;
-import org.fermat.fermat_job_api.layer.identity.job_seeker.interfaces.JobSeekerIdentityManager;
-import org.fermat.fermat_job_plugin.layer.identity.job_seeker.developer.version_1.JobSeekerIdentityPluginRoot;
-import org.fermat.fermat_job_plugin.layer.identity.job_seeker.developer.version_1.database.JobSeekerIdentityDatabaseDao;
+import org.fermat.fermat_job_api.layer.identity.employer.interfaces.Employer;
+import org.fermat.fermat_job_api.layer.identity.employer.interfaces.EmployerIdentityManager;
+import org.fermat.fermat_job_plugin.layer.identity.employer.developer.version_1.EmployerIdentityPluginRoot;
+import org.fermat.fermat_job_plugin.layer.identity.employer.developer.version_1.database.EmployerIdentityDatabaseDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,17 +36,17 @@ import java.util.List;
 /**
  * Created by Manuel Perez (darkpriestrelative@gmail.com) on 20/06/16.
  */
-public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager {
+public class EmployerIdentityPluginManager implements EmployerIdentityManager {
 
     /**
      * Represents the plugin root class
      */
-    private JobSeekerIdentityPluginRoot jobSeekerIdentityPluginRoot;
+    private EmployerIdentityPluginRoot jobSeekerIdentityPluginRoot;
 
     /**
      * Represents the plugin database dao.
      */
-    private JobSeekerIdentityDatabaseDao jobSeekerIdentityDatabaseDao;
+    private EmployerIdentityDatabaseDao jobSeekerIdentityDatabaseDao;
 
     /**
      * Represents the device user manager.
@@ -73,9 +73,9 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
      * @param jobSeekerManager
      * @param locationManager
      */
-    public JobSeekerIdentityPluginManager(
-            JobSeekerIdentityPluginRoot jobSeekerIdentityPluginRoot,
-            JobSeekerIdentityDatabaseDao jobSeekerIdentityDatabaseDao,
+    public EmployerIdentityPluginManager(
+            EmployerIdentityPluginRoot jobSeekerIdentityPluginRoot,
+            EmployerIdentityDatabaseDao jobSeekerIdentityDatabaseDao,
             DeviceUserManager deviceUserManager,
             JobSeekerManager jobSeekerManager,
             LocationManager locationManager ) {
@@ -92,10 +92,10 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
      * @throws CantListJobsPlatformIdentitiesException
      */
     @Override
-    public List<JobSeeker> getIdentitiesFromCurrentDeviceUser()
+    public List<Employer> getIdentitiesFromCurrentDeviceUser()
             throws CantListJobsPlatformIdentitiesException {
         try {
-            List<JobSeeker> jobSeekerList =
+            List<Employer> jobSeekerList =
                     jobSeekerIdentityDatabaseDao.listIdentitiesFromDeviceUser(
                             deviceUserManager.getLoggedInDeviceUser());
             //Determinate the number of identities in database.
@@ -122,7 +122,7 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
      * @throws JobPlatformIdentityAlreadyExistsException
      */
     @Override
-    public JobSeeker createNewIdentity(
+    public Employer createNewIdentity(
             final String alias,
             final DeviceUser deviceUser,
             byte[] imageProfile,
@@ -131,14 +131,14 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
             Frequency frequency)
             throws CantCreateJobPlatformIdentityException,
             JobPlatformIdentityAlreadyExistsException {
-        return jobSeekerIdentityDatabaseDao.createNewJobSeekerIdentity(
+        return jobSeekerIdentityDatabaseDao.createNewEmployerIdentity(
                 alias,
                 deviceUser,
                 imageProfile,
                 exposureLevel,
                 accuracy,
                 frequency,
-                JobTitle.getDefaultJobTitle()
+                Industry.getDefaultIndustry()
         );
     }
 
@@ -150,30 +150,30 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
      * @param exposureLevel
      * @param accuracy
      * @param frequency
-     * @param jobTitle
+     * @param industry
      * @return
      * @throws CantCreateJobPlatformIdentityException
      * @throws JobPlatformIdentityAlreadyExistsException
      */
     @Override
-    public JobSeeker createNewIdentity(
+    public Employer createNewIdentity(
             final String alias,
             final DeviceUser deviceUser,
             byte[] imageProfile,
             ExposureLevel exposureLevel,
             long accuracy,
             Frequency frequency,
-            JobTitle jobTitle)
+            Industry industry)
             throws CantCreateJobPlatformIdentityException,
             JobPlatformIdentityAlreadyExistsException {
-        return jobSeekerIdentityDatabaseDao.createNewJobSeekerIdentity(
+        return jobSeekerIdentityDatabaseDao.createNewEmployerIdentity(
                 alias,
                 deviceUser,
                 imageProfile,
                 exposureLevel,
                 accuracy,
                 frequency,
-                jobTitle
+                industry
         );
     }
 
@@ -189,7 +189,7 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
      * @throws CantUpdateJobPlatformIdentityException
      */
     @Override
-    public JobSeeker updateIdentity(
+    public Employer updateIdentity(
             String alias,
             String publicKey,
             byte[] imageProfile,
@@ -204,7 +204,7 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
                 accuracy,
                 frequency,
                 exposureLevel,
-                JobTitle.getDefaultJobTitle());
+                Industry.getDefaultIndustry());
     }
 
     /**
@@ -215,19 +215,19 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
      * @param accuracy
      * @param frequency
      * @param exposureLevel
-     * @param jobTitle
+     * @param industry
      * @return
      * @throws CantUpdateJobPlatformIdentityException
      */
     @Override
-    public JobSeeker updateIdentity(
+    public Employer updateIdentity(
             String alias,
             String publicKey,
             byte[] imageProfile,
             long accuracy,
             Frequency frequency,
             ExposureLevel exposureLevel,
-            JobTitle jobTitle
+            Industry industry
     ) throws CantUpdateJobPlatformIdentityException {
         return jobSeekerIdentityDatabaseDao.updateCryptoBrokerIdentity(
                 alias,
@@ -236,7 +236,7 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
                 accuracy,
                 frequency,
                 exposureLevel,
-                jobTitle);
+                industry);
     }
 
     /**
@@ -271,13 +271,13 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
                     publicKey,
                     ExposureLevel.PUBLISH);
             Location location = locationManager.getLocation();
-            JobSeeker jobSeeker = jobSeekerIdentityDatabaseDao.getIdentity(publicKey);
-            JobSeekerExposingData jobSeekerExposingData = new JobSeekerExposingData(
+            Employer employer = jobSeekerIdentityDatabaseDao.getIdentity(publicKey);
+            EmployerExposingData jobSeekerExposingData = new EmployerExposingData(
                     publicKey,
-                    jobSeeker.getAlias(),
-                    jobSeeker.getProfileImage(),
+                    employer.getAlias(),
+                    employer.getProfileImage(),
                     location,
-                    jobSeeker.getJobTitle());
+                    employer.getIndustry());
             jobSeekerManager.exposeIdentity(jobSeekerExposingData);
         } catch (CantChangeExposureLevelException e) {
             throw new CantPublishIdentityException(
@@ -326,22 +326,22 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
     public void exposeIdentities() throws CantExposeIdentitiesException {
         try{
             Location location = locationManager.getLocation();
-            final List<JobActorExposingData> jobSeekerExposingDataList = new ArrayList<>();
-            List<JobSeeker> jobSeekerList =
+            final List<JobActorExposingData> employerExposingDataArrayList = new ArrayList<>();
+            List<Employer> jobSeekerList =
                     jobSeekerIdentityDatabaseDao.listIdentitiesFromDeviceUser(
                             deviceUserManager.getLoggedInDeviceUser());
             ExposureLevel exposureLevel;
-            for (final JobSeeker identity : jobSeekerList) {
+            for (final Employer identity : jobSeekerList) {
                 exposureLevel = identity.getExposureLevel();
                 switch (exposureLevel){
                     case PUBLISH:
-                        jobSeekerExposingDataList.add(
-                                new JobSeekerExposingData(
+                        employerExposingDataArrayList.add(
+                                new EmployerExposingData(
                                         identity.getPublicKey(),
                                         identity.getAlias(),
                                         identity.getProfileImage(),
                                         location,
-                                        identity.getJobTitle()
+                                        identity.getIndustry()
                                 )
                         );
                         break;
@@ -349,7 +349,7 @@ public class JobSeekerIdentityPluginManager implements JobSeekerIdentityManager 
                         continue;
                 }
             }
-            jobSeekerManager.exposeIdentities(jobSeekerExposingDataList);
+            jobSeekerManager.exposeIdentities(employerExposingDataArrayList);
         } catch (CantGetDeviceLocationException e) {
             throw new CantExposeIdentitiesException(
                     e,
