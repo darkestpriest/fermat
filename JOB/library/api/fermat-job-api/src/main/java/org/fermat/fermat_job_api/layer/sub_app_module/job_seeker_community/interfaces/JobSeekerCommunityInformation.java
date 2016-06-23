@@ -18,10 +18,4 @@ public interface JobSeekerCommunityInformation extends JobActorCommunityInformat
      */
     JobTitle getJobTitle();
 
-    //TODO:Maybe to send de notification of who review the resume, and the time
-
-    String employerName();
-
-    String dateReview();
-
 }
