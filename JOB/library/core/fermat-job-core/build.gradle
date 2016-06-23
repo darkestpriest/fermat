@@ -12,5 +12,6 @@ dependencies {
     compile project(':fermat-job-plugin-identity-job-seeker')
 
     //Sub app module
+    compile project(':fermat-job-plugin-sub-app-module-job-seeker-community')
     compile project(':fermat-job-plugin-sub-app-module-job-seeker-identity')
 }

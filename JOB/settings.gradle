@@ -39,5 +39,9 @@ include ':fermat-job-plugin-identity-job-seeker'
 project(':fermat-job-plugin-identity-job-seeker').projectDir = new File('JOB/plugin/identity/fermat-job-plugin-identity-job-seeker')
 
 //Sub app module
+include ':fermat-job-plugin-sub-app-module-job-seeker-community'
+project(':fermat-job-plugin-sub-app-module-job-seeker-community').projectDir = new File('JOB/plugin/sub_app_module/fermat-job-plugin-sub-app-module-job-seeker-community')
+
+
 include ':fermat-job-plugin-sub-app-module-job-seeker-identity'
 project(':fermat-job-plugin-sub-app-module-job-seeker-identity').projectDir = new File('JOB/plugin/sub_app_module/fermat-job-plugin-sub-app-module-job-seeker-identity')
