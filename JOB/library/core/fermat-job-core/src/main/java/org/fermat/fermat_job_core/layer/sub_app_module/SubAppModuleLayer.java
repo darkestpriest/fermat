@@ -5,6 +5,7 @@ import com.bitdubai.fermat_core_api.layer.all_definition.system.abstract_classes
 import com.bitdubai.fermat_core_api.layer.all_definition.system.exceptions.CantRegisterPluginException;
 import com.bitdubai.fermat_core_api.layer.all_definition.system.exceptions.CantStartLayerException;
 
+import org.fermat.fermat_job_core.layer.sub_app_module.job_seeker_community.JobSeekerCommunitySubAppModulePluginSubsystem;
 import org.fermat.fermat_job_core.layer.sub_app_module.job_seeker_identity.JobSeekerSubAppModulePluginSubsystem;
 
 /**
@@ -20,6 +21,7 @@ public class SubAppModuleLayer extends AbstractLayer {
 
         try {
 
+            registerPlugin(new JobSeekerCommunitySubAppModulePluginSubsystem());
             registerPlugin(new JobSeekerSubAppModulePluginSubsystem());
 
         } catch(CantRegisterPluginException e) {

@@ -349,6 +349,7 @@ public enum Plugins implements FermatPluginsEnum {
     //JOB
     EMPLOYER                            ("EML"),
     JOB_SEEKER                          ("JOS"),
+    JOB_SEEKER_COMMUNITY                ("JSC"),
     ;
        
 

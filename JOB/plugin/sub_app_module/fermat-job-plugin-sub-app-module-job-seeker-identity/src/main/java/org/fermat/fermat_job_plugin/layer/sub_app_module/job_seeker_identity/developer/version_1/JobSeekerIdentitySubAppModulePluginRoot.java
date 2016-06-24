@@ -27,15 +27,19 @@ import org.fermat.fermat_job_plugin.layer.sub_app_module.job_seeker_identity.dev
 public class JobSeekerIdentitySubAppModulePluginRoot
         extends AbstractModule<JobSeekerPreferenceSettings,ActiveActorIdentityInformation> {
 
+    @NeededAddonReference(platform = Platforms.OPERATIVE_SYSTEM_API, layer = Layers.SYSTEM, addon = Addons.PLUGIN_FILE_SYSTEM)
+    private PluginFileSystem pluginFileSystem;
+
     @NeededAddonReference(platform = Platforms.PLUG_INS_PLATFORM, layer = Layers.USER , addon = Addons.DEVICE_USER)
     private DeviceUserManager deviceUserManager;
 
     @NeededPluginReference(platform = Platforms.JOB_PLATFORM, layer = Layers.IDENTITY, plugin = Plugins.JOB_SEEKER)
     private JobSeekerIdentityManager identityManager;
 
-    @NeededAddonReference(platform = Platforms.OPERATIVE_SYSTEM_API, layer = Layers.SYSTEM, addon = Addons.PLUGIN_FILE_SYSTEM)
-    private PluginFileSystem pluginFileSystem;
 
+    /**
+     * Represents the plugin manager
+     */
     private JobSeekerIdentityModulePluginManager jobSeekerIdentityModulePluginManager;
 
     public JobSeekerIdentitySubAppModulePluginRoot() {

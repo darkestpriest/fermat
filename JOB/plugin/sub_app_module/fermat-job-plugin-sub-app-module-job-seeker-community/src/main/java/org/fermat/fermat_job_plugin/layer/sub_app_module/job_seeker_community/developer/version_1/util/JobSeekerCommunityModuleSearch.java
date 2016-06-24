@@ -111,7 +111,8 @@ public class JobSeekerCommunityModuleSearch implements JobSeekerCommunitySearch 
     }
 
     @Override
-    public List<JobSeekerCommunityInformation> getResultLocation(DeviceLocation deviceLocation) throws CantGetJobActorResultException {
+    public List<JobSeekerCommunityInformation> getResultLocation(DeviceLocation deviceLocation)
+            throws CantGetJobActorResultException {
         try{
             JobSeekerSearch jobSeekerSearch = jobSeekerManager.getSearch();
             List<JobSeekerExposingData> jobSeekerExposingDataList=
@@ -133,7 +134,8 @@ public class JobSeekerCommunityModuleSearch implements JobSeekerCommunitySearch 
     }
 
     @Override
-    public List<JobSeekerCommunityInformation> getResultDistance(double distance) throws CantGetJobActorResultException {
+    public List<JobSeekerCommunityInformation> getResultDistance(double distance)
+            throws CantGetJobActorResultException {
         try{
             JobSeekerSearch jobSeekerSearch = jobSeekerManager.getSearch();
             List<JobSeekerExposingData> jobSeekerExposingDataList=
@@ -155,7 +157,8 @@ public class JobSeekerCommunityModuleSearch implements JobSeekerCommunitySearch 
     }
 
     @Override
-    public List<JobSeekerCommunityInformation> getResultAlias(String alias) throws CantGetJobActorResultException {
+    public List<JobSeekerCommunityInformation> getResultAlias(String alias)
+            throws CantGetJobActorResultException {
         try{
             JobSeekerSearch jobSeekerSearch = jobSeekerManager.getSearch();
             List<JobSeekerExposingData> jobSeekerExposingDataList=

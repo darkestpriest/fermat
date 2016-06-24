@@ -1,7 +1,5 @@
 package org.fermat.fermat_job_api.layer.sub_app_module.job_seeker_community.interfaces;
 
-import com.bitdubai.fermat_api.layer.modules.common_classes.ActiveActorIdentityInformation;
-
 import org.fermat.fermat_job_api.layer.sub_app_module.common.JobCommunitySubAppModuleManager;
 import org.fermat.fermat_job_api.layer.sub_app_module.job_seeker_community.utils.JobSeekerCommunitySettings;
 
@@ -13,7 +11,7 @@ import java.io.Serializable;
 public interface JobSeekerCommunitySubAppModuleManager
         extends JobCommunitySubAppModuleManager<
         JobSeekerCommunitySettings,
-        ActiveActorIdentityInformation,
+        JobSeekerCommunitySelectableIdentity,
         JobSeekerCommunityInformation,
         JobSeekerCommunitySearch>,
         Serializable {
