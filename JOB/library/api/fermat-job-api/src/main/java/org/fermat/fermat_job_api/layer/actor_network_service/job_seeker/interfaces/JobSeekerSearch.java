@@ -1,5 +1,8 @@
 package org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.interfaces;
 
+import com.bitdubai.fermat_api.layer.all_definition.location_system.DeviceLocation;
+
+import org.fermat.fermat_job_api.all_definition.enums.JobTitle;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantListJobActorsException;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.utils.JobSeekerExposingData;
 
@@ -34,6 +37,63 @@ public abstract class JobSeekerSearch {
      * @throws CantListJobActorsException  if something goes wrong.
      */
     public abstract List<JobSeekerExposingData> getResult() throws CantListJobActorsException;
+
+    public abstract List<JobSeekerExposingData> getResult(
+            String publicKey,
+            DeviceLocation deviceLocation,
+            double distance,
+            String alias,
+            Integer offSet,
+            Integer max)
+            throws CantListJobActorsException;
+
+    /**
+     * Through the method <code>getResult</code> we can get the results of the search,
+     * Like we're not setting max and offset we will return all the job seeker that match
+     * with the parameters set.
+     * @param deviceLocation
+     * @return
+     * @throws CantListJobActorsException
+     */
+    public abstract List<JobSeekerExposingData> getResultLocation(
+            DeviceLocation deviceLocation)
+            throws CantListJobActorsException;
+
+    /**
+     * Through the method <code>getResult</code> we can get the results of the search,
+     * Like we're not setting max and offset we will return all the job seeker that match
+     * with the parameters set.
+     * @param distance
+     * @return
+     * @throws CantListJobActorsException
+     */
+    public abstract List<JobSeekerExposingData> getResultDistance(
+            double distance)
+            throws CantListJobActorsException;
+
+    /**
+     * Through the method <code>getResult</code> we can get the results of the search,
+     * Like we're not setting max and offset we will return all the job seeker that match
+     * with the parameters set.
+     * @param alias
+     * @return
+     * @throws CantListJobActorsException
+     */
+    public abstract List<JobSeekerExposingData> getResultAlias(
+            String alias)
+            throws CantListJobActorsException;
+
+    /**
+     * Through the method <code>getResult</code> we can get the results of the search,
+     * Like we're not setting max and offset we will return all the job seeker that match
+     * with the parameters set.
+     * @param jobTitle
+     * @return
+     * @throws CantListJobActorsException
+     */
+    public abstract List<JobSeekerExposingData> getResultJobTitle(
+            JobTitle jobTitle)
+            throws CantListJobActorsException;
 
     /**
      * Through the method <code>getResult</code> we can get the results of the search,

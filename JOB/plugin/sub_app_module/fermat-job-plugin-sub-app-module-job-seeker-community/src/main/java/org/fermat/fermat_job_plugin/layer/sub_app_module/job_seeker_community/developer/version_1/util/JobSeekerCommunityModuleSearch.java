@@ -85,21 +85,95 @@ public class JobSeekerCommunityModuleSearch implements JobSeekerCommunitySearch 
             String alias,
             Integer offSet,
             Integer max) throws CantGetJobActorResultException {
-        return null;
+        try{
+            JobSeekerSearch jobSeekerSearch = jobSeekerManager.getSearch();
+            List<JobSeekerExposingData> jobSeekerExposingDataList=
+                    jobSeekerSearch.getResult(
+                            publicKey,
+                            deviceLocation,
+                            distance,
+                            alias,
+                            offSet,
+                            max);
+            final List<JobSeekerCommunityInformation> jobSeekerCommunityInformationList
+                    = new ArrayList<>();
+            for(JobSeekerExposingData jobSeekerExposingData : jobSeekerExposingDataList)
+                jobSeekerCommunityInformationList.add(
+                        new JobSeekerCommunityPluginInformation(jobSeekerExposingData));
+            return jobSeekerCommunityInformationList;
+        } catch (CantListJobActorsException e) {
+            throw new CantGetJobActorResultException(
+                    e,
+                    "Getting search result",
+                    "Cannot list connected actors");
+        }
+
     }
 
     @Override
     public List<JobSeekerCommunityInformation> getResultLocation(DeviceLocation deviceLocation) throws CantGetJobActorResultException {
-        return null;
+        try{
+            JobSeekerSearch jobSeekerSearch = jobSeekerManager.getSearch();
+            List<JobSeekerExposingData> jobSeekerExposingDataList=
+                    jobSeekerSearch.getResultLocation(
+                            deviceLocation
+                    );
+            final List<JobSeekerCommunityInformation> jobSeekerCommunityInformationList
+                    = new ArrayList<>();
+            for(JobSeekerExposingData jobSeekerExposingData : jobSeekerExposingDataList)
+                jobSeekerCommunityInformationList.add(
+                        new JobSeekerCommunityPluginInformation(jobSeekerExposingData));
+            return jobSeekerCommunityInformationList;
+        } catch (CantListJobActorsException e) {
+            throw new CantGetJobActorResultException(
+                    e,
+                    "Getting search result",
+                    "Cannot list connected actors");
+        }
     }
 
     @Override
     public List<JobSeekerCommunityInformation> getResultDistance(double distance) throws CantGetJobActorResultException {
-        return null;
+        try{
+            JobSeekerSearch jobSeekerSearch = jobSeekerManager.getSearch();
+            List<JobSeekerExposingData> jobSeekerExposingDataList=
+                    jobSeekerSearch.getResultDistance(
+                            distance
+                    );
+            final List<JobSeekerCommunityInformation> jobSeekerCommunityInformationList
+                    = new ArrayList<>();
+            for(JobSeekerExposingData jobSeekerExposingData : jobSeekerExposingDataList)
+                jobSeekerCommunityInformationList.add(
+                        new JobSeekerCommunityPluginInformation(jobSeekerExposingData));
+            return jobSeekerCommunityInformationList;
+        } catch (CantListJobActorsException e) {
+            throw new CantGetJobActorResultException(
+                    e,
+                    "Getting search result",
+                    "Cannot list connected actors");
+        }
     }
 
     @Override
     public List<JobSeekerCommunityInformation> getResultAlias(String alias) throws CantGetJobActorResultException {
-        return null;
+        try{
+            JobSeekerSearch jobSeekerSearch = jobSeekerManager.getSearch();
+            List<JobSeekerExposingData> jobSeekerExposingDataList=
+                    jobSeekerSearch.getResultAlias(
+                            alias
+                    );
+            final List<JobSeekerCommunityInformation> jobSeekerCommunityInformationList
+                    = new ArrayList<>();
+            for(JobSeekerExposingData jobSeekerExposingData : jobSeekerExposingDataList)
+                jobSeekerCommunityInformationList.add(
+                        new JobSeekerCommunityPluginInformation(jobSeekerExposingData));
+            return jobSeekerCommunityInformationList;
+        } catch (CantListJobActorsException e) {
+            throw new CantGetJobActorResultException(
+                    e,
+                    "Getting search result",
+                    "Cannot list connected actors");
+        }
     }
+
 }

@@ -24,6 +24,8 @@ import org.fermat.fermat_job_api.all_definition.exceptions.ActorConnectionAlread
 import org.fermat.fermat_job_api.all_definition.exceptions.CantValidateConnectionStateException;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantListJobActorsException;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantRequestConnectionException;
+import org.fermat.fermat_job_api.layer.sub_app_module.job_seeker_community.interfaces.EmployerCommunityInformation;
+import org.fermat.fermat_job_api.layer.sub_app_module.job_seeker_community.interfaces.JobSeekerCommunityInformation;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -99,7 +101,35 @@ public interface JobCommunitySubAppModuleManager<
      * @return
      * @throws CantListJobActorsException
      */
-    List<M> listAllConnectedJobActors(
+    List<JobActorCommunityInformation> listAllConnectedJobActors(
+            final T selectedIdentity,
+            final int max,
+            final int offset)
+            throws CantListJobActorsException;
+
+    /**
+     * This method returns all the connected job seekers
+     * @param selectedIdentity
+     * @param max
+     * @param offset
+     * @return
+     * @throws CantListJobActorsException
+     */
+    List<JobSeekerCommunityInformation> listAllConnectedJobSeekers(
+            final T selectedIdentity,
+            final int max,
+            final int offset)
+            throws CantListJobActorsException;
+
+    /**
+     * This method returns all the connected employers
+     * @param selectedIdentity
+     * @param max
+     * @param offset
+     * @return
+     * @throws CantListJobActorsException
+     */
+    List<EmployerCommunityInformation> listAllConnectedEmployers(
             final T selectedIdentity,
             final int max,
             final int offset)

@@ -25,6 +25,8 @@ import org.fermat.fermat_job_api.all_definition.exceptions.CantListSelectableIde
 import org.fermat.fermat_job_api.all_definition.exceptions.CantValidateConnectionStateException;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantListJobActorsException;
 import org.fermat.fermat_job_api.layer.actor_network_service.job_seeker.exceptions.CantRequestConnectionException;
+import org.fermat.fermat_job_api.layer.sub_app_module.common.JobActorCommunityInformation;
+import org.fermat.fermat_job_api.layer.sub_app_module.job_seeker_community.interfaces.EmployerCommunityInformation;
 import org.fermat.fermat_job_api.layer.sub_app_module.job_seeker_community.interfaces.JobSeekerCommunityInformation;
 import org.fermat.fermat_job_api.layer.sub_app_module.job_seeker_community.interfaces.JobSeekerCommunitySearch;
 import org.fermat.fermat_job_api.layer.sub_app_module.job_seeker_community.interfaces.JobSeekerCommunitySubAppModuleManager;
@@ -76,7 +78,17 @@ public class JobSeekerCommunityModulePluginManager extends ModuleManagerImpl<Job
     }
 
     @Override
-    public List<JobSeekerCommunityInformation> listAllConnectedJobActors(ActiveActorIdentityInformation selectedIdentity, int max, int offset) throws CantListJobActorsException {
+    public List<JobActorCommunityInformation> listAllConnectedJobActors(ActiveActorIdentityInformation selectedIdentity, int max, int offset) throws CantListJobActorsException {
+        return null;
+    }
+
+    @Override
+    public List<JobSeekerCommunityInformation> listAllConnectedJobSeekers(ActiveActorIdentityInformation selectedIdentity, int max, int offset) throws CantListJobActorsException {
+        return null;
+    }
+
+    @Override
+    public List<EmployerCommunityInformation> listAllConnectedEmployers(ActiveActorIdentityInformation selectedIdentity, int max, int offset) throws CantListJobActorsException {
         return null;
     }
 
