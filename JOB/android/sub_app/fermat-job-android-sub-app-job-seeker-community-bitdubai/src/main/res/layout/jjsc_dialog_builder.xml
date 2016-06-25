@@ -14,7 +14,7 @@
         android:padding="16dp">
 
         <com.bitdubai.fermat_android_api.layer.definition.wallet.views.FermatTextView
-            android:id="@+id/aac_title"
+            android:id="@+id/jjsc_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -34,7 +34,7 @@
         android:orientation="vertical">
 
         <com.bitdubai.fermat_android_api.layer.definition.wallet.views.FermatTextView
-            android:id="@+id/aac_description"
+            android:id="@+id/jjsc_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -49,7 +49,7 @@
             tools:ignore="HardcodedText" />
 
         <com.bitdubai.fermat_android_api.layer.definition.wallet.views.FermatTextView
-            android:id="@+id/aac_user_name"
+            android:id="@+id/jjsc_user_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -63,7 +63,7 @@
             tools:ignore="HardcodedText" />
 
         <com.bitdubai.fermat_android_api.layer.definition.wallet.views.FermatTextView
-            android:id="@+id/aac_second_description"
+            android:id="@+id/jjsc_second_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -90,7 +90,7 @@
             android:orientation="horizontal">
 
             <com.bitdubai.fermat_android_api.layer.definition.wallet.views.FermatButton
-                android:id="@+id/aac_negative_button"
+                android:id="@+id/jjsc_negative_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -110,7 +110,7 @@
                 android:background="#e1e1e1" />
 
             <com.bitdubai.fermat_android_api.layer.definition.wallet.views.FermatButton
-                android:id="@+id/aac_positive_button"
+                android:id="@+id/jjsc_positive_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

@@ -1,6 +1,8 @@
 package org.fermat.fermat_job_api.layer.sub_app_module.job_seeker_community.interfaces;
 
 
+import com.bitdubai.fermat_api.layer.all_definition.enums.Actors;
+
 import org.fermat.fermat_job_api.all_definition.enums.JobTitle;
 import org.fermat.fermat_job_api.layer.sub_app_module.common.JobActorCommunityInformation;
 
@@ -17,5 +19,14 @@ public interface JobSeekerCommunityInformation extends JobActorCommunityInformat
      * @return
      */
     JobTitle getJobTitle();
+
+    /**
+     * This method sets the actor type.
+     * @return
+     */
+
+    Actors getActorType();
+
+
 
 }

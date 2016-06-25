@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#010c12"
+    android:background="#FFFFFFFF"
     android:orientation="vertical"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
@@ -15,40 +14,44 @@
         android:orientation="horizontal">
 
         <RelativeLayout
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:background="@drawable/jjsc_circular_friend_list">
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            >
 
             <ImageView
-                android:id="@+id/aac_selectable_identity_user_avatar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:id="@+id/jjsc_selectable_identity_user_avatar"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center"
                 android:scaleType="centerCrop"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription"
+                android:background="@drawable/jjsc_circular_friend_list"/>
+
             <ImageView
-                android:id="@+id/aac_recycler_icon"
+                android:id="@+id/jjsc_recycler_icon"
                 android:src="@drawable/jjsc_people"
                 android:contentDescription="@string/app_name"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:scaleType="centerCrop"
-                tools:listitem="@layout/jjsc_row_connection_list"/>
+                tools:listitem="@layout/jjsc_row_connection_list"
+                android:visibility="gone"/>
 
         </RelativeLayout>
 
         <com.bitdubai.fermat_android_api.layer.definition.wallet.views.FermatTextView
-            android:id="@+id/aac_selectable_identity_username"
+            android:id="@+id/jjsc_selectable_identity_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:paddingLeft="8dp"
             android:paddingStart="8dp"
             android:text="Username"
-            android:textColor="#0072bb"
+            android:textColor="#6D6F71"
             android:textSize="14sp"
             tools:ignore="HardcodedText,RtlSymmetry" />
+
 
     </LinearLayout>
 
@@ -56,7 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="8dp"
-        android:background="#ffffff" />
+        android:background="@drawable/jjsc_line_coloured" />
 
 
 </LinearLayout>

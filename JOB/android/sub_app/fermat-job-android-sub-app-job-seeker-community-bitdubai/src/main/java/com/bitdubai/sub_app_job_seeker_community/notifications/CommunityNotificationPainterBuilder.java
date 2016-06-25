@@ -4,7 +4,7 @@ import com.bitdubai.fermat_android_api.engine.NotificationPainter;
 import com.bitdubai.fermat_android_api.layer.definition.wallet.abstracts.AbstractReferenceAppFermatSession;
 import com.bitdubai.fermat_api.layer.all_definition.exceptions.InvalidParameterException;
 import com.bitdubai.sub_app.job_seeker_community.R;
-import com.bitdubai.sub_app_job_seeker_community.sessions.JobSeekerSubAppSessionReferenceApp;
+import com.bitdubai.sub_app_job_seeker_community.sessions.JobSeekerCommunitySubAppSessionReferenceApp;
 
 import org.fermat.fermat_job_api.layer.actor.JobSeeker.enums.JobSeekerActorConnectionNotificationType;
 import org.fermat.fermat_job_api.layer.sub_app_module.job_seeker_community.interfaces.JobSeekerCommunitySubAppModuleManager;
@@ -21,7 +21,7 @@ public class CommunityNotificationPainterBuilder {
         NotificationPainter notification = null;
         int lastListIndex;
         if(session!=null){
-            JobSeekerSubAppSessionReferenceApp jobSeekerCommunitySubAppSession = (JobSeekerSubAppSessionReferenceApp) session;
+            JobSeekerCommunitySubAppSessionReferenceApp jobSeekerCommunitySubAppSession = (JobSeekerCommunitySubAppSessionReferenceApp) session;
             JobSeekerCommunitySubAppModuleManager moduleManager = jobSeekerCommunitySubAppSession.getModuleManager();
             try{
                 JobSeekerActorConnectionNotificationType notificationType = JobSeekerActorConnectionNotificationType.getByCode(code);
