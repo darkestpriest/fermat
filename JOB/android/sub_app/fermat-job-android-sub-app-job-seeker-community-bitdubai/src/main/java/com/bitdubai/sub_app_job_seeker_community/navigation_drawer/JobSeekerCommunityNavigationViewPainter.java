@@ -12,7 +12,7 @@ import com.bitdubai.fermat_android_api.engine.NavigationViewPainter;
 import com.bitdubai.fermat_android_api.ui.adapters.FermatAdapter;
 import com.bitdubai.fermat_api.layer.modules.common_classes.ActiveActorIdentityInformation;
 import com.bitdubai.sub_app.job_seeker_community.R;
-import com.bitdubai.sub_app_job_seeker_community.sessions.JobSeekerSubAppSessionReferenceApp;
+import com.bitdubai.sub_app_job_seeker_community.sessions.JobSeekerCommunitySubAppSessionReferenceApp;
 
 import org.fermat.fermat_job_api.layer.sub_app_module.job_seeker_community.interfaces.JobSeekerCommunitySubAppModuleManager;
 
@@ -25,14 +25,14 @@ public class JobSeekerCommunityNavigationViewPainter implements NavigationViewPa
 
     private WeakReference<Context> activity;
     private ActiveActorIdentityInformation actorIdentity;
-    private JobSeekerSubAppSessionReferenceApp subAppSession;
+    private JobSeekerCommunitySubAppSessionReferenceApp subAppSession;
     private JobSeekerCommunitySubAppModuleManager moduleManager;
 
 
     public JobSeekerCommunityNavigationViewPainter(
             Context activity,
             ActiveActorIdentityInformation actorIdentity,
-            JobSeekerSubAppSessionReferenceApp subAppSession) {
+            JobSeekerCommunitySubAppSessionReferenceApp subAppSession) {
         this.activity = new WeakReference<Context>(activity);
         this.actorIdentity = actorIdentity;
         this.subAppSession = subAppSession;

@@ -9,12 +9,12 @@ import org.fermat.fermat_job_api.layer.sub_app_module.job_seeker_community.inter
 /**
  * Created by Miguel Payarez (miguel_payarez@hotmail.com) on 6/23/16.
  */
-public class JobSeekerSubAppSessionReferenceApp extends AbstractReferenceAppFermatSession<
+public class JobSeekerCommunitySubAppSessionReferenceApp extends AbstractReferenceAppFermatSession<
         InstalledSubApp,
         JobSeekerCommunitySubAppModuleManager,
         SubAppResourcesProviderManager> {
 
-    public JobSeekerSubAppSessionReferenceApp(){}
+    public JobSeekerCommunitySubAppSessionReferenceApp(){}
 
 
 }

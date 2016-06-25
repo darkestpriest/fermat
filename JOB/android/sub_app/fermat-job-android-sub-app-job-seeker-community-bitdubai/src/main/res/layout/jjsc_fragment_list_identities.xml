@@ -26,12 +26,12 @@
 
 
         <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/accswipe_refresh"
+            android:id="@+id/jjsc_swipe_refresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/accrecycler_view"
+                android:id="@+id/jjsc_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:listitem="@layout/jjsc_row_connection_list" />
@@ -39,7 +39,7 @@
 
         <!--Empty view-->
         <LinearLayout
-            android:id="@+id/aac_empty_view"
+            android:id="@+id/jjsc_empty_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
