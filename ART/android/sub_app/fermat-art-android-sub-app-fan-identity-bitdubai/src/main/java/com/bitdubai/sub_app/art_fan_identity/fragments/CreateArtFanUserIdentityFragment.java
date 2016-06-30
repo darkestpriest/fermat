@@ -37,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bitdubai.fermat_android_api.layer.definition.wallet.AbstractFermatFragment;
+import com.bitdubai.fermat_android_api.layer.definition.wallet.interfaces.ReferenceAppFermatSession;
 import com.bitdubai.fermat_android_api.layer.definition.wallet.utils.ImagesUtils;
 import com.bitdubai.fermat_android_api.ui.Views.PresentationDialog;
 import com.bitdubai.fermat_android_api.ui.transformation.CircleTransform;
@@ -52,7 +53,6 @@ import com.bitdubai.fermat_art_api.layer.sub_app_module.identity.Fan.FanIdentity
 import com.bitdubai.fermat_art_api.layer.sub_app_module.identity.Fan.FanIdentitySettings;
 import com.bitdubai.fermat_pip_api.layer.network_service.subapp_resources.SubAppResourcesProviderManager;
 import com.bitdubai.sub_app.art_fan_identity.R;
-import com.bitdubai.sub_app.art_fan_identity.sessions.ArtFanUserIdentitySubAppSessionReferenceApp;
 import com.bitdubai.sub_app.art_fan_identity.sessions.SessionConstants;
 import com.bitdubai.sub_app.art_fan_identity.util.CommonLogger;
 import com.squareup.picasso.Picasso;
@@ -73,7 +73,7 @@ import static android.widget.Toast.makeText;
 /**
  * Created by Manuel Perez (darkpriestrelative@gmail.com) on 08/04/16.
  */
-public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment<ArtFanUserIdentitySubAppSessionReferenceApp, SubAppResourcesProviderManager> {
+public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment<ReferenceAppFermatSession<FanIdentityManagerModule>, SubAppResourcesProviderManager> {
     private static final String TAG = "CreateArtFanIdentity";
     private static final int CREATE_IDENTITY_FAIL_MODULE_IS_NULL = 0;
     private static final int CREATE_IDENTITY_FAIL_NO_VALID_DATA = 1;
