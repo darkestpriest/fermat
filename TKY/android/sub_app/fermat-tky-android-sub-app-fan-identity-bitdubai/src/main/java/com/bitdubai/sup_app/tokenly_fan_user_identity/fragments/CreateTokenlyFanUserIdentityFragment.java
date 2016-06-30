@@ -79,7 +79,7 @@ import static android.widget.Toast.makeText;
  * Created by Gabriel Araujo (gabe_512@hotmail.com) on 22/03/16.
  */
 public class CreateTokenlyFanUserIdentityFragment extends AbstractFermatFragment<ReferenceAppFermatSession<TokenlyFanIdentityManagerModule>, SubAppResourcesProviderManager> {
-    private static final String TAG = "CreateTKYFanIdentity";
+    private static final String TAG = "CreateTokenlyFanIdentity";
     private static final int CREATE_IDENTITY_FAIL_MODULE_IS_NULL = 0;
     private static final int CREATE_IDENTITY_FAIL_NO_VALID_DATA = 1;
     private static final int CREATE_IDENTITY_FAIL_MODULE_EXCEPTION = 2;
