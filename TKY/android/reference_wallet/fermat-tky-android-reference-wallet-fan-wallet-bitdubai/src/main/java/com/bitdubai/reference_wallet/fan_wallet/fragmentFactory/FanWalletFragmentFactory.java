@@ -20,7 +20,8 @@ public class FanWalletFragmentFactory extends FermatFragmentFactory<ReferenceApp
     protected AbstractFermatFragment getFermatFragment(FanWalletEnumType fragments) throws FragmentNotFoundException {
         if (fragments == null) {
             throw createFragmentNotFoundException(null);
-        }if (fragments.equals(FanWalletEnumType.TKY_FAN_WALLET_MAIN_ACTIVITY))
+        }
+       if (fragments.equals(FanWalletEnumType.TKY_FAN_WALLET_MAIN_ACTIVITY))
         {
             return FanWalletMainActivity.newInstance();
         }

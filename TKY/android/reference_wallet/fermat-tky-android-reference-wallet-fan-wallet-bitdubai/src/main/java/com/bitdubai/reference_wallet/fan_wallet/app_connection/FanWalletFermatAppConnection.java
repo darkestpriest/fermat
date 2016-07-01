@@ -23,7 +23,8 @@ import com.bitdubai.reference_wallet.fan_wallet.session.FanWalletSessionReferenc
 /**
  * Created by Miguel Payarez on 28/03/16.
  */
-public class FanWalletFermatAppConnection extends AppConnections<ReferenceAppFermatSession<FanWalletModule>> {
+public class FanWalletFermatAppConnection
+        extends AppConnections<ReferenceAppFermatSession<FanWalletModule>> {
 
     public FanWalletFermatAppConnection(Context activity) {
         super(activity);
@@ -55,7 +56,9 @@ public class FanWalletFermatAppConnection extends AppConnections<ReferenceAppFer
 
     @Override
     public HeaderViewPainter getHeaderViewPainter() {
-        return new FanWalletHeaderPainter(getContext(),getFullyLoadedSession());
+
+        return null;
+     //   return new FanWalletHeaderPainter(getContext(),getFullyLoadedSession());
     }
 
     @Override

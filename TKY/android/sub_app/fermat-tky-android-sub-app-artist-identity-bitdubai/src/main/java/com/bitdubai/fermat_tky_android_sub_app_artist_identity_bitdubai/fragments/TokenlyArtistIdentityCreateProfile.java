@@ -70,6 +70,7 @@ import com.bitdubai.fermat_tky_api.layer.identity.artist.interfaces.Artist;
 import com.bitdubai.fermat_tky_api.layer.sub_app_module.artist.interfaces.ArtistIdentitiesList;
 import com.bitdubai.fermat_tky_api.layer.sub_app_module.artist.interfaces.TokenlyArtistIdentityManagerModule;
 import com.bitdubai.fermat_tky_api.layer.sub_app_module.artist.interfaces.TokenlyArtistPreferenceSettings;
+import com.bitdubai.fermat_tky_api.layer.sub_app_module.fan.interfaces.TokenlyFanIdentityManagerModule;
 import com.squareup.picasso.Picasso;
 
 
@@ -86,7 +87,7 @@ import static android.widget.Toast.makeText;
  */
 public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment<ReferenceAppFermatSession<TokenlyArtistIdentityManagerModule>, SubAppResourcesProviderManager> {
 
-    private static final String TAG = "CreateTokenlyArtistIdentity";
+    private static final String TAG = "CreateTKYArtistIdentity";
     private static final int CREATE_IDENTITY_FAIL_MODULE_IS_NULL = 0;
     private static final int CREATE_IDENTITY_FAIL_NO_VALID_DATA = 1;
     private static final int CREATE_IDENTITY_FAIL_MODULE_EXCEPTION = 2;
@@ -486,7 +487,7 @@ public class TokenlyArtistIdentityCreateProfile extends AbstractFermatFragment<R
 
 
         } catch (IOException ex) {
-            Log.e(TAG, "Failed to get Exif data", ex);
+            Log.e(TAG, "Failed get Exit data", ex);
         }
 
         return rotatedBitmap;

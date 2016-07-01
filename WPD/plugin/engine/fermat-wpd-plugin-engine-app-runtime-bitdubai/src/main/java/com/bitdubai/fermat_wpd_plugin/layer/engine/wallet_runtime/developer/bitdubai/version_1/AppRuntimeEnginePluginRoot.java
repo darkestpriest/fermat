@@ -4286,7 +4286,9 @@ public class AppRuntimeEnginePluginRoot extends AbstractPlugin implements
 
         runtimeTab = new Tab();
         runtimeTab.setLabel("Songs");
-//        runtimeTab.setFragment(Fragments.TKY_FAN_WALLET_SONGS_TAB_FRAGMENT);
+        Owner owner = new Owner();
+        owner.setOwnerAppPublicKey(publicKey);
+        runtimeTab.setFragment(new FermatRuntimeFragment(1, owner, SourceLocation.DEVELOPER_RESOURCES, Fragments.TKY_FAN_WALLET_SONGS_TAB_FRAGMENT.getKey()));
         runtimeTabStrip.addTab(runtimeTab);
 
         runtimeFragment = new FermatRuntimeFragment();
@@ -4296,7 +4298,7 @@ public class AppRuntimeEnginePluginRoot extends AbstractPlugin implements
 
         runtimeTab = new Tab();
         runtimeTab.setLabel("Following");
-//        runtimeTab.setFragment(Fragments.TKY_FAN_WALLET_FOLLOWING_TAB_FRAGMENT);
+        runtimeTab.setFragment(new FermatRuntimeFragment(1, owner, SourceLocation.DEVELOPER_RESOURCES, Fragments.TKY_FAN_WALLET_FOLLOWING_TAB_FRAGMENT.getKey()));
         runtimeTabStrip.addTab(runtimeTab);
 
 

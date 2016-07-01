@@ -30,11 +30,13 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bitdubai.fermat_android_api.layer.definition.wallet.AbstractFermatFragment;
+import com.bitdubai.fermat_android_api.layer.definition.wallet.interfaces.ReferenceAppFermatSession;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.ErrorManager;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.error_manager.enums.UnexpectedUIExceptionSeverity;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.error_manager.enums.UnexpectedWalletExceptionSeverity;
 import com.bitdubai.fermat_api.layer.all_definition.enums.UISource;
 import com.bitdubai.fermat_api.layer.all_definition.navigation_structure.enums.Wallets;
+import com.bitdubai.fermat_pip_api.layer.network_service.subapp_resources.SubAppResourcesProviderManager;
 import com.bitdubai.fermat_tky_api.all_definitions.exceptions.CantConnectWithTokenlyException;
 import com.bitdubai.fermat_tky_api.layer.external_api.exceptions.CantGetBotException;
 import com.bitdubai.fermat_tky_api.layer.external_api.interfaces.swapbot.Bot;
@@ -58,7 +60,9 @@ import java.util.regex.Matcher;
 /**
  * Created by Miguel Payarez on 16/03/16.
  */
-public class FollowingFragment extends AbstractFermatFragment implements SearchView.OnQueryTextListener {
+public class FollowingFragment extends
+     AbstractFermatFragment<ReferenceAppFermatSession<FanWalletModule>,
+         SubAppResourcesProviderManager> implements SearchView.OnQueryTextListener {
 
     //FermatManager
     private FanWalletSessionReferenceApp fanwalletSession;

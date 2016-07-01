@@ -40,12 +40,11 @@ import java.util.concurrent.ExecutionException;
  * Edited by Miguel Payarez on 30/03/16.
  */
 public interface FanWalletModule extends
-        ModuleManager<
-                FanWalletPreferenceSettings,
-                ActiveActorIdentityInformation>,
+        ModuleManager,
         ModuleSettingsImpl<FanWalletPreferenceSettings>, Serializable {
 
     //Song Wallet
+    /**
     /**
      * This method returns a songs list by SongStatus enum
      * @param songStatus

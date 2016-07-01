@@ -53,7 +53,6 @@ import com.bitdubai.fermat_art_api.layer.sub_app_module.identity.Fan.FanIdentity
 import com.bitdubai.fermat_art_api.layer.sub_app_module.identity.Fan.FanIdentitySettings;
 import com.bitdubai.fermat_pip_api.layer.network_service.subapp_resources.SubAppResourcesProviderManager;
 import com.bitdubai.sub_app.art_fan_identity.R;
-import com.bitdubai.sub_app.art_fan_identity.sessions.ArtFanUserIdentitySubAppSessionReferenceApp;
 import com.bitdubai.sub_app.art_fan_identity.sessions.SessionConstants;
 import com.bitdubai.sub_app.art_fan_identity.util.CommonLogger;
 import com.squareup.picasso.Picasso;

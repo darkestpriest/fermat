@@ -25,10 +25,7 @@ import java.util.UUID;
  * Created by Alexander Jimenez (alex_jimenez76@hotmail.com) on 3/17/16.
  */
 public interface TokenlyFanIdentityManagerModule extends
-        ModuleManager<
-                TokenlyFanPreferenceSettings,
-                ActiveActorIdentityInformation>,
-        ModuleSettingsImpl<TokenlyFanPreferenceSettings>, Serializable {
+        ModuleManager, ModuleSettingsImpl<TokenlyFanPreferenceSettings>, Serializable {
     /**
      * Through the method <code>listIdentitiesFromCurrentDeviceUser</code> we can get all the fan
      * identities linked to the current logged device user.
