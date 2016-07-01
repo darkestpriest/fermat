@@ -19,37 +19,13 @@ import java.util.List;
  */
 public class FanWalletSessionReferenceApp extends AbstractReferenceAppFermatSession<InstalledWallet,FanWalletModule,WalletResourcesProviderManager> {
 
-    SongFragment.DownloadThreadClass downloadThreadClass=null;
-    SongFragment.SyncThreadClass syncThreadClass=null;
-    View view=null;
-    SwipeRefreshLayout swipeRefreshLayout=null;
-    SongAdapter songAdapter=null;
-    RecyclerView recyclerView=null;
-    Boolean downloading=null;
-    List<SongItems> items=null;
+    public static final String DOWNLOAD_THREAD="DOWNLOAD_THREAD";
+    public static final String SYNC_THREAD="SYNC_THREAD";
+    public static final String FAN_WALLET_VIEW="FAN_WALLET_VIEW";
 
-    public void setDownloadThreadClass(SongFragment.DownloadThreadClass downloadThreadClass){this.downloadThreadClass=downloadThreadClass;}
-    public SongFragment.DownloadThreadClass getDownloadThreadClass(){return downloadThreadClass;}
+    public static final String DOWNLOADING="DOWNLOADING";
 
-    public void setView(View view){this.view=view;}
-    public View getView(){return view;}
+    public static final String ITEMS="ITEMS";
 
-    public void setSyncThreadClass(SongFragment.SyncThreadClass syncThreadClass){this.syncThreadClass=syncThreadClass;}
-    public SongFragment.SyncThreadClass getSyncThreadClass(){return syncThreadClass;}
-
-    public void setSwipeRefreshLayout(SwipeRefreshLayout swipeRefreshLayout){this.swipeRefreshLayout=swipeRefreshLayout;}
-    public SwipeRefreshLayout getSwipeRefreshLayout(){return swipeRefreshLayout;}
-
-    public void setSongAdapter(SongAdapter songAdapter){this.songAdapter=songAdapter;}
-    public SongAdapter getSongAdapter(){return songAdapter;}
-
-    public void setRecyclerView(RecyclerView recyclerView){this.recyclerView=recyclerView;}
-    public RecyclerView getRecyclerView(){return recyclerView;}
-
-    public void setDownloading(Boolean downloading){this.downloading=downloading;}
-    public Boolean getDownloading(){return downloading;}
-
-    public void setItems( List<SongItems> items){this.items=items;}
-    public  List<SongItems> getItems(){return items;}
 
 }
