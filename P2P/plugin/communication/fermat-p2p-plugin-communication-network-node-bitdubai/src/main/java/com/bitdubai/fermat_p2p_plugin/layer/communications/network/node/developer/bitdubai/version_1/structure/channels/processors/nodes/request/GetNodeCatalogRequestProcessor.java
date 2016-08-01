@@ -86,7 +86,7 @@ public class GetNodeCatalogRequestProcessor extends PackageProcessor {
 
             try {
 
-                LOG.info(FermatException.wrapException(exception).toString());
+                LOG.error(FermatException.wrapException(exception).toString());
 
                 /*
                  * Respond whit fail message
@@ -100,7 +100,7 @@ public class GetNodeCatalogRequestProcessor extends PackageProcessor {
                 session.getAsyncRemote().sendObject(packageRespond);
 
             } catch (Exception e) {
-                LOG.info(FermatException.wrapException(e).toString());
+                LOG.error(FermatException.wrapException(e).toString());
             }
         }
     }

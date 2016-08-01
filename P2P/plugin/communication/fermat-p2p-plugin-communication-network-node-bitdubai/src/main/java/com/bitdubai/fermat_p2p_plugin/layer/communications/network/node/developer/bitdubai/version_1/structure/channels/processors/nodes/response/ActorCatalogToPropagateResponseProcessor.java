@@ -117,11 +117,16 @@ public class ActorCatalogToPropagateResponseProcessor extends PackageProcessor {
 
             try {
 
-                LOG.info(FermatException.wrapException(exception).toString());
-                session.close(new CloseReason(CloseReason.CloseCodes.PROTOCOL_ERROR, "Can't process ACTOR_CATALOG_TO_PROPAGATE_RESPONSE. ||| "+ exception.getMessage()));
+                LOG.error(FermatException.wrapException(exception).toString());
+
+                if (session.isOpen()) {
+                    session.close(new CloseReason(CloseReason.CloseCodes.PROTOCOL_ERROR, "Can't process ACTOR_CATALOG_TO_PROPAGATE_RESPONSE. ||| "+ exception.getMessage()));
+                }else {
+                    LOG.error("The session already close, no try to close");
+                }
 
             } catch (Exception e) {
-                LOG.info(FermatException.wrapException(e).toString());
+                LOG.error(FermatException.wrapException(e).toString());
             }
 
         }

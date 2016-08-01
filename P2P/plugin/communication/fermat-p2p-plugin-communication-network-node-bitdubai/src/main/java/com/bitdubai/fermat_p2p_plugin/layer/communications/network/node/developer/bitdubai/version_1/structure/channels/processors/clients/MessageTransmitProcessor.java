@@ -83,6 +83,7 @@ public class MessageTransmitProcessor extends PackageProcessor {
             ActorCatalog actor = JPADaoFactory.getActorCatalogDao().findById(destinationIdentityPublicKey);
 
             if (actor.getSession() != null){
+                LOG.info("Actor session found = "+actor.getSession());
                 clientDestination = clientsSessionMemoryCache.get(actor.getClient().getId());
             }
 

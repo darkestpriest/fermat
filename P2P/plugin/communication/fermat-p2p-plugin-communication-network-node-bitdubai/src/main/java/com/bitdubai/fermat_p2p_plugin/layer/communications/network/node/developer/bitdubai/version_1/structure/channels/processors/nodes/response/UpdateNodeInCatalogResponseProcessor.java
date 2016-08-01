@@ -1,5 +1,6 @@
 package com.bitdubai.fermat_p2p_plugin.layer.communications.network.node.developer.bitdubai.version_1.structure.channels.processors.nodes.response;
 
+import com.bitdubai.fermat_api.FermatException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.Package;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.respond.MsgRespond;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.PackageType;
@@ -78,11 +79,15 @@ public class UpdateNodeInCatalogResponseProcessor extends PackageProcessor {
 
             try {
 
-                LOG.error(exception);
-                session.close(new CloseReason(CloseReason.CloseCodes.PROTOCOL_ERROR, "Can't process respond: "+ exception.getMessage()));
+                LOG.error(FermatException.wrapException(exception).toString());
+                if (session.isOpen()) {
+                    session.close(new CloseReason(CloseReason.CloseCodes.PROTOCOL_ERROR, "Can't process ACTOR_CATALOG_TO_PROPAGATE_RESPONSE. ||| "+ exception.getMessage()));
+                }else {
+                    LOG.error("The session already close, no try to close");
+                }
 
             } catch (Exception e) {
-                LOG.error(e);
+                LOG.error(FermatException.wrapException(e).toString());
             }
 
         }

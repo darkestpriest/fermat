@@ -64,8 +64,8 @@ public class ActorSessionDao extends AbstractBaseDao<ActorSession> {
 
         LOG.debug("Executing checkIn(" + session.getId() + ", " + actorProfile.getIdentityPublicKey() + ")");
 
-        LOG.info("actorProfile = "+actorProfile);
-        LOG.info("client = "+client);
+        LOG.debug("actorProfile = "+actorProfile);
+        LOG.debug("client = "+client);
 
         EntityManager connection = getConnection();
         EntityTransaction transaction = connection.getTransaction();

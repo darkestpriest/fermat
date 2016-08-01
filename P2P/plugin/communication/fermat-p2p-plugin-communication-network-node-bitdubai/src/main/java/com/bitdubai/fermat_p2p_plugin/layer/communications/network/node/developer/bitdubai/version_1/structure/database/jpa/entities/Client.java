@@ -105,7 +105,7 @@ public class Client extends AbstractBaseEntity<String>{
         this.deviceType = clientProfile.getDeviceType();
 
         if (clientProfile.getLocation() != null){
-            this.location = new GeoLocation(clientProfile.getLocation().getLatitude(), clientProfile.getLocation().getLongitude());
+            this.location = new GeoLocation(this.id, clientProfile.getLocation().getLatitude(), clientProfile.getLocation().getLongitude());
         }else {
             this.location = null;
         }
@@ -122,9 +122,14 @@ public class Client extends AbstractBaseEntity<String>{
     public Client(String id, GeoLocation location, ProfileStatus status, String deviceType) {
         super();
         this.id = id;
-        this.location = location;
         this.status = status;
         this.deviceType = deviceType;
+
+        if (location != null){
+            this.location = new GeoLocation(this.id, location.getLatitude(), location.getLongitude());
+        }else {
+            this.location = null;
+        }
     }
 
     /**

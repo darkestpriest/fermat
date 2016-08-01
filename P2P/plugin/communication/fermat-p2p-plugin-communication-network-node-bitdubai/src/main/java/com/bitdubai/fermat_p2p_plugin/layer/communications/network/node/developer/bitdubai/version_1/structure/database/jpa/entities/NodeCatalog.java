@@ -143,6 +143,7 @@ public class NodeCatalog extends AbstractBaseEntity<String>{
         this.version = 0;
         this.pendingPropagations = NodesCatalogPropagationConfiguration.DESIRED_PROPAGATIONS;
         this.triedToPropagateTimes = 0;
+        this.location = null;
     }
 
     /**
@@ -164,7 +165,7 @@ public class NodeCatalog extends AbstractBaseEntity<String>{
         this.version = 0;
 
         if (nodeProfile.getLocation() != null){
-            this.location = new GeoLocation(nodeProfile.getLocation().getLatitude(), nodeProfile.getLocation().getLongitude());
+            this.location = new GeoLocation(this.id, nodeProfile.getLocation().getLatitude(), nodeProfile.getLocation().getLongitude());
         }else {
             this.location = null;
         }

@@ -5,8 +5,6 @@ import com.bitdubai.fermat_api.layer.osa_android.location_system.Location;
 import com.bitdubai.fermat_api.layer.osa_android.location_system.LocationSource;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
@@ -15,7 +13,7 @@ import javax.validation.constraints.NotNull;
  * Created by rrequena on 24/07/16.
  */
 @Entity
-public class GeoLocation extends AbstractBaseEntity<Long> implements Location {
+public class GeoLocation extends AbstractBaseEntity<String> implements Location {
 
     /**
      * Represent the serialVersionUID
@@ -27,8 +25,7 @@ public class GeoLocation extends AbstractBaseEntity<Long> implements Location {
      */
     @Id
     @NotNull
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     /**
      * Represent the latitude
@@ -72,6 +69,7 @@ public class GeoLocation extends AbstractBaseEntity<Long> implements Location {
      * Constructor
      */
     public GeoLocation() {
+        this.id = null;
         this.latitude = 0.0;
         this.longitude = 0.0;
         this.altitude = 0.0;
@@ -86,7 +84,8 @@ public class GeoLocation extends AbstractBaseEntity<Long> implements Location {
      * @param latitude
      * @param longitude
      */
-    public GeoLocation(Double latitude, Double longitude) {
+    public GeoLocation(String idPublicKeyIdentity, Double latitude, Double longitude) {
+        this.id = idPublicKeyIdentity;
         this.latitude = latitude;
         this.longitude = longitude;
         this.altitude = 0.0;
@@ -106,7 +105,7 @@ public class GeoLocation extends AbstractBaseEntity<Long> implements Location {
      * @param time
      * @param source
      */
-    public GeoLocation(Double latitude, Double longitude, Double altitude, Long accuracy, Double altitudeAccuracy, Long time, LocationSource source) {
+    public GeoLocation(String idPublicKeyIdentity, Double latitude, Double longitude, Double altitude, Long accuracy, Double altitudeAccuracy, Long time, LocationSource source) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.altitude = altitude;
@@ -121,7 +120,7 @@ public class GeoLocation extends AbstractBaseEntity<Long> implements Location {
      * @see AbstractBaseEntity@getId()
      */
     @Override
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
@@ -130,7 +129,7 @@ public class GeoLocation extends AbstractBaseEntity<Long> implements Location {
      *
      * @param id
      */
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

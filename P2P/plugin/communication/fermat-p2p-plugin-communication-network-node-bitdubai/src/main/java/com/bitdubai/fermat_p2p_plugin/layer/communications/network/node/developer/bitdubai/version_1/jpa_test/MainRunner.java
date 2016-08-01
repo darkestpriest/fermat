@@ -101,7 +101,7 @@ public class MainRunner {
             nodeCatalog.setName("Node_" + i);
             nodeCatalog.setIp("10.1.1." + i);
             nodeCatalog.setStatus(ProfileStatus.OFFLINE);
-            nodeCatalog.setLocation(new GeoLocation((10.1 + i), (8.9 + i)));
+            nodeCatalog.setLocation(new GeoLocation(nodeCatalog.getId(), (10.1 + i), (8.9 + i)));
 
             list.add(nodeCatalog);
 
@@ -144,7 +144,7 @@ public class MainRunner {
             Client profile = new Client();
             profile.setDeviceType("device " + i);
             profile.setId(id.getPublicKey());
-            profile.setLocation(new GeoLocation((10.1 + i), (8.9 + i)));
+            profile.setLocation(new GeoLocation(profile.getId(), (10.1 + i), (8.9 + i)));
             profile.setStatus(ProfileStatus.ONLINE);
 
             clientSession = new ClientSession();
@@ -219,7 +219,7 @@ public class MainRunner {
             id = new ECCKeyPair();
             NetworkServiceProfile profile = new NetworkServiceProfile();
             profile.setIdentityPublicKey(id.getPublicKey());
-            profile.setLocation(new GeoLocation((10.1 + i), (8.9 + i)));
+            profile.setLocation(new GeoLocation(profile.getIdentityPublicKey(), (10.1 + i), (8.9 + i)));
             profile.setStatus(ProfileStatus.ONLINE);
             profile.setClientIdentityPublicKey(clientSession.getClient().getId());
             profile.setNetworkServiceType(NetworkServiceType.NEGOTIATION_TRANSMISSION);
@@ -270,7 +270,7 @@ public class MainRunner {
             id = new ECCKeyPair();
             ActorProfile profile = new ActorProfile();
             profile.setIdentityPublicKey(id.getPublicKey());
-            profile.setLocation(new GeoLocation((10.1 + i), (8.9 + i)));
+            profile.setLocation(new GeoLocation(profile.getIdentityPublicKey(), (10.1 + i), (8.9 + i)));
             profile.setStatus(ProfileStatus.UNKNOWN);
             profile.setClientIdentityPublicKey(clientSession.getClient().getId());
             profile.setNsIdentityPublicKey(networkServiceSession.getNetworkService().getId());

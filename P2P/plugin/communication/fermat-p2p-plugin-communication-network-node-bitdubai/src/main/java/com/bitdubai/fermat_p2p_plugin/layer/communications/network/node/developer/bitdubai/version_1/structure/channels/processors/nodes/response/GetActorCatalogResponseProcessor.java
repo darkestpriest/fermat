@@ -113,11 +113,17 @@ public class GetActorCatalogResponseProcessor extends PackageProcessor {
 
         } catch (Exception exception){
 
-            LOG.info(FermatException.wrapException(exception).toString());
             try {
-                session.close(new CloseReason(CloseReason.CloseCodes.PROTOCOL_ERROR, exception.getMessage()));
-            } catch (IOException e) {
-                LOG.info(FermatException.wrapException(e).toString());
+
+                LOG.error(FermatException.wrapException(exception).toString());
+                if (session.isOpen()) {
+                    session.close(new CloseReason(CloseReason.CloseCodes.PROTOCOL_ERROR, "Can't process ACTOR_CATALOG_TO_PROPAGATE_RESPONSE. ||| "+ exception.getMessage()));
+                }else {
+                    LOG.error("The session already close, no try to close");
+                }
+
+            } catch (Exception e) {
+                LOG.error(FermatException.wrapException(e).toString());
             }
         }
 
